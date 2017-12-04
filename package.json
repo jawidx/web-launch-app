@@ -1,0 +1,53 @@
+{
+	"name": "web-launch-app",
+	"version": "1.0.0",
+	"description": "launch app from web page",
+	"main": "./src/index.js",
+	"scripts": {
+		"test": "make test",
+		"watch": "webpack --watch",
+		"start": "webpack-dev-server --open",
+		"server": "node server.js",
+		"build": "rm -rf build/* && babel ./src --out-dir ./build/"
+	},
+	"keywords": [
+		"keywords"
+	],
+	"author": "jawidx",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jawidx/web-launch-app.git"
+	},
+	"bugs": {
+		"url": "https://github.com/jawidx/web-launch-app/issues"
+	},
+	"homepage": "https://github.com/jawidx/web-launch-app#readme",
+	"license": "MIT",
+	"dependencies": {
+		"detector": "^2.5.0"
+	},
+	"babel": {
+		"presets": [
+			"env",
+			"stage-1"
+		]
+	},
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-core": "^6.26.0",
+		"babel-loader": "^7.1.2",
+		"babel-preset-env": "^1.6.1",
+		"babel-preset-stage-1": "^6.24.1",
+		"clean-webpack-plugin": "^0.1.17",
+		"css-loader": "^0.28.7",
+		"express": "^4.16.2",
+		"html-loader": "^0.5.1",
+		"html-webpack-plugin": "^2.30.1",
+		"less": "^2.7.3",
+		"less-loader": "^4.0.5",
+		"style-loader": "^0.19.0",
+		"webpack": "^3.8.1",
+		"webpack-dev-middleware": "^1.12.0",
+		"webpack-dev-server": "^2.9.4"
+	}
+}
