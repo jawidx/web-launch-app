@@ -1,12 +1,11 @@
 "use strict";
-import detector from 'detector';
+const detector = require('detector');
 
 /**
  * iframe调起app
  * @param url
- * @param downloadUrl
  */
-export const iframeCall = (url) => {
+const iframeCall = (url:string) => {
     console.log('[iframeCall]', url)
     const iframe = document.createElement('iframe');
     iframe.setAttribute('src', url);
@@ -20,9 +19,8 @@ export const iframeCall = (url) => {
 /**
  * location方式调起app
  * @param url
- * @param downloadUrl
  */
-function locationCall(openUrl) {
+function locationCall(openUrl:string) {
     console.log('[locationCall]', openUrl)
     location.href = openUrl;
 }
@@ -30,15 +28,13 @@ function locationCall(openUrl) {
 /**
  * 微信调起方式
  * @param url
- * @param downloadUrl
- * @constructor
  */
-function wxCall(url, downloadUrl) {
+function wxCall(url:string) {
     console.log('[wxCall]' + url)
     window.location = url
 }
 
-class LaunchApp {
+export class LaunchApp {
     static defaultConfig = {
         scheme: {
             android: {
@@ -90,15 +86,17 @@ class LaunchApp {
         },
         // 下载页面
         downPage: 'http://ti' + 'eba.baidu.com/mo/q/activityDiversion/download',
+        // ios9使用UniversalLink
+        useUniversalLink: true,
         // 唤起失败后尝试下载
         tryDown: true,
         // 参数连接符，默认'?'
-        searchPrefix: (detector) => { return '?' },
+        searchPrefix: (detector:any) => { return '?' },
     };
     static openChannel = {
         scheme: {
-            preOpen(opt) {
-                var pageMap = {};
+            preOpen(opt:any) {
+                var pageMap:any = {};
                 if (detector.os.name === 'android') {
                     pageMap = this.configs.scheme.android;
                 } else if (detector.os.name === 'ios') {
@@ -112,23 +110,23 @@ class LaunchApp {
                 }
                 return this.getUrlFromConf(pageConf);
             },
-            open: function (url) {
+            open: function (url:string) {
                 this.setTimeEvent();
                 locationCall(url);
                 // iframeCall(url);
             }
         },
         yingyongbao: {
-            preOpen: function (opt) {
+            preOpen: function (opt:any) {
                 console.log('yingyongbao,', detector.os.name);
                 return this.getUrlFromConf(this.configs.yingyongbao);
             },
-            open: function (url) {
+            open: function (url:string) {
                 wxCall(url);
             }
         },
         univerlink: {
-            preOpen: function (opt) {
+            preOpen: function (opt:any) {
                 if (opt.url) {
                     return this.getUrlFromConf(opt);
                 }
@@ -145,7 +143,7 @@ class LaunchApp {
                 }
                 return this.getUrlFromConf(pageConf);
             },
-            open: function (url) {
+            open: function (url:string) {
                 this.setTimeEvent();
                 locationCall(url);
             }
@@ -156,8 +154,11 @@ class LaunchApp {
         SUCCESS: 1,
         UNKNOW: 2
     };
-
-    constructor(opt) {
+    private configs:any
+    private openMethod:any
+    private callback:(status:number,detector:any)=>void
+    
+    constructor(opt:any) {
         this.configs = Object.assign(LaunchApp.defaultConfig, opt);
         for (var key in this.configs) {
             if (typeof this.configs[key] === 'function') {
@@ -172,7 +173,7 @@ class LaunchApp {
         this.openMethod = this.getOpenMethod();
     }
 
-    setDefaultProperty(obj, property, defaultValue) {
+    setDefaultProperty(obj:any, property:string, defaultValue:any) {
         if (obj && !obj[property]) {
             property = defaultValue;
         }
@@ -186,7 +187,7 @@ class LaunchApp {
     getOpenMethod() {
         if (detector.os.name === 'android' && detector.browser.name === 'micromessenger') {
             return LaunchApp.openChannel.yingyongbao;
-        } else if (detector.os.name === 'ios' && detector.os.version >= 9) {
+        } else if (this.configs.useUniversalLink && detector.os.name === 'ios' && detector.os.version >= 9) {
             return LaunchApp.openChannel.univerlink;
         }
         return LaunchApp.openChannel.scheme;
@@ -197,7 +198,7 @@ class LaunchApp {
      * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{}} opt 
      * @param {*} callback 
      */
-    open(opt, callback) {
+    open(opt?: any, callback?: (status:number, detector:any) => void) {
         console.log('open,', opt);
         try {
             this.callback = callback;
@@ -238,12 +239,12 @@ class LaunchApp {
      * @param {*} param 
      * @param {*} paramMap 
      */
-    paramMapProcess(param, paramMap) {
+    paramMapProcess(param:any, paramMap:any) {
         if (!paramMap) {
             return param;
         }
 
-        var newParam = {};
+        var newParam:any = {};
         for (var k in param) {
             if (paramMap[k]) {
                 newParam[paramMap[k]] = param[k];
@@ -259,7 +260,7 @@ class LaunchApp {
      * 生成url参数
      * @param {*} obj 
      */
-    stringtifyParams(obj) {
+    stringtifyParams(obj:any) {
         if (!obj) {
             return '';
         }
@@ -283,14 +284,14 @@ class LaunchApp {
      * 生成跳转链接
      * @param {*} conf 
      */
-    getUrlFromConf(conf) {
+    getUrlFromConf(conf:any) {
         console.log('pageConf', conf);
         var paramStr = this.stringtifyParams(conf.param);
         if (conf.url) {
             // 对url进行参数处理 'tieba.baidu.com/p/{pid}'
             let url = conf.url;
             const placeholders = url.match(/\{.*?\}/g);
-            placeholders && placeholders.forEach((ph, i) => {
+            placeholders && placeholders.forEach((ph:string, i:number) => {
                 var key = ph.substring(1, ph.length - 1);
                 url = url.replace(ph, conf.param[key]);
                 delete conf.param[key];
@@ -308,8 +309,8 @@ class LaunchApp {
             (paramStr ? this.configs.searchPrefix + paramStr : '');
     }
 
-    callend(status) {
-        this.callback && this.callback({ status: status, detector: detector });
+    callend(status:number) {
+        this.callback && this.callback(status, detector );
     }
 
     setTimeEvent() {
@@ -344,5 +345,3 @@ class LaunchApp {
         }, 3000);
     }
 }
-
-export { LaunchApp };

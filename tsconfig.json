@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noImplicitAny": true,
+        "experimentalDecorators": true,
+        "preserveConstEnums": true,
+        "outDir": "lib",
+        "declaration": true,
+        // "jsx": "react",
+        "lib": [
+            "es2015.promise",
+            "es5",
+            "dom"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "examples",
+        "lib"
+    ],
+    "include": [
+        "./src/*.ts"
+    ]
+}

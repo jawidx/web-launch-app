@@ -19,14 +19,9 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: 'demo.html',
-            // template: path.resolve(dirVars.pagesDir, `./${page}/html.js`),
             template: './examples/index.html',
             title: 'Demo Title',
-            // hash: true,
-            // minify: true,
-            // xhtml: true,
         })
-        //extract-text-webpack-plugin
     ],
     module: {
         rules: [
@@ -34,9 +29,6 @@ module.exports = {
                 test: /\.(html)$/,
                 use: {
                     loader: 'html-loader',
-                    // options: {
-                    //     attrs: [':data-src']
-                    // }
                 }
             },
             {
@@ -48,12 +40,15 @@ module.exports = {
                 ]
             },
             {
-                test: /\.js$/,
+                test: /\.ts$/,
                 exclude: /node_modules/,
                 use: [
-                    'babel-loader',
+                    {
+                        loader: 'ts-loader'
+                    }
                 ]
             }
+            
             // test: /\.(png|jpg|gif)$/,
             // loader: 'url?limit=8192&name=./static/img/[hash].[ext]',
         ]

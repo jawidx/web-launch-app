@@ -1,4 +1,4 @@
-import { LaunchApp } from '../src/index.js';
+import { LaunchApp } from '../lib/index.js';
 import './index.less';
 
 function addHandler(element, type, handler) {
@@ -11,7 +11,7 @@ function addHandler(element, type, handler) {
         element["on" + type] = handler;
     }
 }
-const tipEle = document.getElementById('tip');
+const tipEle = document.getElementsByClassName('tip')[0];
 console.log = function addHandler(key, info) {
     tipEle.innerHTML = tipEle.innerHTML + '<br/>' + key + (info ? JSON.stringify(info) : '');
 }

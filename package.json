@@ -4,11 +4,8 @@
 	"description": "launch app from web page",
 	"main": "./src/index.js",
 	"scripts": {
-		"test": "make test",
-		"watch": "webpack --watch",
-		"start": "webpack-dev-server --open",
-		"server": "node server.js",
-		"build": "rm -rf build/* && babel ./src --out-dir ./build/"
+		"start": "node server.js",
+		"build": "rm -rf lib/* && tsc"
 	},
 	"keywords": [
 		"keywords"
@@ -46,6 +43,7 @@
 		"less": "^2.7.3",
 		"less-loader": "^4.0.5",
 		"style-loader": "^0.19.0",
+		"ts-loader": "^3.2.0",
 		"webpack": "^3.8.1",
 		"webpack-dev-middleware": "^1.12.0",
 		"webpack-dev-server": "^2.9.4"
