@@ -185,7 +185,8 @@ export class LaunchApp {
     }
 
     getOpenMethod() {
-        if (detector.os.name === 'android' && detector.browser.name === 'micromessenger') {
+        if ((detector.os.name === 'android' || !this.configs.useUniversalLink) 
+            && detector.browser.name === 'micromessenger') {
             return LaunchApp.openChannel.yingyongbao;
         } else if (this.configs.useUniversalLink && detector.os.name === 'ios' && detector.os.version >= 9) {
             return LaunchApp.openChannel.univerlink;

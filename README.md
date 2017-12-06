@@ -98,6 +98,8 @@ const lanchApp = new LaunchApp({
             default: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
         }
     },
+    // use UniversalLink for ios9+(default:true)
+    useUniversalLink: true,
     // download package when call failed(default:true)
     tryDown: true,
     // download page url（boot the user to download or download installation packages directly）,jump to download page when it cant't find a corresponding configuration or get a error
