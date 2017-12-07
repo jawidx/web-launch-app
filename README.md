@@ -13,6 +13,7 @@ lanchApp.open({
     param: {}
 }, (status, detector) => {
     console.log('callback,', status, detector);
+    return true;
 });
 // lanchApp.down();
 ```
@@ -70,7 +71,8 @@ const lanchApp = new LaunchApp({
             }
         },
         frs: {
-            url: 'https://tieba.baidu.com/f',
+            // support placeholder
+            url: 'https://tieba.baidu.com/p/{kw}',
             param: {
             },
             paramMap: {
@@ -116,7 +118,12 @@ lanchApp.open({
     }
 }, (status, detector) => {
     // status(0:failed，1:success，2:unknow)
-    // detector(https://github.com/hotoo/detector)
+    // detector()
     console.log('callback,', status, detector);
+    // true: will down package when open failed or unknow
+    return true;
 });
 ```
+
+## Dependency
+- [detector](https://github.com/hotoo/detector)

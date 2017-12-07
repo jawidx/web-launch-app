@@ -70,17 +70,23 @@ export declare class LaunchApp {
     private openMethod;
     private callback;
     constructor(opt: any);
+    /**
+     *  设置默认值
+     * @param obj 
+     * @param property
+     * @param defaultValue
+     */
     setDefaultProperty(obj: any, property: string, defaultValue: any): void;
     getOpenMethod(): {
         preOpen(opt: any): any;
         open: (url: string) => void;
     };
     /**
-     *
+     * 唤起
      * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{}} opt
      * @param {*} callback
      */
-    open(opt?: any, callback?: (status: number, detector: any) => void): void;
+    open(opt?: any, callback?: (status: number, detector: any) => boolean): void;
     down(): void;
     /**
      * 参数映射（用于处理android与ios参数名不一至问题）
@@ -98,6 +104,9 @@ export declare class LaunchApp {
      * @param {*} conf
      */
     getUrlFromConf(conf: any): string;
-    callend(status: number): void;
+    callend(status: number): boolean;
+    /**
+     * 判断是否打开成功
+     */
     setTimeEvent(): void;
 }

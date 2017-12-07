@@ -131,6 +131,7 @@ const tiebaConfig = {
             qqfriend: '',
         }
     },
+    // useUniversalLink:false,
     downPage: 'http://ti' + 'eba.baidu.com/mo/q/activityDiversion/download',
     searchPrefix: (detector) => {
         if (detector.os.name == 'android') {
@@ -158,6 +159,7 @@ addHandler(linkIndex, 'click', function () {
         param: {}
     }, (status, detector) => {
         console.log('callback,', status, detector);
+        return true;
     });
 });
 addHandler(linkFrs, 'click', function () {

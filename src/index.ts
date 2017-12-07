@@ -6,7 +6,6 @@ const detector = require('detector');
  * @param url
  */
 const iframeCall = (url:string) => {
-    console.log('[iframeCall]', url)
     const iframe = document.createElement('iframe');
     iframe.setAttribute('src', url);
     iframe.setAttribute('style', 'display:none');
@@ -21,17 +20,7 @@ const iframeCall = (url:string) => {
  * @param url
  */
 function locationCall(openUrl:string) {
-    console.log('[locationCall]', openUrl)
     location.href = openUrl;
-}
-
-/**
- * 微信调起方式
- * @param url
- */
-function wxCall(url:string) {
-    console.log('[wxCall]' + url)
-    window.location = url
 }
 
 export class LaunchApp {
@@ -102,7 +91,6 @@ export class LaunchApp {
                 } else if (detector.os.name === 'ios') {
                     pageMap = this.configs.scheme.ios;
                 }
-                console.log('scheme,', pageMap, opt);
                 var pageConf = pageMap[opt.page] || pageMap['index'];
                 pageConf = Object.assign({}, pageConf, opt);
                 if (pageConf.paramMap) {
@@ -112,17 +100,15 @@ export class LaunchApp {
             },
             open: function (url:string) {
                 this.setTimeEvent();
-                locationCall(url);
-                // iframeCall(url);
+                iframeCall(url);
             }
         },
         yingyongbao: {
             preOpen: function (opt:any) {
-                console.log('yingyongbao,', detector.os.name);
                 return this.getUrlFromConf(this.configs.yingyongbao);
             },
             open: function (url:string) {
-                wxCall(url);
+                locationCall(url);
             }
         },
         univerlink: {
@@ -134,7 +120,6 @@ export class LaunchApp {
                 const pageMap = this.configs.univerlink;
                 let pageConf = pageMap[opt.page] || pageMap['index'];
                 pageConf = Object.assign({}, pageConf, opt);
-                console.log('univerlink,', pageConf);
                 if (pageConf.paramMap) {
                     pageConf.param = this.paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
@@ -156,7 +141,7 @@ export class LaunchApp {
     };
     private configs:any
     private openMethod:any
-    private callback:(status:number,detector:any)=>void
+    private callback:(status:number,detector:any)=>boolean
     
     constructor(opt:any) {
         this.configs = Object.assign(LaunchApp.defaultConfig, opt);
@@ -173,6 +158,12 @@ export class LaunchApp {
         this.openMethod = this.getOpenMethod();
     }
 
+    /**
+     *  设置默认值
+     * @param obj 
+     * @param property 
+     * @param defaultValue 
+     */
     setDefaultProperty(obj:any, property:string, defaultValue:any) {
         if (obj && !obj[property]) {
             property = defaultValue;
@@ -195,12 +186,11 @@ export class LaunchApp {
     }
 
     /**
-     * 
+     * 唤起
      * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{}} opt 
      * @param {*} callback 
      */
-    open(opt?: any, callback?: (status:number, detector:any) => void) {
-        console.log('open,', opt);
+    open(opt?: any, callback?: (status:number, detector:any) => boolean) {
         try {
             this.callback = callback;
             // let newOpt = { page: opt.page || 'index', url: opt.url, param: opt.param }
@@ -220,19 +210,14 @@ export class LaunchApp {
         let pkgUrl;
         if (detector.browser.name == 'micromessenger' || detector.browser.name == 'qq') {
             pkgUrl = this.configs.pkgs.yingyongbao[detector.browser.name];
-            console.log('1111', pkgUrl || this.configs.pkgs.yingyongbao['default']);
-            wxCall(pkgUrl || this.configs.pkgs.yingyongbao['default']);
+            locationCall(pkgUrl || this.configs.pkgs.yingyongbao['default']);
         } else if (detector.os.name === 'android') {
             pkgUrl = this.configs.pkgs.androidApk[detector.browser.name];
-            console.log('2222', pkgUrl || this.configs.pkgs.androidApk['default']);
-            iframeCall(pkgUrl || this.configs.pkgs.androidApk['default']);
+            locationCall(pkgUrl || this.configs.pkgs.androidApk['default']);
         } else if (detector.os.name === 'ios') {
             pkgUrl = this.configs.pkgs.appstore[detector.browser.name];
-            console.log('3333', pkgUrl || this.configs.pkgs.appstore['default']);
-            iframeCall(pkgUrl || this.configs.pkgs.appstore['default']);
+            locationCall(pkgUrl || this.configs.pkgs.appstore['default']);
         }
-        // location.href = 'http://ti' + 'eba.baidu.com/mo/q/activityDiversion/download';
-        // location.href = this.configs.downPage;
     }
 
     /**
@@ -286,7 +271,6 @@ export class LaunchApp {
      * @param {*} conf 
      */
     getUrlFromConf(conf:any) {
-        console.log('pageConf', conf);
         var paramStr = this.stringtifyParams(conf.param);
         if (conf.url) {
             // 对url进行参数处理 'tieba.baidu.com/p/{pid}'
@@ -310,10 +294,13 @@ export class LaunchApp {
             (paramStr ? this.configs.searchPrefix + paramStr : '');
     }
 
-    callend(status:number) {
-        this.callback && this.callback(status, detector );
+    callend(status:number):boolean {
+        return this.callback && this.callback(status, detector );
     }
 
+    /**
+     * 判断是否打开成功
+     */
     setTimeEvent() {
         let self = this, haveChange = false;
         const change = function () {
@@ -321,8 +308,8 @@ export class LaunchApp {
             if (document.hidden) {
                 self.callend(LaunchApp.openStatus.SUCCESS);
             } else {
-                self.callend(LaunchApp.openStatus.UNKNOW);
-                self.configs.tryDown && self.down();
+                let backResult = self.callend(LaunchApp.openStatus.UNKNOW);
+                backResult  && self.down();
             }
             document.removeEventListener('visibilitychange', change);
         };
@@ -332,17 +319,17 @@ export class LaunchApp {
             if (haveChange) {
                 return;
             }
-            console.log('setTimeout');
             document.removeEventListener('visibilitychange', change);
+            let backResult = true;
             if (!document.hidden && !haveChange) {
-                self.callend(LaunchApp.openStatus.FAILED);
-                return;
+                backResult = self.callend(LaunchApp.openStatus.FAILED);
+                // return;
             } else {
-                self.callend(LaunchApp.openStatus.UNKNOW);
+                backResult = self.callend(LaunchApp.openStatus.UNKNOW);
             }
             haveChange = true;
             // 导致返回本页后又跳转下载页
-            self.configs.tryDown && self.down();
+            backResult && self.down();
         }, 3000);
     }
 }
