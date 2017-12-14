@@ -13,7 +13,7 @@ function addHandler(element, type, handler) {
 }
 const tipEle = document.getElementsByClassName('tip')[0];
 console.log = function addHandler(key, info) {
-    tipEle.innerHTML = tipEle.innerHTML + '<br/>' + key + (info ? JSON.stringify(info) : '');
+    tipEle.innerHTML = tipEle.innerHTML + '<br/>' + key + ',' + (info ? JSON.stringify(info) : '');
 }
 
 const tiebaConfig = {
@@ -131,7 +131,7 @@ const tiebaConfig = {
             qqfriend: '',
         }
     },
-    // useUniversalLink:false,
+    useUniversalLink: false,
     downPage: 'http://ti' + 'eba.baidu.com/mo/q/activityDiversion/download',
     searchPrefix: (detector) => {
         if (detector.os.name == 'android') {
@@ -159,51 +159,39 @@ addHandler(linkIndex, 'click', function () {
         param: {}
     }, (status, detector) => {
         console.log('callback,', status, detector);
-        return true;
+        return false;
     });
 });
 addHandler(linkFrs, 'click', function () {
     tbCallApp.open({
         page: 'frs',
         param: { forumName: 'jawidx' }
-    }, (status, detector) => {
-        console.log('callback,', status, detector);
     });
 });
 addHandler(linkPb, 'click', function () {
     tbCallApp.open({
         page: 'pb',
         param: { threadId: 5444301754 }
-    }, (status, detector) => {
-        console.log('callback,', status, detector);
     });
 });
 addHandler(linkUsercenter, 'click', function () {
     tbCallApp.open({
         page: 'usercenter',
         param: { uid: 85000367 }
-    }, (status, detector) => {
-        console.log('callback,', status, detector);
     });
 });
 addHandler(linkVideosquare, 'click', function () {
     tbCallApp.open({
         page: 'videosquare',
-    }, (status, detector) => {
-        console.log('callback,', status, detector);
     });
 });
 addHandler(linkTbwebview, 'click', function () {
     tbCallApp.open({
         page: 'webview',
-    }, (status, detector) => {
-        console.log('callback,', status, detector);
     });
 });
 addHandler(linkEmotioncenter, 'click', function () {
     tbCallApp.open({
         page: 'emotioncenter',
-    }, (status, detector) => {
-        console.log('callback,', status, detector);
     });
 });
