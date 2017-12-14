@@ -2,10 +2,10 @@
 const detector = require('detector');
 
 /**
- * iframe调起app
+ * iframe call
  * @param url
  */
-const iframeCall = (url:string) => {
+const iframeCall = (url: string) => {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('src', url);
     iframe.setAttribute('style', 'display:none');
@@ -16,11 +16,11 @@ const iframeCall = (url:string) => {
 }
 
 /**
- * location方式调起app
+ * location call
  * @param url
  */
-function locationCall(openUrl:string) {
-    location.href = openUrl;
+function locationCall(url: string) {
+    location.href = url;
 }
 
 export class LaunchApp {
@@ -60,7 +60,7 @@ export class LaunchApp {
                 pkgname: ''
             }
         },
-        // 配置不同环境的安装包
+        // config package for different browser
         pkgs: {
             yingyongbao: {
                 default: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
@@ -73,53 +73,58 @@ export class LaunchApp {
                 default: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
             }
         },
-        // 下载页面
+        // download page url（boot the user to download or download installation packages directly）
+        // jump to download page when it cant't find a corresponding configuration or get a error
         downPage: 'http://ti' + 'eba.baidu.com/mo/q/activityDiversion/download',
-        // ios9使用UniversalLink
+        // use UniversalLink for ios9+(default:true)
         useUniversalLink: true,
-        // 唤起失败后尝试下载
-        tryDown: true,
-        // 参数连接符，默认'?'
-        searchPrefix: (detector:any) => { return '?' },
+        // the parameter prefix(default is question mark, you can define something else)
+        searchPrefix: (detector: any) => { return '?' },
+        // download after attempting to adjust timeout
+        timeout: 2000
     };
     static openChannel = {
         scheme: {
-            preOpen(opt:any) {
-                var pageMap:any = {};
+            preOpen(opt: any) {
+                var pageMap: any = {};
                 if (detector.os.name === 'android') {
                     pageMap = this.configs.scheme.android;
                 } else if (detector.os.name === 'ios') {
                     pageMap = this.configs.scheme.ios;
                 }
                 var pageConf = pageMap[opt.page] || pageMap['index'];
-                pageConf = Object.assign({}, pageConf, opt);
+                pageConf = (<any>Object).assign({}, pageConf, opt);
                 if (pageConf.paramMap) {
                     pageConf.param = this.paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
                 return this.getUrlFromConf(pageConf);
             },
-            open: function (url:string) {
+            open: function (url: string) {
                 this.setTimeEvent();
-                iframeCall(url);
+                if (detector.os.name === 'ios' && detector.browser.name == 'safari') {
+                    locationCall(url);
+                } else {
+                    iframeCall(url);
+                }
             }
         },
         yingyongbao: {
-            preOpen: function (opt:any) {
+            preOpen: function (opt: any) {
                 return this.getUrlFromConf(this.configs.yingyongbao);
             },
-            open: function (url:string) {
+            open: function (url: string) {
                 locationCall(url);
             }
         },
         univerlink: {
-            preOpen: function (opt:any) {
+            preOpen: function (opt: any) {
                 if (opt.url) {
                     return this.getUrlFromConf(opt);
                 }
 
                 const pageMap = this.configs.univerlink;
                 let pageConf = pageMap[opt.page] || pageMap['index'];
-                pageConf = Object.assign({}, pageConf, opt);
+                pageConf = (<any>Object).assign({}, pageConf, opt);
                 if (pageConf.paramMap) {
                     pageConf.param = this.paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
@@ -128,7 +133,7 @@ export class LaunchApp {
                 }
                 return this.getUrlFromConf(pageConf);
             },
-            open: function (url:string) {
+            open: function (url: string) {
                 this.setTimeEvent();
                 locationCall(url);
             }
@@ -139,12 +144,12 @@ export class LaunchApp {
         SUCCESS: 1,
         UNKNOW: 2
     };
-    private configs:any
-    private openMethod:any
-    private callback:(status:number,detector:any)=>boolean
-    
-    constructor(opt:any) {
-        this.configs = Object.assign(LaunchApp.defaultConfig, opt);
+    private configs: any
+    private openMethod: any
+    private callback: (status: number, detector: any) => boolean
+
+    constructor(opt: any) {
+        this.configs = (<any>Object).assign(LaunchApp.defaultConfig, opt);
         for (var key in this.configs) {
             if (typeof this.configs[key] === 'function') {
                 this.configs[key] = this.configs[key](detector);
@@ -159,12 +164,12 @@ export class LaunchApp {
     }
 
     /**
-     *  设置默认值
+     * set default config
      * @param obj 
      * @param property 
      * @param defaultValue 
      */
-    setDefaultProperty(obj:any, property:string, defaultValue:any) {
+    setDefaultProperty(obj: any, property: string, defaultValue: any) {
         if (obj && !obj[property]) {
             property = defaultValue;
         }
@@ -176,7 +181,7 @@ export class LaunchApp {
     }
 
     getOpenMethod() {
-        if ((detector.os.name === 'android' || !this.configs.useUniversalLink) 
+        if ((detector.os.name === 'android' || !this.configs.useUniversalLink)
             && detector.browser.name === 'micromessenger') {
             return LaunchApp.openChannel.yingyongbao;
         } else if (this.configs.useUniversalLink && detector.os.name === 'ios' && detector.os.version >= 9) {
@@ -186,14 +191,13 @@ export class LaunchApp {
     }
 
     /**
-     * 唤起
+     * launch app
      * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{}} opt 
      * @param {*} callback 
      */
-    open(opt?: any, callback?: (status:number, detector:any) => boolean) {
+    open(opt?: any, callback?: (status: number, detector: any) => boolean) {
         try {
             this.callback = callback;
-            // let newOpt = { page: opt.page || 'index', url: opt.url, param: opt.param }
             const openUrl = this.openMethod
                 && this.openMethod.preOpen
                 && this.openMethod.preOpen.call(this, opt || {});
@@ -206,6 +210,9 @@ export class LaunchApp {
         }
     }
 
+    /**
+     * down package
+     */
     down() {
         let pkgUrl;
         if (detector.browser.name == 'micromessenger' || detector.browser.name == 'qq') {
@@ -221,16 +228,16 @@ export class LaunchApp {
     }
 
     /**
-     * 参数映射（用于处理android与ios参数名不一至问题）
+     * map param（for different platform use different names）
      * @param {*} param 
      * @param {*} paramMap 
      */
-    paramMapProcess(param:any, paramMap:any) {
+    paramMapProcess(param: any, paramMap: any) {
         if (!paramMap) {
             return param;
         }
 
-        var newParam:any = {};
+        var newParam: any = {};
         for (var k in param) {
             if (paramMap[k]) {
                 newParam[paramMap[k]] = param[k];
@@ -243,10 +250,10 @@ export class LaunchApp {
     }
 
     /**
-     * 生成url参数
+     * generating URL parameters
      * @param {*} obj 
      */
-    stringtifyParams(obj:any) {
+    stringtifyParams(obj: any) {
         if (!obj) {
             return '';
         }
@@ -267,16 +274,16 @@ export class LaunchApp {
     }
 
     /**
-     * 生成跳转链接
+     * generating URL
      * @param {*} conf 
      */
-    getUrlFromConf(conf:any) {
+    getUrlFromConf(conf: any) {
         var paramStr = this.stringtifyParams(conf.param);
         if (conf.url) {
             // 对url进行参数处理 'tieba.baidu.com/p/{pid}'
             let url = conf.url;
             const placeholders = url.match(/\{.*?\}/g);
-            placeholders && placeholders.forEach((ph:string, i:number) => {
+            placeholders && placeholders.forEach((ph: string, i: number) => {
                 var key = ph.substring(1, ph.length - 1);
                 url = url.replace(ph, conf.param[key]);
                 delete conf.param[key];
@@ -294,12 +301,12 @@ export class LaunchApp {
             (paramStr ? this.configs.searchPrefix + paramStr : '');
     }
 
-    callend(status:number):boolean {
-        return this.callback && this.callback(status, detector );
+    callend(status: number): boolean {
+        return this.callback && this.callback(status, detector);
     }
 
     /**
-     * 判断是否打开成功
+     * determine whether or not open successfully
      */
     setTimeEvent() {
         let self = this, haveChange = false;
@@ -309,7 +316,7 @@ export class LaunchApp {
                 self.callend(LaunchApp.openStatus.SUCCESS);
             } else {
                 let backResult = self.callend(LaunchApp.openStatus.UNKNOW);
-                backResult  && self.down();
+                backResult && self.down();
             }
             document.removeEventListener('visibilitychange', change);
         };
@@ -323,13 +330,11 @@ export class LaunchApp {
             let backResult = true;
             if (!document.hidden && !haveChange) {
                 backResult = self.callend(LaunchApp.openStatus.FAILED);
-                // return;
             } else {
                 backResult = self.callend(LaunchApp.openStatus.UNKNOW);
             }
             haveChange = true;
-            // 导致返回本页后又跳转下载页
             backResult && self.down();
-        }, 3000);
+        }, this.configs.timeout);
     }
 }

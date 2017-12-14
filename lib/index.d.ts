@@ -44,8 +44,8 @@ export declare class LaunchApp {
         };
         downPage: string;
         useUniversalLink: boolean;
-        tryDown: boolean;
         searchPrefix: (detector: any) => string;
+        timeout: number;
     };
     static openChannel: {
         scheme: {
@@ -71,7 +71,7 @@ export declare class LaunchApp {
     private callback;
     constructor(opt: any);
     /**
-     *  设置默认值
+     * set default config
      * @param obj 
      * @param property
      * @param defaultValue
@@ -82,31 +82,34 @@ export declare class LaunchApp {
         open: (url: string) => void;
     };
     /**
-     * 唤起
+     * launch app
      * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{}} opt
      * @param {*} callback
      */
     open(opt?: any, callback?: (status: number, detector: any) => boolean): void;
+    /**
+     * down package
+     */
     down(): void;
     /**
-     * 参数映射（用于处理android与ios参数名不一至问题）
+     * map param（for different platform use different names）
      * @param {*} param
      * @param {*} paramMap
      */
     paramMapProcess(param: any, paramMap: any): any;
     /**
-     * 生成url参数
+     * generating URL parameters
      * @param {*} obj
      */
     stringtifyParams(obj: any): string;
     /**
-     * 生成跳转链接
+     * generating URL
      * @param {*} conf
      */
     getUrlFromConf(conf: any): string;
     callend(status: number): boolean;
     /**
-     * 判断是否打开成功
+     * determine whether or not open successfully
      */
     setTimeEvent(): void;
 }

@@ -102,8 +102,6 @@ const lanchApp = new LaunchApp({
     },
     // use UniversalLink for ios9+(default:true)
     useUniversalLink: true,
-    // download package when call failed(default:true)
-    tryDown: true,
     // download page url（boot the user to download or download installation packages directly）,jump to download page when it cant't find a corresponding configuration or get a error
     downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
     // the parameter prefix(default is question mark, you can define something else)
