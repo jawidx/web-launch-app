@@ -1,6 +1,6 @@
 {
 	"name": "web-launch-app",
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"description": "launch app from web page",
 	"main": "./lib/index.js",
 	"scripts": {
@@ -21,19 +21,15 @@
 	"homepage": "https://github.com/jawidx/web-launch-app#readme",
 	"license": "MIT",
 	"dependencies": {
+		"babel-polyfill": "^6.26.0",
 		"detector": "^2.5.0"
-	},
-	"babel": {
-		"presets": [
-			"env",
-			"stage-1"
-		]
 	},
 	"devDependencies": {
 		"babel-cli": "^6.26.0",
 		"babel-core": "^6.26.0",
 		"babel-loader": "^7.1.2",
 		"babel-preset-env": "^1.6.1",
+		"babel-preset-es2015": "^6.24.1",
 		"babel-preset-stage-1": "^6.24.1",
 		"clean-webpack-plugin": "^0.1.17",
 		"css-loader": "^0.28.7",

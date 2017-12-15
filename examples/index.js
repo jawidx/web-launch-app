@@ -150,9 +150,9 @@ const linkVideosquare = document.getElementsByClassName('j_videosquare')[0];
 const linkTbwebview = document.getElementsByClassName('j_tbwebview')[0];
 const linkEmotioncenter = document.getElementsByClassName('j_emotioncenter')[0];
 
-addHandler(linkDefault, 'click', function () {
-    tbCallApp.open();
-});
+// addHandler(linkDefault, 'click', function () {
+//     tbCallApp.open();
+// });
 addHandler(linkIndex, 'click', function () {
     tbCallApp.open({
         page: 'index',
@@ -193,5 +193,93 @@ addHandler(linkTbwebview, 'click', function () {
 addHandler(linkEmotioncenter, 'click', function () {
     tbCallApp.open({
         page: 'emotioncenter',
+    });
+});
+
+
+const naniConfig = {
+    scheme: {
+        android: {
+            index: {
+                protocol: 'com.baidu.nani',
+                path: 'index',
+            },
+            video: {
+                protocol: 'com.baidu.nani',
+                path: 'video',
+                param: {},
+                paramMap: {
+                }
+            },
+            usercenter: {
+                protocol: 'com.baidu.nani',
+                path: 'usercenter',
+                paramMap: {
+                }
+            },
+            activity: {
+                protocol: 'com.baidu.nani',
+                path: 'activity',
+                paramMap: {
+                }
+            },
+        },
+        ios: {
+            index: {
+                protocol: 'com.baidu.nani',
+                path: 'index',
+            },
+            video: {
+                protocol: 'com.baidu.nani',
+                path: 'video',
+                param: {},
+                paramMap: {
+                }
+            },
+            usercenter: {
+                protocol: 'com.baidu.nani',
+                path: 'usercenter',
+                paramMap: {
+                }
+            },
+            activity: {
+                protocol: 'com.baidu.nani',
+                path: 'activity',
+                paramMap: {
+                }
+            },
+        }
+    },
+    yingyongbao: {
+        url: 'http://a.app.qq.com/o/simple.jsp',
+        param: {
+            pkgname: 'com.baidu.nani'
+        }
+    },
+    pkgs: {
+        androidApk: {
+            default: 'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk',
+            qqfriend: '',
+        },
+        appstore: {
+            default: 'https://itunes.apple.com/cn/app/id1322948417?mt=8',
+            qqfriend: '',
+        },
+        yingyongbao: {
+            default: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
+            qqfriend: '',
+        }
+    },
+    useUniversalLink: false,
+    downPage: 'http://nani.baidu.com/',
+    timeout: 2000,
+};
+const lanchInstance = new LaunchApp(naniConfig);
+addHandler(linkDefault, 'click', function () {
+    lanchInstance.open({
+        page:  'index',
+        param: {}
+    }, (s, d) => {
+        alert(s)
     });
 });

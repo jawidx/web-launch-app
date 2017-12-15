@@ -1,5 +1,5 @@
-"use strict";
 const detector = require('detector');
+require("babel-polyfill");
 
 /**
  * iframe call
@@ -86,13 +86,13 @@ export class LaunchApp {
     static openChannel = {
         scheme: {
             preOpen(opt: any) {
-                var pageMap: any = {};
+                let pageMap: any = {};
                 if (detector.os.name === 'android') {
                     pageMap = this.configs.scheme.android;
                 } else if (detector.os.name === 'ios') {
                     pageMap = this.configs.scheme.ios;
                 }
-                var pageConf = pageMap[opt.page] || pageMap['index'];
+                let pageConf = pageMap[opt.page] || pageMap['index'];
                 pageConf = (<any>Object).assign({}, pageConf, opt);
                 if (pageConf.paramMap) {
                     pageConf.param = this.paramMapProcess(pageConf.param, pageConf.paramMap);
@@ -150,7 +150,7 @@ export class LaunchApp {
 
     constructor(opt: any) {
         this.configs = (<any>Object).assign(LaunchApp.defaultConfig, opt);
-        for (var key in this.configs) {
+        for (let key in this.configs) {
             if (typeof this.configs[key] === 'function') {
                 this.configs[key] = this.configs[key](detector);
             }
@@ -237,8 +237,8 @@ export class LaunchApp {
             return param;
         }
 
-        var newParam: any = {};
-        for (var k in param) {
+        let newParam: any = {};
+        for (let k in param) {
             if (paramMap[k]) {
                 newParam[paramMap[k]] = param[k];
             } else {
@@ -258,9 +258,9 @@ export class LaunchApp {
             return '';
         }
 
-        var s = '';
-        var otherObj = {};
-        for (var k in obj) {
+        let s = '';
+        let otherObj = {};
+        for (let k in obj) {
             if (!obj.hasOwnProperty(k)) {
                 continue;
             }
@@ -278,13 +278,13 @@ export class LaunchApp {
      * @param {*} conf 
      */
     getUrlFromConf(conf: any) {
-        var paramStr = this.stringtifyParams(conf.param);
+        let paramStr = this.stringtifyParams(conf.param);
         if (conf.url) {
             // 对url进行参数处理 'tieba.baidu.com/p/{pid}'
             let url = conf.url;
             const placeholders = url.match(/\{.*?\}/g);
             placeholders && placeholders.forEach((ph: string, i: number) => {
-                var key = ph.substring(1, ph.length - 1);
+                const key = ph.substring(1, ph.length - 1);
                 url = url.replace(ph, conf.param[key]);
                 delete conf.param[key];
             })
@@ -309,20 +309,21 @@ export class LaunchApp {
      * determine whether or not open successfully
      */
     setTimeEvent() {
-        let self = this, haveChange = false;
+        const self = this;
+        let haveChange = false;
         const change = function () {
             haveChange = true;
             if (document.hidden) {
                 self.callend(LaunchApp.openStatus.SUCCESS);
             } else {
-                let backResult = self.callend(LaunchApp.openStatus.UNKNOW);
+                const backResult = self.callend(LaunchApp.openStatus.UNKNOW);
                 backResult && self.down();
             }
             document.removeEventListener('visibilitychange', change);
         };
         document.addEventListener("visibilitychange", change, false);
 
-        let timer = setTimeout(function () {
+        const timer = setTimeout(function () {
             if (haveChange) {
                 return;
             }
