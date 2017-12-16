@@ -1,3 +1,4 @@
+import 'core-js/fn/object/assign';
 export declare class LaunchApp {
     static defaultConfig: {
         scheme: {

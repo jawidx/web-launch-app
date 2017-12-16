@@ -1,5 +1,5 @@
 const detector = require('detector');
-require("babel-polyfill");
+import 'core-js/fn/object/assign'
 
 /**
  * iframe call

@@ -21,16 +21,10 @@
 	"homepage": "https://github.com/jawidx/web-launch-app#readme",
 	"license": "MIT",
 	"dependencies": {
-		"babel-polyfill": "^6.26.0",
+		"core-js": "^2.5.3",
 		"detector": "^2.5.0"
 	},
 	"devDependencies": {
-		"babel-cli": "^6.26.0",
-		"babel-core": "^6.26.0",
-		"babel-loader": "^7.1.2",
-		"babel-preset-env": "^1.6.1",
-		"babel-preset-es2015": "^6.24.1",
-		"babel-preset-stage-1": "^6.24.1",
 		"clean-webpack-plugin": "^0.1.17",
 		"css-loader": "^0.28.7",
 		"express": "^4.16.2",

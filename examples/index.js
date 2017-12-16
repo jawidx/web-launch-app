@@ -159,13 +159,16 @@ addHandler(linkIndex, 'click', function () {
         param: {}
     }, (status, detector) => {
         console.log('callback,', status, detector);
-        return false;
+        return true;
     });
 });
 addHandler(linkFrs, 'click', function () {
     tbCallApp.open({
         page: 'frs',
         param: { forumName: 'jawidx' }
+    }, (status, detector) => {
+        console.log('callback,', status, detector);
+        return false;
     });
 });
 addHandler(linkPb, 'click', function () {

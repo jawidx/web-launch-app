@@ -48,22 +48,6 @@ module.exports = {
                     }
                 ]
             }
-            , {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: [
-                    {
-                        loader: 'babel-loader',
-                        options: {
-                            cacheDirectory: true,
-                            presets: [
-                                "es2015",
-                            ]
-                        }
-                    }
-                ]
-            }
-
             // test: /\.(png|jpg|gif)$/,
             // loader: 'url?limit=8192&name=./static/img/[hash].[ext]',
         ]
