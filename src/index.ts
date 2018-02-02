@@ -134,7 +134,6 @@ export class LaunchApp {
                 return this.getUrlFromConf(pageConf);
             },
             open: function (url: string) {
-                this.setTimeEvent();
                 locationCall(url);
             }
         }
