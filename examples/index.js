@@ -156,7 +156,10 @@ const linkEmotioncenter = document.getElementsByClassName('j_emotioncenter')[0];
 addHandler(linkIndex, 'click', function () {
     tbCallApp.open({
         page: 'index',
-        param: {}
+        param: {},
+        pkgs:{
+            android:'https://nani.baidu.com/apple-app-site-association'
+        }
     }, (status, detector) => {
         console.log('callback,', status, detector);
         return true;

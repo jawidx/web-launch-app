@@ -75,7 +75,7 @@ export class LaunchApp {
         },
         // download page url（boot the user to download or download installation packages directly）
         // jump to download page when it cant't find a corresponding configuration or get a error
-        downPage: 'http://ti' + 'eba.baidu.com/mo/q/activityDiversion/download',
+        downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
         // use UniversalLink for ios9+(default:true)
         useUniversalLink: true,
         // the parameter prefix(default is question mark, you can define something else)
@@ -145,6 +145,7 @@ export class LaunchApp {
     };
     private configs: any
     private openMethod: any
+    private options: any
     private callback: (status: number, detector: any) => boolean
 
     constructor(opt: any) {
@@ -191,11 +192,12 @@ export class LaunchApp {
 
     /**
      * launch app
-     * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{}} opt 
+     * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{},pkgs:{ios:'',android:''}} opt 
      * @param {*} callback 
      */
     open(opt?: any, callback?: (status: number, detector: any) => boolean) {
         try {
+            this.options = opt;
             this.callback = callback;
             const openUrl = this.openMethod
                 && this.openMethod.preOpen
@@ -218,10 +220,18 @@ export class LaunchApp {
             pkgUrl = this.configs.pkgs.yingyongbao[detector.browser.name];
             locationCall(pkgUrl || this.configs.pkgs.yingyongbao['default']);
         } else if (detector.os.name === 'android') {
-            pkgUrl = this.configs.pkgs.androidApk[detector.browser.name];
+            if (this.options.pkgs && this.options.pkgs.android) {
+                pkgUrl = this.options.pkgs.android;
+            } else {
+                pkgUrl = this.configs.pkgs.androidApk[detector.browser.name];
+            }
             locationCall(pkgUrl || this.configs.pkgs.androidApk['default']);
         } else if (detector.os.name === 'ios') {
-            pkgUrl = this.configs.pkgs.appstore[detector.browser.name];
+            if (this.options.pkgs && this.options.pkgs.android) {
+                pkgUrl = this.options.pkgs.ios;
+            } else {
+                pkgUrl = this.configs.pkgs.appstore[detector.browser.name];
+            }
             locationCall(pkgUrl || this.configs.pkgs.appstore['default']);
         }
     }
@@ -316,6 +326,7 @@ export class LaunchApp {
                 self.callend(LaunchApp.openStatus.SUCCESS);
             } else {
                 const backResult = self.callend(LaunchApp.openStatus.UNKNOW);
+                console.log('backResult,2',backResult)
                 backResult && self.down();
             }
             document.removeEventListener('visibilitychange', change);

@@ -69,6 +69,7 @@ export declare class LaunchApp {
     };
     private configs;
     private openMethod;
+    private options;
     private callback;
     constructor(opt: any);
     /**
@@ -84,7 +85,7 @@ export declare class LaunchApp {
     };
     /**
      * launch app
-     * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{}} opt
+     * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{},pkgs:{ios:'',android:''}} opt
      * @param {*} callback
      */
     open(opt?: any, callback?: (status: number, detector: any) => boolean): void;
