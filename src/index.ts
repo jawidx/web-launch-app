@@ -1,3 +1,4 @@
+declare var require: any
 const detector = require('detector');
 import 'core-js/fn/object/assign'
 
@@ -24,7 +25,7 @@ function locationCall(url: string) {
 }
 
 export class LaunchApp {
-    static defaultConfig = {
+    static defaultConfig:any = {
         scheme: {
             android: {
                 index: {
@@ -73,10 +74,13 @@ export class LaunchApp {
                 default: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
             }
         },
+        // guide to explorer when open in weixin
+        wxGuideMethod: null,
         // download page url（boot the user to download or download installation packages directly）
         // jump to download page when it cant't find a corresponding configuration or get a error
         downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
         // use UniversalLink for ios9+(default:true)
+        useYingyongbao: true,
         useUniversalLink: true,
         // the parameter prefix(default is question mark, you can define something else)
         searchPrefix: (detector: any) => { return '?' },
@@ -116,6 +120,11 @@ export class LaunchApp {
                 locationCall(url);
             }
         },
+        weixin: {
+            open: function () {
+                this.configs.wxGuideMethod && this.configs.wxGuideMethod();
+            }
+        },
         univerlink: {
             preOpen: function (opt: any) {
                 if (opt.url) {
@@ -150,11 +159,11 @@ export class LaunchApp {
 
     constructor(opt: any) {
         this.configs = (<any>Object).assign(LaunchApp.defaultConfig, opt);
-        for (let key in this.configs) {
-            if (typeof this.configs[key] === 'function') {
-                this.configs[key] = this.configs[key](detector);
-            }
-        }
+        // for (let key in this.configs) {
+        //     if (typeof this.configs[key] === 'function') {
+        //         this.configs[key] = this.configs[key](detector);
+        //     }
+        // }
         const defaultProtocol = location.host.split('.').reverse().join('.');
         this.setDefaultProperty(this.configs.scheme.android.index, 'protocol', defaultProtocol);
         this.setDefaultProperty(this.configs.scheme.ios.index, 'protocol', defaultProtocol);
@@ -181,8 +190,10 @@ export class LaunchApp {
     }
 
     getOpenMethod() {
-        if ((detector.os.name === 'android' || !this.configs.useUniversalLink)
-            && detector.browser.name === 'micromessenger') {
+        if (detector.browser.name === 'micromessenger' && !this.configs.useYingyongbao) {
+            return LaunchApp.openChannel.weixin;
+        } else if (detector.browser.name === 'micromessenger'
+            && (detector.os.name === 'android' || !this.configs.useUniversalLink)) {
             return LaunchApp.openChannel.yingyongbao;
         } else if (this.configs.useUniversalLink && detector.os.name === 'ios' && detector.os.version >= 9) {
             return LaunchApp.openChannel.univerlink;
@@ -326,7 +337,6 @@ export class LaunchApp {
                 self.callend(LaunchApp.openStatus.SUCCESS);
             } else {
                 const backResult = self.callend(LaunchApp.openStatus.UNKNOW);
-                console.log('backResult,2',backResult)
                 backResult && self.down();
             }
             document.removeEventListener('visibilitychange', change);

@@ -131,7 +131,21 @@ const tiebaConfig = {
             qqfriend: '',
         }
     },
+    useYingyongbao: false,
     useUniversalLink: false,
+    wxGuideMethod: function () {
+        const div = document.createElement('div');
+        div.style.position = 'absolute'
+        div.style.top = '0';
+        div.style.zIndex = '1111';
+        div.style.width = '100%';
+        div.style.height = '100%';
+        div.innerHTML = '<div style="height:100%;background-color:#000;opacity:0.5;"></div><p style="position:absolute;top:0px;background-color:white;font-size:80px;padding: 20px 40px;margin: 0 40px;">点击右上角->选择在浏览器中打开->即可打开或下载APP</p>';
+        document.body.appendChild(div);
+        div.onclick = function () {
+            div.remove()
+        }
+    },
     downPage: 'http://ti' + 'eba.baidu.com/mo/q/activityDiversion/download',
     searchPrefix: (detector) => {
         if (detector.os.name == 'android') {
@@ -157,8 +171,8 @@ addHandler(linkIndex, 'click', function () {
     tbCallApp.open({
         page: 'index',
         param: {},
-        pkgs:{
-            android:'https://nani.baidu.com/apple-app-site-association'
+        pkgs: {
+            android: 'https://nani.baidu.com/apple-app-site-association'
         }
     }, (status, detector) => {
         console.log('callback,', status, detector);
@@ -283,7 +297,7 @@ const naniConfig = {
 const lanchInstance = new LaunchApp(naniConfig);
 addHandler(linkDefault, 'click', function () {
     lanchInstance.open({
-        page:  'index',
+        page: 'index',
         param: {}
     }, (s, d) => {
         alert(s)

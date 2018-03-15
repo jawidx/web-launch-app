@@ -1,53 +1,6 @@
 import 'core-js/fn/object/assign';
 export declare class LaunchApp {
-    static defaultConfig: {
-        scheme: {
-            android: {
-                index: {
-                    protocol: string;
-                    path: string;
-                    param: {};
-                    paramMap: {};
-                };
-            };
-            ios: {
-                index: {
-                    protocol: string;
-                    path: string;
-                    param: {};
-                    paramMap: {};
-                };
-            };
-        };
-        univerlink: {
-            index: {
-                url: string;
-                param: {};
-                paramMap: {};
-            };
-        };
-        yingyongbao: {
-            url: string;
-            param: {
-                pkgname: string;
-            };
-        };
-        pkgs: {
-            yingyongbao: {
-                default: string;
-            };
-            androidApk: {
-                default: string;
-            };
-            appstore: {
-                default: string;
-            };
-        };
-        downPage: string;
-        useUniversalLink: boolean;
-        searchPrefix: (detector: any) => string;
-        timeout: number;
-    };
+    static defaultConfig: any;
     static openChannel: {
         scheme: {
             preOpen(opt: any): any;
@@ -56,6 +9,9 @@ export declare class LaunchApp {
         yingyongbao: {
             preOpen: (opt: any) => any;
             open: (url: string) => void;
+        };
+        weixin: {
+            open: () => void;
         };
         univerlink: {
             preOpen: (opt: any) => any;
@@ -82,6 +38,8 @@ export declare class LaunchApp {
     getOpenMethod(): {
         preOpen(opt: any): any;
         open: (url: string) => void;
+    } | {
+        open: () => void;
     };
     /**
      * launch app
