@@ -25,7 +25,7 @@ function locationCall(url: string) {
 }
 
 export class LaunchApp {
-    static defaultConfig:any = {
+    static defaultConfig: any = {
         scheme: {
             android: {
                 index: {
@@ -122,7 +122,7 @@ export class LaunchApp {
         },
         weixin: {
             open: function () {
-                this.configs.wxGuideMethod && this.configs.wxGuideMethod();
+                this.configs.wxGuideMethod && this.configs.wxGuideMethod(detector);
             }
         },
         univerlink: {
@@ -225,20 +225,21 @@ export class LaunchApp {
     /**
      * down package
      */
-    down() {
+    down(opt?: any) {
+        this.options = opt;
         let pkgUrl;
         if (detector.browser.name == 'micromessenger' || detector.browser.name == 'qq') {
             pkgUrl = this.configs.pkgs.yingyongbao[detector.browser.name];
             locationCall(pkgUrl || this.configs.pkgs.yingyongbao['default']);
         } else if (detector.os.name === 'android') {
-            if (this.options.pkgs && this.options.pkgs.android) {
+            if (this.options && this.options.pkgs && this.options.pkgs.android) {
                 pkgUrl = this.options.pkgs.android;
             } else {
                 pkgUrl = this.configs.pkgs.androidApk[detector.browser.name];
             }
             locationCall(pkgUrl || this.configs.pkgs.androidApk['default']);
         } else if (detector.os.name === 'ios') {
-            if (this.options.pkgs && this.options.pkgs.android) {
+            if (this.options && this.options.pkgs && this.options.pkgs.ios) {
                 pkgUrl = this.options.pkgs.ios;
             } else {
                 pkgUrl = this.configs.pkgs.appstore[detector.browser.name];
@@ -337,7 +338,7 @@ export class LaunchApp {
                 self.callend(LaunchApp.openStatus.SUCCESS);
             } else {
                 const backResult = self.callend(LaunchApp.openStatus.UNKNOW);
-                backResult && self.down();
+                backResult && self.down(self.options);
             }
             document.removeEventListener('visibilitychange', change);
         };
@@ -355,7 +356,7 @@ export class LaunchApp {
                 backResult = self.callend(LaunchApp.openStatus.UNKNOW);
             }
             haveChange = true;
-            backResult && self.down();
+            backResult && self.down(self.options);
         }, this.configs.timeout);
     }
 }

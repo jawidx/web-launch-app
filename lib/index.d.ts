@@ -50,7 +50,7 @@ export declare class LaunchApp {
     /**
      * down package
      */
-    down(): void;
+    down(opt?: any): void;
     /**
      * map param（for different platform use different names）
      * @param {*} param
