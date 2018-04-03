@@ -319,7 +319,7 @@ export class LaunchApp {
         }
         return conf.protocol + '://' +
             (conf.host ? conf.host + '/' + conf.path : conf.path) +
-            (paramStr ? this.configs.searchPrefix + paramStr : '');
+            (paramStr ? this.configs.searchPrefix() + paramStr : '');
     }
 
     callend(status: number): boolean {
