@@ -26,6 +26,7 @@ function locationCall(url: string) {
 
 export class LaunchApp {
     static defaultConfig: any = {
+        openMethod: '',
         scheme: {
             android: {
                 index: {
@@ -76,16 +77,16 @@ export class LaunchApp {
         },
         // guide to explorer when open in weixin
         wxGuideMethod: null,
-        // download page url（boot the user to download or download installation packages directly）
-        // jump to download page when it cant't find a corresponding configuration or get a error
-        downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
         // use UniversalLink for ios9+(default:true)
         useYingyongbao: true,
         useUniversalLink: true,
         // the parameter prefix(default is question mark, you can define something else)
         searchPrefix: (detector: any) => { return '?' },
         // download after attempting to adjust timeout
-        timeout: 2000
+        timeout: 2000,
+        // download page url（boot the user to download or download installation packages directly）
+        // jump to download page when it cant't find a corresponding configuration or get a error
+        downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
     };
     static openChannel = {
         scheme: {
@@ -210,6 +211,21 @@ export class LaunchApp {
         try {
             this.options = opt;
             this.callback = callback;
+
+            switch (this.options.openMethod) {
+                case 'weixin':
+                    this.openMethod = LaunchApp.openChannel.weixin
+                    break;
+                case 'yingyongbao':
+                    this.openMethod = LaunchApp.openChannel.yingyongbao
+                    break;
+                case 'scheme':
+                    this.openMethod = LaunchApp.openChannel.scheme
+                    break;
+                case 'univerlink':
+                    this.openMethod = LaunchApp.openChannel.univerlink
+                    break;
+            }
             const openUrl = this.openMethod
                 && this.openMethod.preOpen
                 && this.openMethod.preOpen.call(this, opt || {});
