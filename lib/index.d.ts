@@ -6,16 +6,16 @@ export declare class LaunchApp {
             preOpen(opt: any): any;
             open: (url: string) => void;
         };
+        univerlink: {
+            preOpen: (opt: any) => any;
+            open: (url: string) => void;
+        };
         yingyongbao: {
             preOpen: (opt: any) => any;
             open: (url: string) => void;
         };
         weixin: {
             open: () => void;
-        };
-        univerlink: {
-            preOpen: (opt: any) => any;
-            open: (url: string) => void;
         };
     };
     static openStatus: {
@@ -29,13 +29,9 @@ export declare class LaunchApp {
     private callback;
     constructor(opt: any);
     /**
-     * set default config
-     * @param obj 
-     * @param property
-     * @param defaultValue
+     * select open method according to the environment
      */
-    setDefaultProperty(obj: any, property: string, defaultValue: any): void;
-    getOpenMethod(): {
+    _getOpenMethod(): {
         preOpen(opt: any): any;
         open: (url: string) => void;
     } | {
@@ -43,7 +39,7 @@ export declare class LaunchApp {
     };
     /**
      * launch app
-     * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{},pkgs:{ios:'',android:''}} opt
+     * @param {page:'index',url:'http://tieba.baidu.com/',param:{},paramMap:{}} opt
      * @param {*} callback
      */
     open(opt?: any, callback?: (status: number, detector: any) => boolean): void;
@@ -52,24 +48,24 @@ export declare class LaunchApp {
      */
     down(opt?: any): void;
     /**
-     * map param（for different platform use different names）
+     * map param (for different platform)
      * @param {*} param
      * @param {*} paramMap
      */
-    paramMapProcess(param: any, paramMap: any): any;
+    _paramMapProcess(param: any, paramMap: any): any;
     /**
      * generating URL parameters
      * @param {*} obj
      */
-    stringtifyParams(obj: any): string;
+    _stringtifyParams(obj: any): string;
     /**
      * generating URL
      * @param {*} conf
      */
-    getUrlFromConf(conf: any): string;
-    callend(status: number): boolean;
+    _getUrlFromConf(conf: any): string;
+    _callend(status: number): boolean;
     /**
      * determine whether or not open successfully
      */
-    setTimeEvent(): void;
+    _setTimeEvent(): void;
 }

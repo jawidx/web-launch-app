@@ -1,6 +1,5 @@
-declare var require: any
-const detector = require('detector');
 import 'core-js/fn/object/assign'
+import { detector } from './detector';
 
 /**
  * iframe call
@@ -75,11 +74,11 @@ export class LaunchApp {
                 default: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
             }
         },
-        // guide to explorer when open in weixin
-        wxGuideMethod: null,
         // use UniversalLink for ios9+(default:true)
-        useYingyongbao: true,
         useUniversalLink: true,
+        // guide to explorer when open in wechat
+        wxGuideMethod: null,
+        useYingyongbao: true,
         // the parameter prefix(default is question mark, you can define something else)
         searchPrefix: (detector: any) => { return '?' },
         // download after attempting to adjust timeout
@@ -102,28 +101,15 @@ export class LaunchApp {
                 if (pageConf.paramMap) {
                     pageConf.param = this.paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
-                return this.getUrlFromConf(pageConf);
+                return this._getUrlFromConf(pageConf);
             },
             open: function (url: string) {
-                this.setTimeEvent();
+                this._setTimeEvent();
                 if (detector.os.name === 'ios' && detector.browser.name == 'safari') {
                     locationCall(url);
                 } else {
                     iframeCall(url);
                 }
-            }
-        },
-        yingyongbao: {
-            preOpen: function (opt: any) {
-                return this.getUrlFromConf(this.configs.yingyongbao);
-            },
-            open: function (url: string) {
-                locationCall(url);
-            }
-        },
-        weixin: {
-            open: function () {
-                this.configs.wxGuideMethod && this.configs.wxGuideMethod(detector);
             }
         },
         univerlink: {
@@ -146,6 +132,19 @@ export class LaunchApp {
             open: function (url: string) {
                 locationCall(url);
             }
+        },
+        yingyongbao: {
+            preOpen: function (opt: any) {
+                return this.getUrlFromConf(this.configs.yingyongbao);
+            },
+            open: function (url: string) {
+                locationCall(url);
+            }
+        },
+        weixin: {
+            open: function () {
+                this.configs.wxGuideMethod && this.configs.wxGuideMethod(detector);
+            }
         }
     };
     static openStatus = {
@@ -153,44 +152,22 @@ export class LaunchApp {
         SUCCESS: 1,
         UNKNOW: 2
     };
+    // config
     private configs: any
     private openMethod: any
+    // param
     private options: any
     private callback: (status: number, detector: any) => boolean
-
+    
     constructor(opt: any) {
         this.configs = (<any>Object).assign(LaunchApp.defaultConfig, opt);
-        // for (let key in this.configs) {
-        //     if (typeof this.configs[key] === 'function') {
-        //         this.configs[key] = this.configs[key](detector);
-        //     }
-        // }
-        const defaultProtocol = location.host.split('.').reverse().join('.');
-        this.setDefaultProperty(this.configs.scheme.android.index, 'protocol', defaultProtocol);
-        this.setDefaultProperty(this.configs.scheme.ios.index, 'protocol', defaultProtocol);
-        this.setDefaultProperty(this.configs.univerlink.index, 'url', 'https://' + location.host);
-        this.setDefaultProperty(this.configs.yingyongbao.param, 'pkgname', defaultProtocol);
-        this.openMethod = this.getOpenMethod();
+        this.openMethod = this._getOpenMethod();
     }
 
     /**
-     * set default config
-     * @param obj 
-     * @param property 
-     * @param defaultValue 
+     * select open method according to the environment
      */
-    setDefaultProperty(obj: any, property: string, defaultValue: any) {
-        if (obj && !obj[property]) {
-            property = defaultValue;
-        }
-        if (!obj) {
-            obj = {
-                property: defaultValue
-            }
-        }
-    }
-
-    getOpenMethod() {
+    _getOpenMethod() {
         if (detector.browser.name === 'micromessenger' && !this.configs.useYingyongbao) {
             return LaunchApp.openChannel.weixin;
         } else if (detector.browser.name === 'micromessenger'
@@ -204,34 +181,36 @@ export class LaunchApp {
 
     /**
      * launch app
-     * @param {page:'index',url:'http://tieba.baidu.com/p/2013',param:{},paramMap:{},pkgs:{ios:'',android:''}} opt 
+     * @param {page:'index',url:'http://tieba.baidu.com/',param:{},paramMap:{}} opt 
      * @param {*} callback 
      */
     open(opt?: any, callback?: (status: number, detector: any) => boolean) {
         try {
             this.options = opt;
             this.callback = callback;
-
-            switch (this.options.openMethod) {
-                case 'weixin':
-                    this.openMethod = LaunchApp.openChannel.weixin
-                    break;
-                case 'yingyongbao':
-                    this.openMethod = LaunchApp.openChannel.yingyongbao
-                    break;
-                case 'scheme':
-                    this.openMethod = LaunchApp.openChannel.scheme
-                    break;
-                case 'univerlink':
-                    this.openMethod = LaunchApp.openChannel.univerlink
-                    break;
+            var tmpOpenMethod = null;
+            if (this.options.openMethod) {
+                switch (this.options.openMethod) {
+                    case 'weixin':
+                        tmpOpenMethod = LaunchApp.openChannel.weixin
+                        break;
+                    case 'yingyongbao':
+                        tmpOpenMethod = LaunchApp.openChannel.yingyongbao
+                        break;
+                    case 'scheme':
+                        tmpOpenMethod = LaunchApp.openChannel.scheme
+                        break;
+                    case 'univerlink':
+                        tmpOpenMethod = LaunchApp.openChannel.univerlink
+                        break;
+                }
+            } else {
+                tmpOpenMethod = this.openMethod;
             }
-            const openUrl = this.openMethod
-                && this.openMethod.preOpen
-                && this.openMethod.preOpen.call(this, opt || {});
-            this.openMethod
-                && this.openMethod.open
-                && this.openMethod.open.call(this, openUrl);
+            const openUrl = tmpOpenMethod.preOpen
+                && tmpOpenMethod.preOpen.call(this, opt || {});
+            tmpOpenMethod.open
+                && tmpOpenMethod.open.call(this, openUrl);
         } catch (e) {
             console.log('error:', e);
             locationCall(this.configs.downPage);
@@ -265,11 +244,11 @@ export class LaunchApp {
     }
 
     /**
-     * map param（for different platform use different names）
+     * map param (for different platform)
      * @param {*} param 
      * @param {*} paramMap 
      */
-    paramMapProcess(param: any, paramMap: any) {
+    _paramMapProcess(param: any, paramMap: any) {
         if (!paramMap) {
             return param;
         }
@@ -290,7 +269,7 @@ export class LaunchApp {
      * generating URL parameters
      * @param {*} obj 
      */
-    stringtifyParams(obj: any) {
+    _stringtifyParams(obj: any) {
         if (!obj) {
             return '';
         }
@@ -304,18 +283,15 @@ export class LaunchApp {
             s += (k + '=' + obj[k] + '&');
         };
 
-        if (!s) {
-            return s;
-        }
-        return s.substr(0, s.length - 1);
+        return s ? s.substr(0, s.length - 1) : s;
     }
 
     /**
      * generating URL
      * @param {*} conf 
      */
-    getUrlFromConf(conf: any) {
-        let paramStr = this.stringtifyParams(conf.param);
+    _getUrlFromConf(conf: any) {
+        let paramStr = this._stringtifyParams(conf.param);
         if (conf.url) {
             // 对url进行参数处理 'tieba.baidu.com/p/{pid}'
             let url = conf.url;
@@ -326,34 +302,30 @@ export class LaunchApp {
                 delete conf.param[key];
             })
 
-            paramStr = this.stringtifyParams(conf.param);
+            paramStr = this._stringtifyParams(conf.param);
             return url + (paramStr ? ((url.indexOf('?') > 0 ? '&' : '?') + paramStr) : '');
-            // if (~idx) {
-            //     url = url.substring(0, idx);
-            // }
-            // return url + (paramStr ? '?' + paramStr : '');
         }
         return conf.protocol + '://' +
             (conf.host ? conf.host + '/' + conf.path : conf.path) +
             (paramStr ? this.configs.searchPrefix() + paramStr : '');
     }
 
-    callend(status: number): boolean {
+    _callend(status: number): boolean {
         return this.callback && this.callback(status, detector);
     }
 
     /**
      * determine whether or not open successfully
      */
-    setTimeEvent() {
+    _setTimeEvent() {
         const self = this;
         let haveChange = false;
         const change = function () {
             haveChange = true;
             if (document.hidden) {
-                self.callend(LaunchApp.openStatus.SUCCESS);
+                self._callend(LaunchApp.openStatus.SUCCESS);
             } else {
-                const backResult = self.callend(LaunchApp.openStatus.UNKNOW);
+                const backResult = self._callend(LaunchApp.openStatus.UNKNOW);
                 backResult && self.down(self.options);
             }
             document.removeEventListener('visibilitychange', change);
@@ -367,9 +339,9 @@ export class LaunchApp {
             document.removeEventListener('visibilitychange', change);
             let backResult = true;
             if (!document.hidden && !haveChange) {
-                backResult = self.callend(LaunchApp.openStatus.FAILED);
+                backResult = self._callend(LaunchApp.openStatus.FAILED);
             } else {
-                backResult = self.callend(LaunchApp.openStatus.UNKNOW);
+                backResult = self._callend(LaunchApp.openStatus.UNKNOW);
             }
             haveChange = true;
             backResult && self.down(self.options);

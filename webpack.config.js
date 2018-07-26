@@ -15,9 +15,6 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(['build']),
         new HtmlWebpackPlugin({
-            title: 'Output Management',
-        }),
-        new HtmlWebpackPlugin({
             filename: 'demo.html',
             template: './examples/index.html',
             title: 'Demo Title',

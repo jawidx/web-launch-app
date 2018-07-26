@@ -12,10 +12,11 @@ function addHandler(element, type, handler) {
     }
 }
 const tipEle = document.getElementsByClassName('tip')[0];
-console.log = function addHandler(key, info) {
-    tipEle.innerHTML = tipEle.innerHTML + '<br/>' + key + ',' + (info ? JSON.stringify(info) : '');
-}
+// console.log = function addHandler(key, info) {
+//     tipEle.innerHTML = tipEle.innerHTML + '<br/>' + key + ',' + (info ? JSON.stringify(info) : '');
+// }
 
+// TIEBA
 const tiebaConfig = {
     scheme: {
         android: {
@@ -216,7 +217,7 @@ addHandler(linkEmotioncenter, 'click', function () {
     });
 });
 
-
+// NANI
 const naniConfig = {
     scheme: {
         android: {
@@ -270,6 +271,24 @@ const naniConfig = {
             },
         }
     },
+    univerlink: {
+        index: {
+            url: 'https://nan.baidu.com',
+            param: {
+            },
+        },
+        video: {
+            url: 'https://nan.baidu.com/n/nani/share/item/{tid}',
+            param: {
+            },
+        },
+        h5: {
+            url: 'https://nan.baidu.com/',
+            param: {
+                uid: ''
+            }
+        },
+    },
     yingyongbao: {
         url: 'http://a.app.qq.com/o/simple.jsp',
         param: {
@@ -295,11 +314,20 @@ const naniConfig = {
     timeout: 2000,
 };
 const lanchInstance = new LaunchApp(naniConfig);
+// addHandler(linkDefault, 'click', function () {
+//     lanchInstance.open({
+//         page: 'index',
+//         param: {}
+//     }, (s, d) => {
+//         alert(s)
+//     });
+// });
 addHandler(linkDefault, 'click', function () {
     lanchInstance.open({
-        page: 'index',
-        param: {}
+        page: 'h5',
+        url: 'http://tieba.baidu.com',
+        // param: {}
     }, (s, d) => {
-        alert(s)
+        console.log(s,d)
     });
 });
