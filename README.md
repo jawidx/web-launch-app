@@ -88,9 +88,9 @@ const lanchApp = new LaunchApp({
     },
     // use UniversalLink for ios9+(default:true)
     useUniversalLink: true,
-    // to yingyongbao in wechat
+    // to yingyongbao in wechat(default:false)
     useYingyongbao: false,
-    // open tip in wechat
+    // open tip in wechat(when useYingyongbao is false)
     wxGuideMethod: function (detector) {
         const explorerName = (detector.os.name == 'ios' ? 'Safari' : '');
         const div = document.createElement('div');
@@ -99,8 +99,8 @@ const lanchApp = new LaunchApp({
         div.style.zIndex = '1111';
         div.style.width = '100%';
         div.style.height = '100%';
-        div.innerHTML = `<div style="height:100%;background-color:#000;opacity:0.5;"></div>
-        <div style="position:absolute;top:0;background: url(`
+        div.innerHTML = '<div style="height:100%;background-color:#000;opacity:0.5;"></div>'
+            +'<div style="position:absolute;top:0;background: url('
             + require('../static/img/finger.png') + ') no-repeat right top;background-size:' + px('204px') + ' ' + px('212px') + ';width:100%;padding-top:' + px('208px') + ';color:white;font-size:' + px('32px') + ';text-align:center;">'
             + (explorerName ? '<img src="' + require("../static/img/safari.png") + '" style="width:' + px('120px') + ';height:' + px('120px') + ';"/>' : '')
             + '<p style="font-size:' + px('36px') + ';font-weight:bold;margin-bottom:6px;">点右上角选择“在' + explorerName + '浏览器中打开”</p>'
@@ -110,7 +110,7 @@ const lanchApp = new LaunchApp({
             div.remove()
         }
     },
-    // download page url（boot the user to download or download installation packages directly）,jump to download page when it cant't find a corresponding configuration or get a error
+    // download page,jump to download page when it cant't find a corresponding configuration or get a error
     downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
     // the parameter prefix(default is question mark)
     searchPrefix: (detector) => {
@@ -150,3 +150,6 @@ lanchApp.down({
     }
 });
 ```
+
+## Who use?
+Tieba、Nani小视频

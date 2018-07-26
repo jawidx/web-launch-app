@@ -99,7 +99,7 @@ export class LaunchApp {
                 let pageConf = pageMap[opt.page] || pageMap['index'];
                 pageConf = (<any>Object).assign({}, pageConf, opt);
                 if (pageConf.paramMap) {
-                    pageConf.param = this.paramMapProcess(pageConf.param, pageConf.paramMap);
+                    pageConf.param = this._paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
                 return this._getUrlFromConf(pageConf);
             },
@@ -115,19 +115,19 @@ export class LaunchApp {
         univerlink: {
             preOpen: function (opt: any) {
                 if (opt.url) {
-                    return this.getUrlFromConf(opt);
+                    return this._getUrlFromConf(opt);
                 }
 
                 const pageMap = this.configs.univerlink;
                 let pageConf = pageMap[opt.page] || pageMap['index'];
                 pageConf = (<any>Object).assign({}, pageConf, opt);
                 if (pageConf.paramMap) {
-                    pageConf.param = this.paramMapProcess(pageConf.param, pageConf.paramMap);
+                    pageConf.param = this._paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
                 if (!opt.page) {
                     pageConf.url = 'https://' + (this.configs.host || location.host);
                 }
-                return this.getUrlFromConf(pageConf);
+                return this._getUrlFromConf(pageConf);
             },
             open: function (url: string) {
                 locationCall(url);
@@ -135,7 +135,7 @@ export class LaunchApp {
         },
         yingyongbao: {
             preOpen: function (opt: any) {
-                return this.getUrlFromConf(this.configs.yingyongbao);
+                return this._getUrlFromConf(this.configs.yingyongbao);
             },
             open: function (url: string) {
                 locationCall(url);
