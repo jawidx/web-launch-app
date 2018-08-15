@@ -4,11 +4,53 @@ awake app from webpage
 ## Installation
 npm install --save web-launch-app
 
+## Intro
+- ios: iOS9 use universal link, iOS9- use scheme
+- android: scheme
+- wechat:yingyongbao
+
 ## Usage
+```javascript
+const lanchApp = new LaunchApp(config);
+lanchApp.open({
+    openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'     //指定具体打开方法
+    page: '',   // for scheme
+    param:{},
+    url:''  // for universal link
+}, (status, detector) => {
+    // status(0:failed，1:success，2:unknow)
+    // true: will down package when open failed or unknow
+    return true;
+});
+
+lanchApp.down{
+    pkgs:{
+        ios:'',
+        android:''
+    }
+};
+```
+
+## Config
+```javascript
+{
+    scheme: {}, // protocol://path?param&param
+    univerlink: {}, // https://nan.baidu.com
+    yingyongbao: {},
+    pkgs: {},   // packages for download
+    useUniversalLink: true, // use UniversalLink for ios9+(default:true)
+    useYingyongbao: true,   // to yingyongbao in wechat(default:true)
+    wxGuideMethod: ()=>{},  // open tip in wechat(when useYingyongbao is false)
+    downPage:'',   //download page,jump to download page when it cant't find a corresponding configuration or get a error
+    searchPrefix: '?',  // the parameter prefix(default is question mark)
+    timeout: 2000   // for scheme(default:2000)
+}
+```
+
+## Demo
 ```javascript
 import {LaunchApp} from 'web-launch-app';
 const lanchApp = new LaunchApp({
-    // protocol://path?param&param
     scheme: {
         android: {
             // page name(default:index)
@@ -86,11 +128,8 @@ const lanchApp = new LaunchApp({
             default: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
         }
     },
-    // use UniversalLink for ios9+(default:true)
     useUniversalLink: true,
-    // to yingyongbao in wechat(default:false)
     useYingyongbao: false,
-    // open tip in wechat(when useYingyongbao is false)
     wxGuideMethod: function (detector) {
         const explorerName = (detector.os.name == 'ios' ? 'Safari' : '');
         const div = document.createElement('div');
@@ -110,13 +149,10 @@ const lanchApp = new LaunchApp({
             div.remove()
         }
     },
-    // download page,jump to download page when it cant't find a corresponding configuration or get a error
     downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
-    // the parameter prefix(default is question mark)
     searchPrefix: (detector) => {
        return '?';
     },
-    // for scheme(default:2000)
     timeout: 3000
 });
 lanchApp.open();
