@@ -63,8 +63,7 @@ const lanchApp = new LaunchApp({
                 // fixed parameter for this page
                 param: {},
                 // param map(to solve the problem of using different parameter names for different platforms)
-                paramMap: {
-                }
+                paramMap: {}
             },
             frs: {
                 protocol: 'tbfrs',
@@ -73,6 +72,12 @@ const lanchApp = new LaunchApp({
                 paramMap: {
                     forumName: 'kw'
                 }
+            },
+            h5: {
+                protocol: 'h5',
+                path: 'tieba.baidu.com',
+                param: {url:''},
+                paramMap: {}
             }
         },
         ios: {
@@ -80,8 +85,7 @@ const lanchApp = new LaunchApp({
                 protocol: 'com.baidu.tieba',
                 path: 'jumptoforum',
                 param: {},
-                paramMap: {
-                }
+                paramMap: {}
             },
             frs: {
                 protocol: 'com.baidu.tieba',
@@ -89,14 +93,19 @@ const lanchApp = new LaunchApp({
                 paramMap: {
                     forumName: 'tname'
                 }
+            },
+            h5: {
+                protocol: 'h5',
+                path: 'tieba.baidu.com',
+                param: {url:''},
+                paramMap: {}
             }
         }
     },
     univerlink: {
         index: {
             url: 'https://tieba.baidu.com',
-            param: {
-            },
+            param: {},
             paramMap: {
                 forumName: 'kw'
             }
@@ -104,8 +113,14 @@ const lanchApp = new LaunchApp({
         frs: {
             // support placeholder
             url: 'https://tieba.baidu.com/p/{kw}',
-            param: {
-            },
+            param: {},
+            paramMap: {
+                forumName: 'kw'
+            }
+        },
+        h5: {
+            url: 'https://tieba.baidu.com/',
+            param: {},
             paramMap: {
                 forumName: 'kw'
             }
@@ -160,26 +175,22 @@ const lanchApp = new LaunchApp({
 });
 lanchApp.open();
 lanchApp.open({
-    openMethod:'yingyongbao'    //'weixin'|'yingyongbao'|'scheme'|'univerlink'
-});
-lanchApp.open({
-    page: 'frs',
-    param: {
-        forumName: 'jawidx'
-    },
-    url:'https://tieba.baidu.com/jawidx'
-});
-lanchApp.open({
     page: 'frs',
     param: {
         forumName: 'jawidx'
     }
 }, (status, detector) => {
-    // status(0:failed，1:success，2:unknow)
-    // detector()
-    console.log('callback,', status, detector);
-    // true: will down package when open failed or unknow
     return true;
+});
+lanchApp.open({
+    openMethod:'yingyongbao'
+});
+lanchApp.open({
+    page: 'h5',
+    param: {
+        url: 'https://tieba.baidu.com/huodong'
+    },
+    url:'https://tieba.baidu.com/huodong'
 });
 lanchApp.down();
 lanchApp.down({
