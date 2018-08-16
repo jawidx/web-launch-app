@@ -5,24 +5,27 @@ awake app from webpage
 npm install --save web-launch-app
 
 ## Intro
-- ios: iOS9 use universal link, iOS9- use scheme
+- ios: iOS9&iOS9+ use universal link, iOS9- use scheme
 - android: scheme
 - wechat:yingyongbao
 
 ## Usage
 ```javascript
 const lanchApp = new LaunchApp(config);
+lanchApp.open();
 lanchApp.open({
-    openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'     //指定具体打开方法
-    page: '',   // for scheme
-    param:{},
-    url:''  // for universal link
+    // weixin:opentip in wechat，univerlink&appstore only work on iOS
+    openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'|'appstore'     
+    page: '',   // for scheme&univerlink
+    param:{},   // for scheme&univerlink
+    url:'',  // for universal link
+    pkgs:{android:'',ios:''}    // for timeout download when use scheme
 }, (status, detector) => {
     // status(0:failed，1:success，2:unknow)
     // true: will down package when open failed or unknow
     return true;
 });
-
+lanchApp.down();
 lanchApp.down{
     pkgs:{
         ios:'',
@@ -188,4 +191,4 @@ lanchApp.down({
 ```
 
 ## Who use?
-Tieba、Nani小视频
+Tieba、伙拍小视频

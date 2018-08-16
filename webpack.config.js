@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
+    mode: 'development',
     devtool: 'inline-source-map',
     entry: {
         demo: ['./examples/index.js']
@@ -10,7 +11,7 @@ module.exports = {
     output: {
         filename: '[name].[chunkhash].js',
         path: path.resolve(__dirname, 'build'),
-        publicPath: '/'
+        // publicPath: '/'
     },
     plugins: [
         new CleanWebpackPlugin(['build']),

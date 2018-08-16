@@ -1,6 +1,6 @@
 {
 	"name": "web-launch-app",
-	"version": "1.2.5",
+	"version": "1.2.6",
 	"description": "launch app from web page",
 	"main": "./lib/index.js",
 	"scripts": {
@@ -28,12 +28,12 @@
 		"css-loader": "^0.28.7",
 		"express": "^4.16.2",
 		"html-loader": "^0.5.1",
-		"html-webpack-plugin": "^2.30.1",
+		"html-webpack-plugin": "^3.2.0",
 		"less": "^2.7.3",
 		"less-loader": "^4.0.5",
 		"style-loader": "^0.19.0",
-		"ts-loader": "^3.2.0",
-		"webpack": "^3.8.1",
+		"ts-loader": "^4.4.2",
+		"webpack": "^4.16.5",
 		"webpack-dev-middleware": "^1.12.0",
 		"webpack-dev-server": "^2.9.4"
 	}

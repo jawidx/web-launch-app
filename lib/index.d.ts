@@ -17,6 +17,9 @@ export declare class LaunchApp {
         weixin: {
             open: () => void;
         };
+        appstore: {
+            open: () => void;
+        };
     };
     static openStatus: {
         FAILED: number;
@@ -39,12 +42,23 @@ export declare class LaunchApp {
     };
     /**
      * launch app
-     * @param {page:'index',url:'http://tieba.baidu.com/',param:{},paramMap:{}} opt
-     * @param {*} callback
+     * @param {*} opt
+     * {
+     * page:'index',
+     * url:'http://tieba.baidu.com/', for universallink
+     * param:{},
+     * openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'|'appstore'
+     * pkgs:{android:'',ios:''}
+     * },
+     * paramMap:{}
+     * @param {*} callback return true for timeout download
      */
     open(opt?: any, callback?: (status: number, detector: any) => boolean): void;
     /**
      * down package
+     * {
+     * pkgs:{android:'',ios:''}
+     * }
      */
     down(opt?: any): void;
     /**

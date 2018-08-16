@@ -1,4 +1,4 @@
-import { LaunchApp } from '../lib/index.js';
+import { LaunchApp } from '../src/index.ts';
 import './index.less';
 
 function addHandler(element, type, handler) {
@@ -325,9 +325,13 @@ const lanchInstance = new LaunchApp(naniConfig);
 addHandler(linkDefault, 'click', function () {
     lanchInstance.open({
         page: 'h5',
-        url: 'http://tieba.baidu.com',
+        url: 'http://tieba.baidu.com/3',
+        pkgs:{
+            android:'https://imgsa.baidu.com/forum/pic/item/632762d0f703918f81780a075d3d269758eec455.jpg'
+        }
         // param: {}
     }, (s, d) => {
-        console.log(s,d)
+        console.log(s, d)
+        return true;
     });
 });

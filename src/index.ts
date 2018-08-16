@@ -12,7 +12,7 @@ const iframeCall = (url: string) => {
     document.body.appendChild(iframe);
     setTimeout(function () {
         document.body.removeChild(iframe);
-    }, 200)
+    }, 200);
 }
 
 /**
@@ -145,6 +145,11 @@ export class LaunchApp {
             open: function () {
                 this.configs.wxGuideMethod && this.configs.wxGuideMethod(detector);
             }
+        },
+        appstore: {
+            open: function () {
+                locationCall(this.configs.pkgs.appstore['default']);
+            }
         }
     };
     static openStatus = {
@@ -158,7 +163,7 @@ export class LaunchApp {
     // param
     private options: any
     private callback: (status: number, detector: any) => boolean
-    
+
     constructor(opt: any) {
         this.configs = (<any>Object).assign(LaunchApp.defaultConfig, opt);
         this.openMethod = this._getOpenMethod();
@@ -181,8 +186,16 @@ export class LaunchApp {
 
     /**
      * launch app
-     * @param {page:'index',url:'http://tieba.baidu.com/',param:{},paramMap:{}} opt 
-     * @param {*} callback 
+     * @param {*} opt 
+     * {
+     * page:'index',
+     * url:'http://tieba.baidu.com/', for universallink
+     * param:{},
+     * openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'|'appstore'
+     * pkgs:{android:'',ios:''}
+     * },
+     * paramMap:{}
+     * @param {*} callback return true for timeout download
      */
     open(opt?: any, callback?: (status: number, detector: any) => boolean) {
         try {
@@ -192,21 +205,28 @@ export class LaunchApp {
             if (this.options.openMethod) {
                 switch (this.options.openMethod) {
                     case 'weixin':
-                        tmpOpenMethod = LaunchApp.openChannel.weixin
+                        tmpOpenMethod = LaunchApp.openChannel.weixin;
                         break;
                     case 'yingyongbao':
-                        tmpOpenMethod = LaunchApp.openChannel.yingyongbao
+                        tmpOpenMethod = LaunchApp.openChannel.yingyongbao;
                         break;
                     case 'scheme':
-                        tmpOpenMethod = LaunchApp.openChannel.scheme
+                        tmpOpenMethod = LaunchApp.openChannel.scheme;
                         break;
                     case 'univerlink':
-                        tmpOpenMethod = LaunchApp.openChannel.univerlink
+                        if (detector.os.name === 'ios' && detector.os.version >= 9) {
+                            tmpOpenMethod = LaunchApp.openChannel.univerlink;
+                        }
+                        break;
+                    case 'appstore':
+                        if (detector.os.name === 'ios') {
+                            tmpOpenMethod = LaunchApp.openChannel.appstore;
+                        }
                         break;
                 }
-            } else {
-                tmpOpenMethod = this.openMethod;
             }
+            tmpOpenMethod = tmpOpenMethod || this.openMethod;
+
             const openUrl = tmpOpenMethod.preOpen
                 && tmpOpenMethod.preOpen.call(this, opt || {});
             tmpOpenMethod.open
@@ -219,6 +239,9 @@ export class LaunchApp {
 
     /**
      * down package
+     * {
+     * pkgs:{android:'',ios:''}
+     * }
      */
     down(opt?: any) {
         this.options = opt;
@@ -292,7 +315,7 @@ export class LaunchApp {
      */
     _getUrlFromConf(conf: any) {
         let paramStr = this._stringtifyParams(conf.param);
-        if (conf.url) {
+        if (conf.url && detector.os.name === 'ios' && detector.os.version >= 9) {
             // 对url进行参数处理 'tieba.baidu.com/p/{pid}'
             let url = conf.url;
             const placeholders = url.match(/\{.*?\}/g);
