@@ -3,7 +3,7 @@
 npm install --save web-launch-app
 
 ## 简介 
-- 通过配置唤起方案、唤起页面路径及参数、渠道包地址等，在业务代码中通过open()方法唤起App指定页面或通过down()方法下载指定安装包。
+- 通过配置唤起方案、唤起页面路径及参数、渠道包地址等，在业务代码中通过open()方法唤起App指定页面或通过down()方法下载指定安装包
 - 默认唤起方案
     - iOS使用universal link或scheme或appstore方案
     - Android使用scheme方案
