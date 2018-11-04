@@ -1,31 +1,35 @@
 # web-launch-app
-awake app from webpage
-
-## Installation
+## 安装
 npm install --save web-launch-app
 
-## Intro
-- ios: iOS9&iOS9+ use universal link, iOS9- use scheme
-- android: scheme
-- wechat:yingyongbao
+## 简介 
+- 通过配置唤起方案、唤起页面路径及参数、渠道包地址等，在业务代码中通过open()方法唤起App指定页面或通过down()方法下载指定安装包。
+- 默认唤起方案
+    - iOS使用universal link或scheme或appstore方案
+    - Android使用scheme方案
+    - 微信中使用应用宝或弹引导提示方案
 
-## Usage
+## 使用
 ```javascript
 const lanchApp = new LaunchApp(config);
+// 唤起App
 lanchApp.open();
+// 唤起App到指定页面
 lanchApp.open({
-    // weixin:opentip in wechat，univerlink&appstore only work on iOS
-    openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'|'appstore'     
+    // 唤起方案（weixin表示弹引导提示方案）
+    openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'|'appstore' 
     page: '',   // for scheme&univerlink
     param:{},   // for scheme&univerlink
     url:'',  // for universal link
-    pkgs:{android:'',ios:''}    // for timeout download when use scheme
+    pkgs:{android:'',ios:''}    // 使用scheme唤起超时后下载使用
 }, (status, detector) => {
-    // status(0:failed，1:success，2:unknow)
-    // true: will down package when open failed or unknow
+    // 使用scheme方案时唤起回调，status(0:failed，1:success，2:unknow)
+    // 返回true表示打开失败时进行下载
     return true;
 });
+// 下载配置的默认包
 lanchApp.down();
+// 下载指定包
 lanchApp.down{
     pkgs:{
         ios:'',
@@ -34,41 +38,40 @@ lanchApp.down{
 };
 ```
 
-## Config
+## 配置
 ```javascript
 {
-    scheme: {}, // protocol://path?param&param
-    univerlink: {}, // https://nan.baidu.com
+    scheme: {}, // 配置scheme方案具体页面及参数，生成请求格式为"protocol://path?param&param"
+    univerlink: {}, // 配置univerlink方案具体页面及参数，生成请求格式为"https://domain.com?param=value"
     yingyongbao: {},
-    pkgs: {},   // packages for download
-    useUniversalLink: true, // use UniversalLink for ios9+(default:true)
-    useYingyongbao: true,   // to yingyongbao in wechat(default:true)
-    wxGuideMethod: ()=>{},  // open tip in wechat(when useYingyongbao is false)
-    downPage:'',   //download page,jump to download page when it cant't find a corresponding configuration or get a error
-    searchPrefix: '?',  // the parameter prefix(default is question mark)
-    timeout: 2000   // for scheme(default:2000)
+    pkgs: {},   // 下载包配置
+    useUniversalLink: true, // 是否为ios9+使用universallink方案，默认为true
+    useYingyongbao: true,   // 在微信中跳转应用宝，默认为true
+    wxGuideMethod: ()=>{},  // 微信中进行提示引导(useYingyongbao为false时)
+    downPage:'',   //下载页（当无法找到对应配置或出错时跳转到下载页）
+    searchPrefix: '?',  // scheme或univerlink生成请求中参数前辍，默认为"?"
+    timeout: 2000   // scheme方案中跳转超时判断，默认2000毫秒
 }
 ```
 
 ## Demo
 ```javascript
+// launchapp.ts
 import {LaunchApp} from 'web-launch-app';
-const lanchApp = new LaunchApp({
+const lanchInstance = new LaunchApp({
     scheme: {
         android: {
-            // page name(default:index)
+            // 页面名称(默认页面请设置为:index)
             index: {
                 protocol: 'tbfrs',
                 path: 'tieba.baidu.com',
-                // fixed parameter for this page
-                param: {},
-                // param map(to solve the problem of using different parameter names for different platforms)
-                paramMap: {}
+                // 固定参数
+                param: {from:'h5'},
             },
             frs: {
                 protocol: 'tbfrs',
                 path: 'tieba.baidu.com',
-                param: {},
+                // 参数映射(解决不同端使用不同参数名的问题)
                 paramMap: {
                     forumName: 'kw'
                 }
@@ -76,16 +79,12 @@ const lanchApp = new LaunchApp({
             h5: {
                 protocol: 'h5',
                 path: 'tieba.baidu.com',
-                param: {url:''},
-                paramMap: {}
             }
         },
         ios: {
             index: {
                 protocol: 'com.baidu.tieba',
                 path: 'jumptoforum',
-                param: {},
-                paramMap: {}
             },
             frs: {
                 protocol: 'com.baidu.tieba',
@@ -97,8 +96,6 @@ const lanchApp = new LaunchApp({
             h5: {
                 protocol: 'h5',
                 path: 'tieba.baidu.com',
-                param: {url:''},
-                paramMap: {}
             }
         }
     },
@@ -111,16 +108,8 @@ const lanchApp = new LaunchApp({
             }
         },
         frs: {
-            // support placeholder
+            // 支持占位符
             url: 'https://tieba.baidu.com/p/{kw}',
-            param: {},
-            paramMap: {
-                forumName: 'kw'
-            }
-        },
-        h5: {
-            url: 'https://tieba.baidu.com/',
-            param: {},
             paramMap: {
                 forumName: 'kw'
             }
@@ -134,10 +123,9 @@ const lanchApp = new LaunchApp({
     },
     pkgs: {
         androidApk: {
-            // detector.browser.name
-            default: 'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk',
-            qq: 'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk',
-            micromessenger:'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk'
+            // 可以根据浏览器名称设置渠道包 edge|sogou|360|micromessenger|qq|tt|liebao|tao|baidu|ie|mi|opera|oupeng|yandex|ali-ap|uc|chrome|android|blackberry|safari|webview|firefox|nokia
+            default: 'https://downpack.baidu.com/default.apk',
+            qq: 'https://downpack.baidu.com/tieba_qq.apk'
         },
         appstore: {
             default: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
@@ -161,7 +149,7 @@ const lanchApp = new LaunchApp({
             + require('../static/img/finger.png') + ') no-repeat right top;background-size:' + px('204px') + ' ' + px('212px') + ';width:100%;padding-top:' + px('208px') + ';color:white;font-size:' + px('32px') + ';text-align:center;">'
             + (explorerName ? '<img src="' + require("../static/img/safari.png") + '" style="width:' + px('120px') + ';height:' + px('120px') + ';"/>' : '')
             + '<p style="font-size:' + px('36px') + ';font-weight:bold;margin-bottom:6px;">点右上角选择“在' + explorerName + '浏览器中打开”</p>'
-            + '<p> 就能马上打开Nani了哦~</p></div>';
+            + '<p> 就能马上打开伙拍了哦~</p></div>';
         document.body.appendChild(div);
         div.onclick = function () {
             div.remove()
@@ -173,8 +161,23 @@ const lanchApp = new LaunchApp({
     },
     timeout: 3000
 });
-lanchApp.open();
-lanchApp.open({
+
+export function lanchApp(options:any, callback?: (status, detector) => boolean) {
+    lanchInstance.open(options, callback);
+}
+
+// 下载app
+export function downApp(options:any) {
+    lanchInstance.down(options);
+}
+
+```
+
+```javascript
+// 业务代码中使用
+import {lanchApp, downApp} from 'launchapp'
+lanchApp();
+lanchApp({
     page: 'frs',
     param: {
         forumName: 'jawidx'
@@ -182,18 +185,18 @@ lanchApp.open({
 }, (status, detector) => {
     return true;
 });
-lanchApp.open({
+lanchApp({
     openMethod:'yingyongbao'
 });
-lanchApp.open({
+lanchApp({
     page: 'h5',
     param: {
         url: 'https://tieba.baidu.com/huodong'
     },
     url:'https://tieba.baidu.com/huodong'
 });
-lanchApp.down();
-lanchApp.down({
+downApp();
+downApp({
     pkgs:{
         ios:'',
         android:''
