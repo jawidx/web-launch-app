@@ -1,11 +1,12 @@
-import 'core-js/fn/object/assign'
-import { detector } from './detector';
+import * as copy from 'copy-to-clipboard';
+import { ua, detector } from './detector';
+export { detector }
 
 /**
  * iframe call
  * @param url
  */
-const iframeCall = (url: string) => {
+export const iframeCall = (url: string) => {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('src', url);
     iframe.setAttribute('style', 'display:none');
@@ -19,92 +20,166 @@ const iframeCall = (url: string) => {
  * location call
  * @param url
  */
-function locationCall(url: string) {
+export function locationCall(url: string) {
     location.href = url;
 }
 
+/**
+ * 如果target(也就是FirstOBJ[key])存在，
+ * 且是对象的话再去调用deepObjectMerge，
+ * 否则就是FirstOBJ[key]里面没这个对象，需要与SecondOBJ[key]合并
+ */
+function deepMerge(firstObj, secondObj) {
+    for (var key in secondObj) {
+        firstObj[key] = firstObj[key] && firstObj[key].toString() === "[object Object]" ?
+            deepMerge(firstObj[key], secondObj[key]) : firstObj[key] = secondObj[key];
+    }
+    return firstObj;
+}
+
+const inWexin = detector.browser.name === 'micromessenger';
+const enableULink = detector.os.name === 'ios' && detector.os.version >= 9;
+const enableApplink = detector.os.name === 'android' && detector.os.version >= 6;
+
 export class LaunchApp {
     static defaultConfig: any = {
-        openMethod: '',
-        scheme: {
-            android: {
-                index: {
-                    protocol: '',
-                    path: '',
-                    param: {},
-                    paramMap: {
-                    }
+        inApp: false,
+        appVersion: '',
+        deeplink: {
+            scheme: {
+                android: {
+                    // 页面或功能（视频页、分享功能）
+                    index: {
+                        protocol: '',
+                        path: '',
+                        param: {},
+                        paramMap: {
+                        },
+                        version: 0,
+                    },
                 },
+                ios: {
+                    index: {
+                        protocol: '',
+                        path: '',
+                        param: {},
+                        paramMap: {
+                        },
+                        version: 0,
+                    }
+                }
             },
-            ios: {
+            link: {
                 index: {
-                    protocol: '',
-                    path: '',
-                    param: {},
+                    url: 'www.baidu.com',
+                    param: {
+                    },
                     paramMap: {
-                    }
+                    },
+                    version: 0,
                 }
-            }
-        },
-        univerlink: {
-            index: {
-                url: '',
+            },
+            yyb: {
+                url: 'http://a.app.qq.com/o/simple.jsp',
                 param: {
-                },
-                paramMap: {
+                    pkgname: '',
+                    ckey: ''
                 }
-            }
-        },
-        yingyongbao: {
-            url: 'http://a.app.qq.com/o/simple.jsp',
-            param: {
-                pkgname: ''
-            }
+            },
         },
         // config package for different browser
         pkgs: {
-            yingyongbao: {
-                default: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
-                //browser.name: '',
+            yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
+            android: 'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk',
+            ios: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
+            store: {
+                // TODO考虑把ios和yyb加到这里
+                xiaomi: {
+                    reg: /\(.*Android.*(MI|Mi|Redmi|HM NOTE| 201\d{4} Build).*\)|Android.*XiaoMi/,
+                    scheme: 'mimarket://details?id={id}&back=true',
+                    // id: {}
+                },
+                samsung: {
+                    reg: /\(.*Android.*(SAMSUNG|SM-|GT-).*\)/,
+                    scheme: 'samsungapps://ProductDetail/{id}'
+                },
+                huawei: {
+                    reg: /\(.*Android.*(HUAWEI|HONOR|HW-|H60-).*\)|^HONOR|^HUAWEI/i,
+                    scheme: 'appmarket://details?id={id}'
+                },
+                oppo: {
+                    reg: /Android.*(OPPO|A31.? Build|R\d+(Plus)? Build)|Android.*OppoBrowser|^OPPO/,
+                    // scheme: 'oppomarket://details?packagename={id}',
+                    scheme: 'market://details?id={id}',
+                    // 功能上有坑，下载优先
+                    downloadFirst: true
+                },
+                vivo: {
+                    reg: /\(.*Android.*(vivo|VIVO).*\)/,
+                    scheme: 'vivomarket://details?id={id}'
+                }
             },
-            androidApk: {
-                default: 'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk',
-            },
-            appstore: {
-                default: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
-            }
         },
+        // use UniversalLink for android6+(default:true)
+        useAppLink: true,
         // use UniversalLink for ios9+(default:true)
         useUniversalLink: true,
-        // guide to explorer when open in wechat
-        wxGuideMethod: null,
         useYingyongbao: true,
+        // guide to explorer when open in wechat
+        wxGuideMethod: () => {
+            const div = document.createElement('div');
+            div.style.position = 'absolute'
+            div.style.top = '0';
+            div.style.zIndex = '1111';
+            div.style.width = '100%';
+            div.style.height = '100%';
+            div.innerHTML = '<div style="height:100%;background-color:#000;opacity:0.5;"></div><p style="position:absolute;top:0px;background-color:white;font-size:80px;padding: 20px 40px;margin: 0 40px;">点击右上角->选择在浏览器中打开->即可打开或下载APP</p>';
+            document.body.appendChild(div);
+            div.onclick = function () {
+                div.remove()
+            }
+        },
+        // 升级提示
+        updateTipMethod: () => {
+            alert('升级才能使用此功能！');
+        },
+        // 口令
+        clipboardTxt: '',
         // the parameter prefix(default is question mark, you can define something else)
         searchPrefix: (detector: any) => { return '?' },
-        // download after attempting to adjust timeout
+        // download after attempting to adjust timeout,<0 means disable
         timeout: 2000,
         // download page url（boot the user to download or download installation packages directly）
         // jump to download page when it cant't find a corresponding configuration or get a error
-        downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
+        landPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
     };
     static openChannel = {
         scheme: {
             preOpen(opt: any) {
                 let pageMap: any = {};
                 if (detector.os.name === 'android') {
-                    pageMap = this.configs.scheme.android;
+                    pageMap = this.configs.deeplink.scheme.android;
                 } else if (detector.os.name === 'ios') {
-                    pageMap = this.configs.scheme.ios;
+                    pageMap = this.configs.deeplink.scheme.ios;
                 }
                 let pageConf = pageMap[opt.page] || pageMap['index'];
                 pageConf = (<any>Object).assign({}, pageConf, opt);
+                // 版本检测
+                if (this.configs.inApp && pageConf.version && !this.checkVersion(pageConf)) {
+                    return '';
+                }
                 if (pageConf.paramMap) {
                     pageConf.param = this._paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
-                return this._getUrlFromConf(pageConf);
+                return this._getUrlFromConf(pageConf, 'scheme');
             },
             open: function (url: string) {
-                this._setTimeEvent();
+                if (!url) {
+                    return;
+                }
+                if (this.timeoutDownload) {
+                    this._setTimeEvent();
+                }
                 if (detector.os.name === 'ios' && detector.browser.name == 'safari') {
                     locationCall(url);
                 } else {
@@ -112,22 +187,15 @@ export class LaunchApp {
                 }
             }
         },
-        univerlink: {
+        link: {
             preOpen: function (opt: any) {
-                if (opt.url) {
-                    return this._getUrlFromConf(opt);
-                }
-
-                const pageMap = this.configs.univerlink;
+                const pageMap = this.configs.deeplink.link;
                 let pageConf = pageMap[opt.page] || pageMap['index'];
                 pageConf = (<any>Object).assign({}, pageConf, opt);
                 if (pageConf.paramMap) {
                     pageConf.param = this._paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
-                if (!opt.page) {
-                    pageConf.url = 'https://' + (this.configs.host || location.host);
-                }
-                return this._getUrlFromConf(pageConf);
+                return this._getUrlFromConf(pageConf, 'link');
             },
             open: function (url: string) {
                 locationCall(url);
@@ -135,20 +203,54 @@ export class LaunchApp {
         },
         yingyongbao: {
             preOpen: function (opt: any) {
-                return this._getUrlFromConf(this.configs.yingyongbao);
+                let pageConf = deepMerge(this.configs.deeplink.yyb, { param: opt.param });
+                return this._getUrlFromConf(pageConf, 'yyb');
             },
             open: function (url: string) {
                 locationCall(url);
             }
         },
-        weixin: {
+        wxGuide: {
             open: function () {
-                this.configs.wxGuideMethod && this.configs.wxGuideMethod(detector);
+                let func = this.options.wxGuideMethod || this.configs.wxGuideMethod;
+                func && func(detector);
             }
         },
-        appstore: {
+        store: {
+            open: function (noTimeout) {
+                if (!noTimeout && this.timeoutDownload) {
+                    this._setTimeEvent();
+                }
+                if (detector.os.name === 'ios') {
+                    locationCall(this.configs.pkgs.ios);
+                } else if (detector.os.name === 'android') {
+                    let store = this.configs.pkgs.store, brand, url;
+                    // Object.keys(store).forEach((v, i) => {
+                    //     brand = store[v];
+                    //     if (brand && brand.reg.test(ua)) {
+                    //         let url = this._getUrlFromConf(brand, 'store');
+                    //         iframeCall(url);
+                    //         return;
+                    //     }
+                    // })
+                    for (let key in store) {
+                        brand = store[key];
+                        if (brand && brand.reg.test(ua)) {
+                            url = this._getUrlFromConf(brand, 'store');
+                            iframeCall(url);
+                            break;
+                        }
+                    }
+                    if (noTimeout && !url) {
+                        locationCall(this.options.landPage || this.configs.landPage);
+                    }
+                }
+                // 未匹配到商店会走超时逻辑走兜底
+            }
+        },
+        unknown: {
             open: function () {
-                locationCall(this.configs.pkgs.appstore['default']);
+                locationCall(this.options.landPage || this.configs.landPage);
             }
         }
     };
@@ -157,31 +259,40 @@ export class LaunchApp {
         SUCCESS: 1,
         UNKNOW: 2
     };
-    // config
-    private configs: any
-    private openMethod: any
+    // config(init config & method options)
+    private configs: any;
+    private openMethod: any;
+    private timer: any;
     // param
-    private options: any
-    private callback: (status: number, detector: any) => boolean
-
+    private options: any;
+    private timeoutDownload: boolean;
+    private callback: (status: number, detector: any) => number;
+    // other
+    private callbackId = 0;
     constructor(opt: any) {
-        this.configs = (<any>Object).assign(LaunchApp.defaultConfig, opt);
+        let tmpConfig = deepMerge({}, LaunchApp.defaultConfig);
+        this.configs = deepMerge(tmpConfig, opt);
         this.openMethod = this._getOpenMethod();
     }
 
     /**
-     * select open method according to the environment
+     * select open method according to the environment and options
      */
     _getOpenMethod() {
-        if (detector.browser.name === 'micromessenger' && !this.configs.useYingyongbao) {
-            return LaunchApp.openChannel.weixin;
-        } else if (detector.browser.name === 'micromessenger'
-            && (detector.os.name === 'android' || !this.configs.useUniversalLink)) {
-            return LaunchApp.openChannel.yingyongbao;
-        } else if (this.configs.useUniversalLink && detector.os.name === 'ios' && detector.os.version >= 9) {
-            return LaunchApp.openChannel.univerlink;
+        if (inWexin) {
+            if (this.configs.useYingyongbao) {
+                return LaunchApp.openChannel.yingyongbao;
+            } else if (this.configs.wxGuideMethod) {
+                return LaunchApp.openChannel.wxGuide;
+            }
         }
-        return LaunchApp.openChannel.scheme;
+        if ((this.configs.useUniversalLink && enableULink) || (this.configs.useAppLink && enableApplink)) {
+            return LaunchApp.openChannel.link;
+        }
+        if (detector.os.name == 'ios' || detector.os.name == 'android') {
+            return LaunchApp.openChannel.scheme;
+        }
+        return LaunchApp.openChannel.unknown;
     }
 
     /**
@@ -189,81 +300,129 @@ export class LaunchApp {
      * @param {*} opt 
      * {
      * page:'index',
-     * url:'http://tieba.baidu.com/', for universallink
      * param:{},
-     * openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'|'appstore'
-     * pkgs:{android:'',ios:''}
-     * },
      * paramMap:{}
-     * @param {*} callback return true for timeout download
+     * scheme:'', for scheme
+     * url:'http://tieba.baidu.com/', for link
+     * launchType:{
+     *     ios:link/scheme/store
+     *     android:link/scheme/store
+     * }
+     * wxGuideMethod
+     * updateTipMethod
+     * clipboardTxt
+     * pkgs:{android:'',ios:'',yyb:''}
+     * timeout 是否走超时逻辑,<0表示不走
+     * landpage
+     * callback 端回调方法？？????????TODO
+     * },
+     * 
+     * @param {*} callback number(1 download,0 landpage,-1 nothing)
      */
-    open(opt?: any, callback?: (status: number, detector: any) => boolean) {
+    open(opt?: any, callback?: (status: number, detector: any) => number) {
         try {
             this.options = opt;
             this.callback = callback;
-            var tmpOpenMethod = null;
-            if (this.options.openMethod) {
-                switch (this.options.openMethod) {
-                    case 'weixin':
-                        tmpOpenMethod = LaunchApp.openChannel.weixin;
+            this.timeoutDownload = opt.timeout >= 0 || (this.configs.timeout >= 0 && opt.timeout == undefined);
+            let tmpOpenMethod = null, needPro = true;
+
+            // 指定降级调起方案
+            if (inWexin) {
+                // 腾讯系产品
+                if (opt.wxGuideMethod === null) {
+                    tmpOpenMethod = LaunchApp.openChannel.unknown;
+                    if ((this.configs.useUniversalLink && enableULink) || (this.configs.useAppLink && enableApplink)) {
+                        tmpOpenMethod = LaunchApp.openChannel.link;
+                    } else if (detector.os.name == 'ios' || detector.os.name == 'android') {
+                        tmpOpenMethod = LaunchApp.openChannel.scheme;
+                    }
+                } else if (opt.wxGuideMethod) {
+                    tmpOpenMethod = LaunchApp.openChannel.wxGuide;
+                    needPro = false;
+                }
+            } else if (opt.launchType) {
+                let type;
+                switch (detector.os.name) {
+                    case 'ios':
+                        type = opt.launchType.ios;
                         break;
-                    case 'yingyongbao':
-                        tmpOpenMethod = LaunchApp.openChannel.yingyongbao;
+                    case 'android':
+                        type = opt.launchType.android;
+                        break;
+                }
+                switch (type) {
+                    case 'link':
+                        tmpOpenMethod = LaunchApp.openChannel.link;
                         break;
                     case 'scheme':
                         tmpOpenMethod = LaunchApp.openChannel.scheme;
                         break;
-                    case 'univerlink':
-                        if (detector.os.name === 'ios' && detector.os.version >= 9) {
-                            tmpOpenMethod = LaunchApp.openChannel.univerlink;
-                        }
-                        break;
-                    case 'appstore':
-                        if (detector.os.name === 'ios') {
-                            tmpOpenMethod = LaunchApp.openChannel.appstore;
-                        }
+                    case 'store':
+                        tmpOpenMethod = LaunchApp.openChannel.store;
+                        needPro = false;
                         break;
                 }
             }
             tmpOpenMethod = tmpOpenMethod || this.openMethod;
 
-            const openUrl = tmpOpenMethod.preOpen
-                && tmpOpenMethod.preOpen.call(this, opt || {});
-            tmpOpenMethod.open
-                && tmpOpenMethod.open.call(this, openUrl);
+            if (typeof opt.callback === 'function') {
+                opt.param = opt.param || {};
+                let funcName = '_wla_func_' + (++this.callbackId);
+                window[funcName] = function () {
+                    opt.callback.apply(window, ([]).slice.call(arguments, 0));
+                };
+                opt.param['callback'] = funcName;
+            } else {
+                if (opt.callback) {
+                    opt.param['callback'] = callback;
+                }
+            }
+
+            if (needPro) {
+                const openUrl = tmpOpenMethod.preOpen && tmpOpenMethod.preOpen.call(this, opt || {});
+                tmpOpenMethod.open.call(this, openUrl);
+            } else {
+                tmpOpenMethod.open.call(this);
+            }
+
+            if (opt.clipboardTxt) {
+                copy(opt.clipboardTxt)
+            }
         } catch (e) {
-            console.log('error:', e);
-            locationCall(this.configs.downPage);
+            console.log('launch error:', e);
+            locationCall(this.options.landPage || this.configs.landPage);
         }
     }
 
     /**
      * down package
-     * {
-     * pkgs:{android:'',ios:''}
-     * }
+     * opt: {android:'',ios:''，yyk:'',landPage}
      */
-    down(opt?: any) {
-        this.options = opt;
-        let pkgUrl;
+    download(opt?: any) {
+        let pkgs = (<any>Object).assign({}, this.configs.pkgs, opt);
+
         if (detector.browser.name == 'micromessenger' || detector.browser.name == 'qq') {
-            pkgUrl = this.configs.pkgs.yingyongbao[detector.browser.name];
-            locationCall(pkgUrl || this.configs.pkgs.yingyongbao['default']);
+            locationCall(opt.yyb);
         } else if (detector.os.name === 'android') {
-            if (this.options && this.options.pkgs && this.options.pkgs.android) {
-                pkgUrl = this.options.pkgs.android;
-            } else {
-                pkgUrl = this.configs.pkgs.androidApk[detector.browser.name];
-            }
-            locationCall(pkgUrl || this.configs.pkgs.androidApk['default']);
+            locationCall(pkgs.android);
         } else if (detector.os.name === 'ios') {
-            if (this.options && this.options.pkgs && this.options.pkgs.ios) {
-                pkgUrl = this.options.pkgs.ios;
-            } else {
-                pkgUrl = this.configs.pkgs.appstore[detector.browser.name];
-            }
-            locationCall(pkgUrl || this.configs.pkgs.appstore['default']);
+            locationCall(pkgs.ios);
+        } else {
+            locationCall(opt.landPage || this.configs.landPage);
         }
+    }
+
+    /**
+     * 检验版本
+     * @param pageConf {version:''}
+     */
+    checkVersion(pageConf) {
+        if (pageConf.version > this.configs.appVersion) {
+            let func = this.options.updateTipMethod || this.configs.updateTipMethod;
+            func && func();
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -296,45 +455,73 @@ export class LaunchApp {
         if (!obj) {
             return '';
         }
-
-        let s = '';
-        let otherObj = {};
+        let str = '';
         for (let k in obj) {
             if (!obj.hasOwnProperty(k)) {
                 continue;
             }
-            s += (k + '=' + obj[k] + '&');
+            if (typeof obj[k] == 'object') {
+                str += k + '=' + encodeURIComponent(JSON.stringify(obj)) + '&';
+            } else {
+                str += k + '=' + obj[k] + '&';
+            }
         };
-
-        return s ? s.substr(0, s.length - 1) : s;
+        return str ? str.substr(0, str.length - 1) : str;
     }
 
     /**
      * generating URL
      * @param {*} conf 
+     * @param type 'scheme link yyb'
      */
-    _getUrlFromConf(conf: any) {
-        let paramStr = this._stringtifyParams(conf.param);
-        if (conf.url && detector.os.name === 'ios' && detector.os.version >= 9) {
-            // 对url进行参数处理 'tieba.baidu.com/p/{pid}'
-            let url = conf.url;
-            const placeholders = url.match(/\{.*?\}/g);
-            placeholders && placeholders.forEach((ph: string, i: number) => {
-                const key = ph.substring(1, ph.length - 1);
-                url = url.replace(ph, conf.param[key]);
-                delete conf.param[key];
-            })
+    _getUrlFromConf(conf: any, type: string) {
+        let paramStr = conf.param && this._stringtifyParams(conf.param);
+        let strUrl = '';
+        switch (type) {
+            case 'link':
+                // 对url进行参数处理 'tieba.baidu.com/p/{pid}'
+                let url = conf.url;
+                const placeholders = url.match(/\{.*?\}/g);
+                placeholders && placeholders.forEach((ph: string, i: number) => {
+                    const key = ph.substring(1, ph.length - 1);
+                    url = url.replace(ph, conf.param[key]);
+                    delete conf.param[key];
+                });
 
-            paramStr = this._stringtifyParams(conf.param);
-            return url + (paramStr ? ((url.indexOf('?') > 0 ? '&' : '?') + paramStr) : '');
+                strUrl = url + (paramStr ? ((url.indexOf('?') > 0 ? '&' : '?') + paramStr) : '');
+                break;
+            case 'scheme':
+                if (this.options.scheme) {
+                    strUrl = this.options.scheme + (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
+                } else {
+                    strUrl = conf.protocol + '://' +
+                        (conf.host ? conf.host + '/' + conf.path : conf.path) +
+                        (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
+                }
+                break;
+            case 'yyb':
+                strUrl = conf.url + (paramStr ? ((conf.url.indexOf('?') > 0 ? '&' : '?') + paramStr) : '');
+                break;
+            case 'store':
+                strUrl = conf.scheme.replace('{id}', conf.id);
+                break;
         }
-        return conf.protocol + '://' +
-            (conf.host ? conf.host + '/' + conf.path : conf.path) +
-            (paramStr ? this.configs.searchPrefix() + paramStr : '');
+        return strUrl;
     }
 
-    _callend(status: number): boolean {
-        return this.callback && this.callback(status, detector);
+    _callend(status: number) {
+        clearTimeout(this.timer);
+        const backResult = this.callback && this.callback(status, detector);
+        // 调起失败处理
+        if (status != LaunchApp.openStatus.SUCCESS) {
+            if (backResult == 1) {
+                this.download(this.options.pkgs);
+            } else if (backResult == 2) {
+                locationCall(this.options.landPage || this.configs.landPage);
+            } else if (backResult == 3) {
+                LaunchApp.openChannel.store.open.call(this, true);
+            }
+        }
     }
 
     /**
@@ -343,31 +530,52 @@ export class LaunchApp {
     _setTimeEvent() {
         const self = this;
         let haveChange = false;
-        const change = function () {
+
+        let property = 'hidden', eventName = 'visibilitychange';
+        if (typeof document.hidden !== 'undefined') { // Opera 12.10 and Firefox 18 and later support
+            property = 'hidden';
+            eventName = 'visibilitychange';
+        } else if (typeof (<any>document).msHidden !== 'undefined') {
+            property = 'msHidden';
+            eventName = 'msvisibilitychange';
+        } else if (typeof (<any>document).webkitHidden !== 'undefined') {
+            property = 'webkitHidden';
+            eventName = 'webkitvisibilitychange';
+        }
+
+        const pageChange = function (e) {
             haveChange = true;
-            if (document.hidden) {
+            if (document.hidden || e.hidden) {
                 self._callend(LaunchApp.openStatus.SUCCESS);
             } else {
-                const backResult = self._callend(LaunchApp.openStatus.UNKNOW);
-                backResult && self.down(self.options);
+                self._callend(LaunchApp.openStatus.UNKNOW);
             }
-            document.removeEventListener('visibilitychange', change);
+            document.removeEventListener('pagehide', pageChange);
+            document.removeEventListener(eventName, pageChange);
+            document.removeEventListener('baiduboxappvisibilitychange', pageChange);
         };
-        document.addEventListener("visibilitychange", change, false);
+        window.addEventListener('pagehide', pageChange, false);
+        document.addEventListener(eventName, pageChange, false);
+        document.addEventListener('baiduboxappvisibilitychange', pageChange, false);
 
-        const timer = setTimeout(function () {
+
+        this.timer = setTimeout(function () {
             if (haveChange) {
                 return;
             }
-            document.removeEventListener('visibilitychange', change);
-            let backResult = true;
+            // document.removeEventListener('visibilitychange', pageChange);
+            document.removeEventListener('pagehide', pageChange);
+            document.removeEventListener(eventName, pageChange);
+            document.removeEventListener('baiduboxappvisibilitychange', pageChange);
+
+            // document.removeEventListener
             if (!document.hidden && !haveChange) {
-                backResult = self._callend(LaunchApp.openStatus.FAILED);
+                self._callend(LaunchApp.openStatus.FAILED);
             } else {
-                backResult = self._callend(LaunchApp.openStatus.UNKNOW);
+                alert('unknown');
+                self._callend(LaunchApp.openStatus.UNKNOW);
             }
             haveChange = true;
-            backResult && self.down(self.options);
-        }, this.configs.timeout);
+        }, this.options.timeout || this.configs.timeout);
     }
 }
