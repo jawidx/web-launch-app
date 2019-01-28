@@ -12,3 +12,7 @@ yarn-error.log
 *.sln
 .vscode/*
 !.vscode/settings.json
+
+# project
+lib
+output

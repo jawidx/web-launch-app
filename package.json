@@ -1,40 +1,44 @@
 {
-	"name": "web-launch-app",
-	"version": "1.2.7",
-	"description": "launch app from web page",
-	"main": "./lib/index.js",
-	"scripts": {
-		"start": "node server.js",
-		"build": "rm -rf lib/* && tsc"
-	},
-	"keywords": [
-		"keywords"
-	],
-	"author": "jawidx",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/jawidx/web-launch-app.git"
-	},
-	"bugs": {
-		"url": "https://github.com/jawidx/web-launch-app/issues"
-	},
-	"homepage": "https://github.com/jawidx/web-launch-app#readme",
-	"license": "MIT",
-	"dependencies": {
-		"core-js": "^2.5.3"
-	},
-	"devDependencies": {
-		"clean-webpack-plugin": "^0.1.17",
-		"css-loader": "^0.28.7",
-		"express": "^4.16.2",
-		"html-loader": "^0.5.1",
-		"html-webpack-plugin": "^3.2.0",
-		"less": "^2.7.3",
-		"less-loader": "^4.0.5",
-		"style-loader": "^0.19.0",
-		"ts-loader": "^4.4.2",
-		"webpack": "^4.16.5",
-		"webpack-dev-middleware": "^1.12.0",
-		"webpack-dev-server": "^2.9.4"
-	}
+    "name": "web-launch-app",
+    "version": "2.0.0",
+    "description": "launch app from web page",
+    "main": "./lib/index.js",
+    "scripts": {
+        "tsc": "tsc",
+        "start": "http-server output",
+        "build": "webpack -w",
+        "build-amd": "webpack -p --config webpack.amd.config.js"
+    },
+    "keywords": [
+        "deeplink,scheme,universal link,invoke,launch app"
+    ],
+    "author": "jawidx",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jawidx/web-launch-app.git"
+    },
+    "bugs": {
+        "url": "https://github.com/jawidx/web-launch-app/issues"
+    },
+    "homepage": "https://github.com/jawidx/web-launch-app#readme",
+    "license": "MIT",
+    "dependencies": {
+        "copy-to-clipboard": "3.0.8"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.2.2",
+        "@babel/preset-env": "^7.2.3",
+        "babel-loader": "^8.0.4",
+        "clean-webpack-plugin": "^0.1.17",
+        "css-loader": "^0.28.7",
+        "html-loader": "^0.5.1",
+        "html-webpack-plugin": "^3.2.0",
+        "http-server": "^0.11.1",
+        "less": "^2.7.3",
+        "less-loader": "^4.0.5",
+        "style-loader": "^0.19.0",
+        "ts-loader": "^4.4.2",
+        "webpack": "^4.16.5",
+        "webpack-cli": "^3.2.0"
+    }
 }

@@ -4,25 +4,51 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
     mode: 'development',
-    devtool: 'inline-source-map',
+    // devtool: 'inline-source-map',
+    target: 'web',
     entry: {
-        demo: ['./examples/index.js']
+        demo:['./examples/index.ts']
     },
     output: {
         filename: '[name].[chunkhash].js',
-        path: path.resolve(__dirname, 'build'),
-        // publicPath: '/'
+        path: path.resolve(__dirname, 'output'),
+        // publicPath: '/view'
     },
     plugins: [
-        new CleanWebpackPlugin(['build']),
+        new CleanWebpackPlugin(['output']),
         new HtmlWebpackPlugin({
             filename: 'demo.html',
             template: './examples/index.html',
             title: 'Demo Title',
-        })
+            alwaysWriteToDisk: true,
+            // chunksSortMode: none
+        }),
+        // new webpack.optimize.UglifyJsPlugin(),
+        // new webpack.optimize.ModuleConcatenationPlugin()
     ],
+    resolve: {
+        extensions: ['*', '.js', '.jsx', '.ts', '.tsx']
+    },
     module: {
         rules: [
+            {
+                test: /\.(js|jsx|ts|tsx)$/,
+                include: path.resolve(__dirname, 'src'),
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: ['@babel/env'],
+                            // "plugins": [
+                            //     ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                            //     ["@babel/plugin-proposal-class-properties", { "loose": true }],
+                            //     ['@babel/transform-runtime'],
+                            // ]
+                        }
+                    },
+                    'ts-loader'
+                ]
+            },
             {
                 test: /\.(html)$/,
                 use: {
@@ -37,15 +63,6 @@ module.exports = {
                     'less-loader'
                 ]
             },
-            {
-                test: /\.ts$/,
-                exclude: /node_modules/,
-                use: [
-                    {
-                        loader: 'ts-loader'
-                    }
-                ]
-            }
             // test: /\.(png|jpg|gif)$/,
             // loader: 'url?limit=8192&name=./static/img/[hash].[ext]',
         ]
