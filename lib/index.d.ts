@@ -1,4 +1,15 @@
-import 'core-js/fn/object/assign';
+import { ua, detector } from './detector';
+export { ua, detector };
+/**
+ * iframe call
+ * @param url
+ */
+export declare function iframeCall(url: string): void;
+/**
+ * location call
+ * @param url
+ */
+export declare function locationCall(url: string): void;
 export declare class LaunchApp {
     static defaultConfig: any;
     static openChannel: {
@@ -6,7 +17,7 @@ export declare class LaunchApp {
             preOpen(opt: any): any;
             open: (url: string) => void;
         };
-        univerlink: {
+        link: {
             preOpen: (opt: any) => any;
             open: (url: string) => void;
         };
@@ -14,10 +25,13 @@ export declare class LaunchApp {
             preOpen: (opt: any) => any;
             open: (url: string) => void;
         };
-        weixin: {
+        wxGuide: {
             open: () => void;
         };
-        appstore: {
+        store: {
+            open: (noTimeout: any) => void;
+        };
+        unknown: {
             open: () => void;
         };
     };
@@ -28,11 +42,14 @@ export declare class LaunchApp {
     };
     private configs;
     private openMethod;
+    private timer;
     private options;
+    private timeoutDownload;
     private callback;
+    private callbackId;
     constructor(opt: any);
     /**
-     * select open method according to the environment
+     * select open method according to the environment and options
      */
     _getOpenMethod(): {
         preOpen(opt: any): any;
@@ -45,22 +62,35 @@ export declare class LaunchApp {
      * @param {*} opt
      * {
      * page:'index',
-     * url:'http://tieba.baidu.com/', for universallink
      * param:{},
-     * openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'|'appstore'
-     * pkgs:{android:'',ios:''}
-     * },
      * paramMap:{}
-     * @param {*} callback return true for timeout download
-     */
-    open(opt?: any, callback?: (status: number, detector: any) => boolean): void;
-    /**
-     * down package
-     * {
-     * pkgs:{android:'',ios:''}
+     * scheme:'', for scheme
+     * url:'', for link
+     * launchType:{
+     *     ios:link/scheme/store
+     *     android:link/scheme/store
      * }
+     * wxGuideMethod
+     * updateTipMethod
+     * clipboardTxt
+     * pkgs:{android:'',ios:'',yyb:'',store:{...}}
+     * timeout 是否走超时逻辑,<0表示不走
+     * landpage
+     * callback 端回调方法
+     * },
+     * @param {*} callback number(1 download,0 landpage,-1 nothing)
      */
-    down(opt?: any): void;
+    open(opt?: any, callback?: (status: number, detector: any) => number): void;
+    /**
+     * download package
+     * opt: {android:'',ios:''，yyk:'',landPage}
+     */
+    download(opt?: any): void;
+    /**
+     * 检验版本
+     * @param pageConf {version:''}
+     */
+    checkVersion(pageConf: any): boolean;
     /**
      * map param (for different platform)
      * @param {*} param
@@ -75,9 +105,10 @@ export declare class LaunchApp {
     /**
      * generating URL
      * @param {*} conf
+     * @param type 'scheme link yyb'
      */
-    _getUrlFromConf(conf: any): string;
-    _callend(status: number): boolean;
+    _getUrlFromConf(conf: any, type: string): string;
+    _callend(status: number): void;
     /**
      * determine whether or not open successfully
      */

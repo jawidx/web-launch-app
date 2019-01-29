@@ -6,9 +6,9 @@ function addHandler(element, type, handler) {
     if (element.addEventListener) {
         element.addEventListener(type, handler, false);
     } else if (element.attachEvent) {
-        element.attachEvent("on" + type, handler);
+        element.attachEvent('on' + type, handler);
     } else {
-        element["on" + type] = handler;
+        element['on' + type] = handler;
     }
 }
 
@@ -276,16 +276,14 @@ addHandler(linkNani, 'click', function () {
 
 // Haokan
 const haokanConfig = {
-    // appRegExp: /haokan(.*)/,
     inApp: false,
-    // appVerReg: /haokan\/(\d+(\.\d+)*)/,
     appVersion: '4.9.5.10',
     pkgName: 'com.baidu.haokan',
     deeplink: {
         scheme: {
             android: {
+                protocol: 'baiduhaokan',
                 index: {
-                    protocol: 'baiduhaokan',
                     path: 'home/index',
                     // baiduhaokan://home/index/?channel=recommend&auto_play_index=0
                     param: {
@@ -297,162 +295,73 @@ const haokanConfig = {
                     },
                 },
                 video: {
-                    protocol: 'baiduhaokan',
                     path: 'video/details/',
                     param: {
                         vid: ''
                     }
                 },
                 minivideo: {
-                    protocol: 'baiduhaokan',
                     path: 'minivideo/videodetails/',
                     param: {
                         vid: ''
                     }
                 },
-                launch3rdApp: {
-                    protocol: 'baiduhaokan',
-                    path: 'growth/launch3rdApp',
-                },
-                // growth/getAppInstall
                 login: {
-                    protocol: 'baiduhaokan',
                     path: 'action/loginSMS/',
                     param: {
                         vid: ''
                     }
                 },
                 my: {
-                    protocol: 'baiduhaokan',
-                    path: 'home/my',
-                    paramMap: {
-                    }
-                },
-                hotword: {
-                    protocol: 'baiduhaokan',
-                    path: 'search/hotword/',
-                    paramMap: {
-                    }
-                },
-                searchresult: {
-                    protocol: 'baiduhaokan',
-                    path: 'search/result/',
-                    paramMap: {
-                    }
-                },
-                live: {
-                    protocol: 'baiduhaokan',
-                    path: 'home/live/',
-                    paramMap: {
-                    }
-                },
-                donothing: {
-                    protocol: 'baiduhaokan',
-                    path: 'donothing',
-                    paramMap: {
-                    }
-                },
-                topic: {
-                    protocol: 'baiduhaokan',
-                    path: 'video/topic/',
-                    paramMap: {
-                    }
-                },
-                topicvideoset: {
-                    protocol: 'baiduhaokan',
-                    path: 'video/topicvideoset/',
-                    paramMap: {
-                    }
-                },
-                webview: {
-                    protocol: 'baiduhaokan',
-                    path: 'webview/',
-                    paramMap: {
-                    },
-                    version: '4.9.5'
-                },
-                getAppInstall: {
-                    protocol: 'baiduhaokan',
-                    path: 'growth/getAppInstall',
-                    paramMap: {
-                    }
-                },
-                regShare: {
-                    protocol: 'baiduhaokan',
-                    path: 'action/shareHandler',
-                    param: {
-                        share_content: ''
-                    },
-                    paramMap: {
-                    },
-                    version: '4.9.6'
-                }
-            },
-            ios: {
-                index: {
-                    protocol: 'baiduhaokan',
-                    path: 'home/index'
-                },
-                video: {
-                    protocol: 'baiduhaokan',
-                    path: 'video/details/',
-                    param: {
-                        vid: ''
-                    },
-                    paramMap: {
-                    }
-                },
-                minivideo: {
-                    protocol: 'baiduhaokan',
-                    path: 'minivideo/videodetails/',
-                    param: {
-                        vid: ''
-                    }
-                },
-                launch3rdApp: {
-                    protocol: 'baiduhaokan',
-                    path: 'growth/launch3rdApp',
-                },
-                login: {
-                    protocol: 'baiduhaokan',
-                    path: 'action/loginSMS/',
-                    param: {
-                        vid: ''
-                    }
-                },
-                my: {
-                    protocol: 'baiduhaokan',
                     path: 'home/my',
                     paramMap: {
                     }
                 },
                 live: {
-                    protocol: 'baiduhaokan',
                     path: 'home/live/',
                     paramMap: {
                     }
                 },
                 webview: {
-                    protocol: 'baiduhaokan',
                     path: 'webview',
                     paramMap: {
                     }
+                }
+            },
+            ios: {
+                protocol: 'baiduhaokan',
+                index: {
+                    path: 'home/index'
                 },
-                getAppInstall: {
-                    protocol: 'baiduhaokan',
-                    path: 'growth/getAppInstall',
+                video: {
+                    path: 'video/details/'
+                },
+                minivideo: {
+                    path: 'minivideo/videodetails/',
+                    param: {
+                        vid: ''
+                    }
+                },
+                login: {
+                    path: 'action/loginSMS/',
+                    param: {
+                        vid: ''
+                    }
+                },
+                my: {
+                    path: 'home/my',
                     paramMap: {
                     }
                 },
-                regShare: {
-                    protocol: 'baiduhaokan',
-                    path: 'action/shareHandler',
-                    param: {
-                        share_content: ''
-                    },
+                live: {
+                    path: 'home/live/',
                     paramMap: {
-                    },
-                    version: '4.9.5'
+                    }
+                },
+                webview: {
+                    path: 'webview',
+                    paramMap: {
+                    }
                 }
             }
         },
@@ -519,12 +428,16 @@ const haokanConfig = {
 };
 const lanchHaokan = new LaunchApp(haokanConfig);
 
-
 addHandler(linkHaokan, 'click', function () {
     lanchHaokan.open({
         page: 'my',
         param: {
             vid: '4215764431860909454'
+        },
+        pkgName:'3333',
+        launchType: {
+            ios: 'store',
+            android: 'store'
         },
         // clipboardTxt: '#baiduhaokan://webview/?url_key=https%3a%2f%2feopa.baidu.com%2fpage%2fauthorizeIndex-AcHzJLpa%3fproductid%3d1%26gtype%3d1%26idfrom%3dinside-baiduappbanner&pd=yq&tab=guide&tag=guide&source=yq-0-yq#',
         pkgs: {
@@ -533,7 +446,7 @@ addHandler(linkHaokan, 'click', function () {
             yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
         }
     }, (s, d) => {
-        console.log('callbackout', s, d)
+        console.log('callbackout', s, d);
         return 0;
     });
 

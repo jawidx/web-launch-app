@@ -1,12 +1,12 @@
 import * as copy from 'copy-to-clipboard';
 import { ua, detector } from './detector';
-export { detector }
+export { ua, detector }
 
 /**
  * iframe call
  * @param url
  */
-export const iframeCall = (url: string) => {
+export function iframeCall(url: string) {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('src', url);
     iframe.setAttribute('style', 'display:none');
@@ -25,9 +25,7 @@ export function locationCall(url: string) {
 }
 
 /**
- * 如果target(也就是FirstOBJ[key])存在，
- * 且是对象的话再去调用deepObjectMerge，
- * 否则就是FirstOBJ[key]里面没这个对象，需要与SecondOBJ[key]合并
+ * merge object
  */
 function deepMerge(firstObj, secondObj) {
     for (var key in secondObj) {
@@ -45,13 +43,14 @@ export class LaunchApp {
     static defaultConfig: any = {
         inApp: false,
         appVersion: '',
+        // 应用商店包名
+        pkgName: '',
         deeplink: {
             scheme: {
                 android: {
-                    // 页面或功能（视频页、分享功能）
+                    protocol: 'protocol',
                     index: {
-                        protocol: '',
-                        path: '',
+                        path: 'path',
                         param: {},
                         paramMap: {
                         },
@@ -59,9 +58,9 @@ export class LaunchApp {
                     },
                 },
                 ios: {
+                    protocol: 'protocol',
                     index: {
-                        protocol: '',
-                        path: '',
+                        path: 'path',
                         param: {},
                         paramMap: {
                         },
@@ -71,7 +70,7 @@ export class LaunchApp {
             },
             link: {
                 index: {
-                    url: 'www.baidu.com',
+                    url: '',
                     param: {
                     },
                     paramMap: {
@@ -87,36 +86,34 @@ export class LaunchApp {
                 }
             },
         },
-        // config package for different browser
         pkgs: {
-            yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
-            android: 'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk',
-            ios: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
+            yyb: '',
+            android: '',
+            ios: '',
             store: {
-                // TODO考虑把ios和yyb加到这里
-                xiaomi: {
-                    reg: /\(.*Android.*(MI|Mi|Redmi|HM NOTE| 201\d{4} Build).*\)|Android.*XiaoMi/,
-                    scheme: 'mimarket://details?id={id}&back=true',
-                    // id: {}
-                },
+                // xiaomi: {
+                //     reg: /\(.*Android.*(MI|Mi|Redmi|HM NOTE| 201\d{4} Build).*\)|Android.*XiaoMi/,
+                //     scheme: 'mimarket://details?id={id}&back=true',
+                // },
                 samsung: {
                     reg: /\(.*Android.*(SAMSUNG|SM-|GT-).*\)/,
                     scheme: 'samsungapps://ProductDetail/{id}'
                 },
-                huawei: {
-                    reg: /\(.*Android.*(HUAWEI|HONOR|HW-|H60-).*\)|^HONOR|^HUAWEI/i,
-                    scheme: 'appmarket://details?id={id}'
-                },
-                oppo: {
-                    reg: /Android.*(OPPO|A31.? Build|R\d+(Plus)? Build)|Android.*OppoBrowser|^OPPO/,
-                    // scheme: 'oppomarket://details?packagename={id}',
-                    scheme: 'market://details?id={id}',
-                    // 功能上有坑，下载优先
-                    downloadFirst: true
-                },
-                vivo: {
-                    reg: /\(.*Android.*(vivo|VIVO).*\)/,
-                    scheme: 'vivomarket://details?id={id}'
+                // huawei: {
+                //     reg: /\(.*Android.*(HUAWEI|HONOR|HW-|H60-).*\)|^HONOR|^HUAWEI/i,
+                //     scheme: 'appmarket://details?id={id}'
+                // },
+                // oppo: {
+                //     reg: /Android.*(OPPO|A31.? Build|R\d+(Plus)? Build)|Android.*OppoBrowser|^OPPO/,
+                //     scheme: 'oppomarket://details?packagename={id}',
+                // },
+                // vivo: {
+                //     reg: /\(.*Android.*(vivo|VIVO).*\)/,
+                //     scheme: 'vivomarket://details?id={id}'
+                // },
+                android: {
+                    reg: /\(.*Android.*\)/,
+                    scheme: 'market://details?id={id}&a=3'
                 }
             },
         },
@@ -125,7 +122,7 @@ export class LaunchApp {
         // use UniversalLink for ios9+(default:true)
         useUniversalLink: true,
         useYingyongbao: true,
-        // guide to explorer when open in wechat
+        // 微信引导
         wxGuideMethod: () => {
             const div = document.createElement('div');
             div.style.position = 'absolute'
@@ -145,13 +142,12 @@ export class LaunchApp {
         },
         // 口令
         clipboardTxt: '',
-        // the parameter prefix(default is question mark, you can define something else)
+        // 参数前缀
         searchPrefix: (detector: any) => { return '?' },
-        // download after attempting to adjust timeout,<0 means disable
+        // 超时下载, <0表示不使用超时下载
         timeout: 2000,
-        // download page url（boot the user to download or download installation packages directly）
-        // jump to download page when it cant't find a corresponding configuration or get a error
-        landPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
+        // 兜底页面
+        landPage: '',
     };
     static openChannel = {
         scheme: {
@@ -225,14 +221,6 @@ export class LaunchApp {
                     locationCall(this.configs.pkgs.ios);
                 } else if (detector.os.name === 'android') {
                     let store = this.configs.pkgs.store, brand, url;
-                    // Object.keys(store).forEach((v, i) => {
-                    //     brand = store[v];
-                    //     if (brand && brand.reg.test(ua)) {
-                    //         let url = this._getUrlFromConf(brand, 'store');
-                    //         iframeCall(url);
-                    //         return;
-                    //     }
-                    // })
                     for (let key in store) {
                         brand = store[key];
                         if (brand && brand.reg.test(ua)) {
@@ -303,7 +291,7 @@ export class LaunchApp {
      * param:{},
      * paramMap:{}
      * scheme:'', for scheme
-     * url:'http://tieba.baidu.com/', for link
+     * url:'', for link
      * launchType:{
      *     ios:link/scheme/store
      *     android:link/scheme/store
@@ -311,12 +299,11 @@ export class LaunchApp {
      * wxGuideMethod
      * updateTipMethod
      * clipboardTxt
-     * pkgs:{android:'',ios:'',yyb:''}
+     * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
      * landpage
-     * callback 端回调方法？？????????TODO
+     * callback 端回调方法
      * },
-     * 
      * @param {*} callback number(1 download,0 landpage,-1 nothing)
      */
     open(opt?: any, callback?: (status: number, detector: any) => number) {
@@ -395,7 +382,7 @@ export class LaunchApp {
     }
 
     /**
-     * down package
+     * download package
      * opt: {android:'',ios:''，yyk:'',landPage}
      */
     download(opt?: any) {
@@ -494,7 +481,8 @@ export class LaunchApp {
                 if (this.options.scheme) {
                     strUrl = this.options.scheme + (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
                 } else {
-                    strUrl = conf.protocol + '://' +
+                    let protocol = conf.protocol || (detector.os.name === 'ios' ? this.configs.deeplink.scheme.ios.protocol : this.configs.deeplink.scheme.android.protocol);
+                    strUrl = protocol + '://' +
                         (conf.host ? conf.host + '/' + conf.path : conf.path) +
                         (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
                 }
@@ -503,7 +491,7 @@ export class LaunchApp {
                 strUrl = conf.url + (paramStr ? ((conf.url.indexOf('?') > 0 ? '&' : '?') + paramStr) : '');
                 break;
             case 'store':
-                strUrl = conf.scheme.replace('{id}', conf.id);
+                strUrl = conf.scheme.replace('{id}', conf.pkgName || this.configs.pkgName);
                 break;
         }
         return strUrl;

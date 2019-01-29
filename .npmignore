@@ -14,7 +14,7 @@ yarn-error.log
 !.vscode/settings.json
 
 examples/
+output/
 src/
-server.js
 tsconfig.json
 webpack.config.js

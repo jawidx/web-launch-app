@@ -7,7 +7,7 @@ module.exports = {
     // devtool: 'inline-source-map',
     target: 'web',
     entry: {
-        demo:['./examples/index.ts']
+        demo: ['./examples/index.ts']
     },
     output: {
         filename: '[name].[chunkhash].js',
@@ -20,7 +20,6 @@ module.exports = {
             filename: 'demo.html',
             template: './examples/index.html',
             title: 'Demo Title',
-            alwaysWriteToDisk: true,
             // chunksSortMode: none
         }),
         // new webpack.optimize.UglifyJsPlugin(),

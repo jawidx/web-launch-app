@@ -16,5 +16,6 @@ export declare class Detector {
      */
     parse(ua: string): any;
 }
+declare const ua: string;
 declare const d: any;
-export { d as detector };
+export { d as detector, ua };
