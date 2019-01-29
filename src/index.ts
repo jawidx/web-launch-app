@@ -54,8 +54,8 @@ export class LaunchApp {
                         param: {},
                         paramMap: {
                         },
-                        version: 0,
-                    },
+                        version: 0
+                    }
                 },
                 ios: {
                     protocol: 'protocol',
@@ -64,7 +64,7 @@ export class LaunchApp {
                         param: {},
                         paramMap: {
                         },
-                        version: 0,
+                        version: 0
                     }
                 }
             },
@@ -75,7 +75,7 @@ export class LaunchApp {
                     },
                     paramMap: {
                     },
-                    version: 0,
+                    version: 0
                 }
             },
             yyb: {
@@ -84,7 +84,7 @@ export class LaunchApp {
                     pkgname: '',
                     ckey: ''
                 }
-            },
+            }
         },
         pkgs: {
             yyb: '',
@@ -115,7 +115,7 @@ export class LaunchApp {
                     reg: /\(.*Android.*\)/,
                     scheme: 'market://details?id={id}&a=3'
                 }
-            },
+            }
         },
         // use UniversalLink for android6+(default:true)
         useAppLink: true,
@@ -133,7 +133,7 @@ export class LaunchApp {
             div.innerHTML = '<div style="height:100%;background-color:#000;opacity:0.5;"></div><p style="position:absolute;top:0px;background-color:white;font-size:80px;padding: 20px 40px;margin: 0 40px;">点击右上角->选择在浏览器中打开->即可打开或下载APP</p>';
             document.body.appendChild(div);
             div.onclick = function () {
-                div.remove()
+                div.remove();
             }
         },
         // 升级提示
@@ -147,7 +147,7 @@ export class LaunchApp {
         // 超时下载, <0表示不使用超时下载
         timeout: 2000,
         // 兜底页面
-        landPage: '',
+        landPage: 'https://github.com/jawidx/web-launch-app'
     };
     static openChannel = {
         scheme: {
@@ -373,7 +373,7 @@ export class LaunchApp {
             }
 
             if (opt.clipboardTxt) {
-                copy(opt.clipboardTxt)
+                copy(opt.clipboardTxt);
             }
         } catch (e) {
             console.log('launch error:', e);

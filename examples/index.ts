@@ -1,6 +1,6 @@
 import { LaunchApp, detector } from '../src/index';
 import './index.less';
-console.log('detector,', detector)
+console.log('detector,', detector);
 function addHandler(element, type, handler) {
     if (!element) return;
     if (element.addEventListener) {
@@ -118,7 +118,7 @@ const tiebaConfig = {
             param: {
                 pkgname: 'com.baidu.tieba'
             }
-        },
+        }
     },
     pkgs: {
         android: 'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk',
@@ -382,7 +382,7 @@ const haokanConfig = {
                 param: {
                     uid: ''
                 }
-            },
+            }
         },
         yyb: {
             url: 'http://a.app.qq.com/o/simple.jsp',
@@ -402,21 +402,6 @@ const haokanConfig = {
             //     scheme: '',
             //     id: ''
             // },
-            xiaomi: {
-                id: 'com.baidu.haokan'
-            },
-            samsung: {
-                id: 'com.baidu.haokan'
-            },
-            huawei: {
-                id: 'com.baidu.haokan'
-            },
-            oppo: {
-                id: 'com.baidu.haokan'
-            },
-            vivo: {
-                id: 'com.baidu.haokan'
-            },
         }
     },
     useYingyongbao: false,
@@ -424,7 +409,7 @@ const haokanConfig = {
     useUniversalLink: false,
     useAppLink: false,
     landPage: 'http://haokan.baidu.com/download',
-    timeout: 2000,
+    timeout: 2000
 };
 const lanchHaokan = new LaunchApp(haokanConfig);
 
@@ -435,10 +420,10 @@ addHandler(linkHaokan, 'click', function () {
             vid: '4215764431860909454'
         },
         pkgName:'3333',
-        launchType: {
-            ios: 'store',
-            android: 'store'
-        },
+        // launchType: {
+        //     ios: 'store',
+        //     android: 'store'
+        // },
         // clipboardTxt: '#baiduhaokan://webview/?url_key=https%3a%2f%2feopa.baidu.com%2fpage%2fauthorizeIndex-AcHzJLpa%3fproductid%3d1%26gtype%3d1%26idfrom%3dinside-baiduappbanner&pd=yq&tab=guide&tag=guide&source=yq-0-yq#',
         pkgs: {
             android: 'https://sv.bdstatic.com/static/haokanapk/apk/baiduhaokan1021176d.apk',
@@ -447,7 +432,7 @@ addHandler(linkHaokan, 'click', function () {
         }
     }, (s, d) => {
         console.log('callbackout', s, d);
-        return 0;
+        return 2;
     });
 
     // lanchHaokan.open({
