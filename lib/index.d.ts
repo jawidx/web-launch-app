@@ -75,7 +75,7 @@ export declare class LaunchApp {
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
-     * landpage
+     * landPage
      * callback 端回调方法
      * },
      * @param {*} callback number(1 download,0 landpage,-1 nothing)
