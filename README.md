@@ -3,37 +3,53 @@
 npm install --save web-launch-app
 
 ## 简介 
-- 通过配置唤起方案、唤起页面路径及参数、渠道包地址等，在业务代码中通过open()方法唤起App指定页面或通过down()方法下载指定安装包
+- 通过简单配置，在业务代码中通过open/download方法唤起App指定页或下载安装包（适用app内调用端功能）
 - 默认唤起方案
     - iOS使用universal link或scheme或appstore方案
-    - Android使用scheme方案
-    - 微信中使用应用宝或弹引导提示方案
+    - Android使用app link或scheme或应用商店方案
+    - 微信中使用应用宝或引导提示方案或走ios/android的具体方案
+    - 其它平台可通过方法参数控制实现
 
 ## 使用
 ```javascript
 const lanchApp = new LaunchApp(config);
-// 唤起App
-lanchApp.open();
-// 唤起App到指定页面
 lanchApp.open({
-    // 唤起方案（weixin表示弹引导提示方案）
-    openMethod:'weixin'|'yingyongbao'|'scheme'|'univerlink'|'appstore' 
-    page: '',   // for scheme&univerlink
-    param:{},   // for scheme&univerlink
-    url:'',  // for universal link
-    pkgs:{android:'',ios:''}    // 使用scheme唤起超时后下载使用
+    // launchType:{
+    //     ios:'link'|'scheme'|'store'
+    //     android:'link'|'scheme'|'store'
+    // }
+    page: 'frs',    // for scheme&link
+    param:{         // for scheme&link
+        forumName: 'jawidx'
+    },
+    //paramMap:{}
+    // scheme:'',  // 指定完整的scheme值
+    // url:'',  // 指定完成的link值
+    // wxGuideMethod: ()=>{},
+    // updateTipMethod: ()=>{},
+    // clipboardTxt:'',
+    // pkgs:{
+    //     android:'',
+    //     ios:''
+    //     yyb:'',
+    //     store:{...}
+    // },
+    // timeout:3000,
+    // landpage:''
 }, (status, detector) => {
     // 使用scheme方案时唤起回调，status(0:failed，1:success，2:unknow)
-    // 返回true表示打开失败时进行下载
-    return true;
+    // 返回值：1下载安装包，2跳转兜底页，3跳转应用商店
+    return 2;
 });
-// 下载配置的默认包
-lanchApp.down();
-// 下载指定包
+// 下载
+lanchApp.download();
+// 下载指定包(不指定平台使用全局配置)
 lanchApp.down{
     pkgs:{
         ios:'',
         android:''
+        yyb:'',
+        landPage:''
     }
 };
 ```
@@ -41,16 +57,71 @@ lanchApp.down{
 ## 配置
 ```javascript
 {
-    scheme: {}, // 配置scheme方案具体页面及参数，生成请求格式为"protocol://path?param&param"
-    univerlink: {}, // 配置univerlink方案具体页面及参数，生成请求格式为"https://domain.com?param=value"
-    yingyongbao: {},
-    pkgs: {},   // 下载包配置
-    useUniversalLink: true, // 是否为ios9+使用universallink方案，默认为true
+    inApp: false,   //是否是app内，在app内且指定了version的scheme会进行版本检测时
+    appVersion: '', //对具体scheme链接进行版本检测时使用
+    pkgName:'', //应用商店使用
+    deeplink:{
+        // 配置scheme方案具体页面及参数，生成请求格式为"protocol://path?param&param"
+        scheme: {
+            android: {
+                // 指定android的scheme协议头
+                protocol: 'protocol',
+                index: {
+                    path: 'path',
+                    param: {},
+                    paramMap: {},// 参数映射，解决不同平台参数名不一至情况
+                    version: '4.9.6'  // 版本要求
+                }
+            },
+            ios: {
+                protocol: 'protocol',
+                index: {
+                    path: 'path',
+                    param: {},
+                    paramMap: {
+                    },
+                    version: 0
+                }
+            }
+        },
+        link: {
+            pagename: {
+                url: '',
+                param: {
+                },
+                paramMap: {
+                },
+                version: 0
+            }
+        }, // 配置univerlink方案具体页面及参数，生成请求格式为"https://domain.com?param=value"
+        yyb: {
+            url: 'http://a.app.qq.com/o/simple.jsp',
+            param: {
+                pkgname: '',
+                ckey: ''
+            }
+        },
+    },
+    pkgs: { // 下载包配置
+        yyb: '',
+            android: 'http://www.**.com/package.apk',
+            ios: '',
+            store: {    // 手机商店匹配
+                xphone: {
+                    reg: /\(.*Android.*\)/,
+                    scheme: 'market://details?id=packagename'
+                }
+            }
+    }, 
+    useAppLink: true,       // 是否为android6+使用applink方案，默认true
+    useUniversalLink: true, // 是否为ios9+使用universallink方案，默认true
     useYingyongbao: true,   // 在微信中跳转应用宝，默认为true
-    wxGuideMethod: ()=>{},  // 微信中进行提示引导(useYingyongbao为false时)
-    downPage:'',   //下载页（当无法找到对应配置或出错时跳转到下载页）
+    wxGuideMethod: ()=>{},  // 微信中进行提示引导(useYingyongbao为false时)，指定null时走ios/android方案（适用不受微信限制）
+    updateTipMethod: ()=>{},    // scheme版本检测时升级提示
+    clipboardTxt:'',    // 剪贴板内容，常见口令方案
     searchPrefix: '?',  // scheme或univerlink生成请求中参数前辍，默认为"?"
     timeout: 2000   // scheme方案中跳转超时判断，默认2000毫秒
+    landPage:'',   // 兜底页
 }
 ```
 
@@ -58,82 +129,67 @@ lanchApp.down{
 ```javascript
 // launchapp.ts
 import {LaunchApp} from 'web-launch-app';
+let inApp = /haokan(.*)/.test(ua);
+let appVersion = inApp ? /haokan\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
 const lanchInstance = new LaunchApp({
-    scheme: {
-        android: {
-            // 页面名称(默认页面请设置为:index)
-            index: {
+    inApp: inApp,
+    appVersion: appVersion,
+    pkgName: 'com.baidu.tieba',
+    deeplink: {
+        scheme: {
+            android: {
                 protocol: 'tbfrs',
-                path: 'tieba.baidu.com',
-                // 固定参数
-                param: {from:'h5'},
-            },
-            frs: {
-                protocol: 'tbfrs',
-                path: 'tieba.baidu.com',
-                // 参数映射(解决不同端使用不同参数名的问题)
-                paramMap: {
-                    forumName: 'kw'
+                // 页面名称(默认页面请设置为:index)
+                index: {
+                    protocol: 'tbfrs',
+                    path: 'tieba.baidu.com',
+                    // 固定参数
+                    param: {from:'h5'},
+                },
+                frs: {
+                    protocol: 'tbfrs',
+                    path: 'tieba.baidu.com',
+                    // 参数映射(解决不同端使用不同参数名的问题)
+                    paramMap: {
+                        forumName: 'kw'
+                    }
                 }
             },
-            h5: {
-                protocol: 'h5',
-                path: 'tieba.baidu.com',
+            ios: {
+                protocol: 'com.baidu.tieba',
+                index: {
+                    path: 'jumptoforum',
+                },
+                frs: {
+                    path: 'jumptoforum',
+                    paramMap: {
+                        forumName: 'tname'
+                    }
+                }
             }
         },
-        ios: {
+        link: {
             index: {
-                protocol: 'com.baidu.tieba',
-                path: 'jumptoforum',
+                url: 'https://tieba.baidu.com'
             },
             frs: {
-                protocol: 'com.baidu.tieba',
-                path: 'jumptoforum',
-                paramMap: {
-                    forumName: 'tname'
-                }
-            },
-            h5: {
-                protocol: 'h5',
-                path: 'tieba.baidu.com',
-            }
-        }
-    },
-    univerlink: {
-        index: {
-            url: 'https://tieba.baidu.com',
-            param: {},
-            paramMap: {
-                forumName: 'kw'
+                // 支持占位符
+                url: 'https://tieba.baidu.com/p/{forumName}'
             }
         },
-        frs: {
-            // 支持占位符
-            url: 'https://tieba.baidu.com/p/{kw}',
-            paramMap: {
-                forumName: 'kw'
+        yyb: {
+            url: 'http://a.app.qq.com/o/simple.jsp',
+            param: {
+                pkgname: 'com.baidu.tieba'
             }
-        }
-    },
-    yingyongbao: {
-        url: 'http://a.app.qq.com/o/simple.jsp',
-        param: {
-            pkgname: 'com.baidu.tieba'
-        }
+        },
     },
     pkgs: {
-        androidApk: {
-            // 可以根据浏览器名称设置渠道包 edge|sogou|360|micromessenger|qq|tt|liebao|tao|baidu|ie|mi|opera|oupeng|yandex|ali-ap|uc|chrome|android|blackberry|safari|webview|firefox|nokia
-            default: 'https://downpack.baidu.com/default.apk',
-            qq: 'https://downpack.baidu.com/tieba_qq.apk'
-        },
-        appstore: {
-            default: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
-        },
-        yingyongbao: {
-            default: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
-        }
+        android: 'https://downpack.baidu.com/default.apk',
+        ios: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
+        yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
     },
+    useAppLink: false,
     useUniversalLink: true,
     useYingyongbao: false,
     wxGuideMethod: function (detector) {
@@ -152,21 +208,19 @@ const lanchInstance = new LaunchApp({
             + '<p> 就能马上打开伙拍了哦~</p></div>';
         document.body.appendChild(div);
         div.onclick = function () {
-            div.remove()
+            div.remove();
         }
     },
-    downPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download',
     searchPrefix: (detector) => {
        return '?';
     },
-    timeout: 3000
+    timeout: 3000,
+    landPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download'
 });
 
 export function lanchApp(options:any, callback?: (status, detector) => boolean) {
     lanchInstance.open(options, callback);
 }
-
-// 下载app
 export function downApp(options:any) {
     lanchInstance.down(options);
 }

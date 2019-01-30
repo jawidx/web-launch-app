@@ -54,7 +54,7 @@ export class LaunchApp {
                         param: {},
                         paramMap: {
                         },
-                        version: 0
+                        version: ''
                     }
                 },
                 ios: {
@@ -64,7 +64,7 @@ export class LaunchApp {
                         param: {},
                         paramMap: {
                         },
-                        version: 0
+                        version: ''
                     }
                 }
             },
@@ -285,7 +285,7 @@ export class LaunchApp {
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
-     * landpage
+     * landPage
      * callback 端回调方法
      * },
      * @param {*} callback number(1 download,0 landpage,-1 nothing)
@@ -373,7 +373,7 @@ export class LaunchApp {
         let pkgs = (<any>Object).assign({}, this.configs.pkgs, opt);
 
         if (detector.browser.name == 'micromessenger' || detector.browser.name == 'qq') {
-            locationCall(opt.yyb);
+            locationCall(pkgs.yyb);
         } else if (detector.os.name === 'android') {
             locationCall(pkgs.android);
         } else if (detector.os.name === 'ios') {
