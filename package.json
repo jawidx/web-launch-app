@@ -6,11 +6,10 @@
     "scripts": {
         "tsc": "tsc",
         "start": "http-server output",
-        "build": "webpack -w",
-        "build-amd": "webpack -p --config webpack.amd.config.js"
+        "build": "webpack -w"
     },
     "keywords": [
-        "deeplink,scheme,universal link,invoke,launch app"
+        "deeplink,scheme,universal link,applink,invoke,launch app"
     ],
     "author": "jawidx",
     "repository": {
