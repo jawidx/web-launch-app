@@ -91,26 +91,10 @@ export class LaunchApp {
             android: '',
             ios: '',
             store: {
-                // xiaomi: {
-                //     reg: /\(.*Android.*(MI|Mi|Redmi|HM NOTE| 201\d{4} Build).*\)|Android.*XiaoMi/,
-                //     scheme: 'mimarket://details?id={id}&back=true',
-                // },
                 samsung: {
                     reg: /\(.*Android.*(SAMSUNG|SM-|GT-).*\)/,
                     scheme: 'samsungapps://ProductDetail/{id}'
                 },
-                // huawei: {
-                //     reg: /\(.*Android.*(HUAWEI|HONOR|HW-|H60-).*\)|^HONOR|^HUAWEI/i,
-                //     scheme: 'appmarket://details?id={id}'
-                // },
-                // oppo: {
-                //     reg: /Android.*(OPPO|A31.? Build|R\d+(Plus)? Build)|Android.*OppoBrowser|^OPPO/,
-                //     scheme: 'oppomarket://details?packagename={id}',
-                // },
-                // vivo: {
-                //     reg: /\(.*Android.*(vivo|VIVO).*\)/,
-                //     scheme: 'vivomarket://details?id={id}'
-                // },
                 android: {
                     reg: /\(.*Android.*\)/,
                     scheme: 'market://details?id={id}&a=3'
@@ -247,7 +231,7 @@ export class LaunchApp {
         SUCCESS: 1,
         UNKNOW: 2
     };
-    // config(init config & method options)
+    // config
     private configs: any;
     private openMethod: any;
     private timer: any;
