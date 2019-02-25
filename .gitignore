@@ -14,5 +14,4 @@ yarn-error.log
 !.vscode/settings.json
 
 # project
-lib
 output
