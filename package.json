@@ -1,10 +1,9 @@
 {
     "name": "web-launch-app",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "launch app from web page",
     "main": "./lib/index.js",
     "scripts": {
-        "tsc": "tsc",
         "start": "http-server output",
         "build": "webpack -w"
     },

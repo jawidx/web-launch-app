@@ -432,7 +432,7 @@ export class LaunchApp {
                 continue;
             }
             if (typeof obj[k] == 'object') {
-                str += k + '=' + encodeURIComponent(JSON.stringify(obj)) + '&';
+                str += k + '=' + encodeURIComponent(JSON.stringify(obj[k])) + '&';
             } else {
                 str += k + '=' + obj[k] + '&';
             }
