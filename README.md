@@ -3,7 +3,7 @@
 npm install --save web-launch-app
 
 ## 简介 
-- 通过简单配置，在业务代码中通过open/download方法唤起App指定页或下载安装包（适用app内调用端功能）
+- 通过简单配置，在业务代码中通过open/download方法唤起App指定页或下载安装包（适用app内调用端功能）
 - 默认唤起方案
     - iOS使用universal link或scheme或appstore方案
     - Android使用app link或scheme或应用商店方案
@@ -19,7 +19,7 @@ lanchApp.open({
     //     android:'link'|'scheme'|'store'
     // }
     page: 'frs',    // for scheme&link
-    param:{         // for scheme&link
+    param:{         // for scheme&link，对object类型会进行encodeURIComponent
         forumName: 'jawidx'
     },
     //paramMap:{}
@@ -119,7 +119,7 @@ lanchApp.down{
     wxGuideMethod: ()=>{},  // 微信中进行提示引导(useYingyongbao为false时)，指定null时走ios/android方案（适用不受微信限制）
     updateTipMethod: ()=>{},    // scheme版本检测时升级提示
     clipboardTxt:'',    // 剪贴板内容，常见口令方案
-    searchPrefix: '?',  // scheme或univerlink生成请求中参数前辍，默认为"?"
+    searchPrefix: '?',  // scheme或univerlink生成请求中参数前缀，默认为"?"
     timeout: 2000   // scheme方案中跳转超时判断，默认2000毫秒
     landPage:'',   // 兜底页
 }
@@ -149,7 +149,7 @@ const lanchInstance = new LaunchApp({
                 frs: {
                     protocol: 'tbfrs',
                     path: 'tieba.baidu.com',
-                    // 参数映射(解决不同端使用不同参数名的问题)
+                    // 参数映射(解决不同端使用不同参数名的问题)
                     paramMap: {
                         forumName: 'kw'
                     }
@@ -173,7 +173,7 @@ const lanchInstance = new LaunchApp({
                 url: 'https://tieba.baidu.com'
             },
             frs: {
-                // 支持占位符
+                // 支持占位符
                 url: 'https://tieba.baidu.com/p/{forumName}'
             }
         },
@@ -218,13 +218,29 @@ const lanchInstance = new LaunchApp({
     landPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download'
 });
 
+/**
+ * 外部调起app到具体页面
+*/ 
 export function lanchApp(options:any, callback?: (status, detector) => boolean) {
     lanchInstance.open(options, callback);
 }
+
+/**
+ * 下载APP
+ */
 export function downApp(options:any) {
     lanchInstance.down(options);
 }
 
+/**
+ * 端内H5页面调用端能力
+ */
+export function invokeApp(options:any, callback?: (status, detector) => boolean) {
+    lanchInstance.open(Object.assign({},{launchType:{
+            ios:'scheme'
+            android:'scheme'
+        }},options), callback);
+}
 ```
 
 ```javascript
