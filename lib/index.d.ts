@@ -1,5 +1,6 @@
+import { copy } from './copy';
 import { ua, detector } from './detector';
-export { ua, detector };
+export { ua, detector, copy };
 /**
  * iframe call
  * @param url

@@ -128,7 +128,7 @@ lanchApp.down{
 ## Demo
 ```javascript
 // launchapp.ts
-import {LaunchApp} from 'web-launch-app';
+import { LaunchApp, ua, detector, copy } from 'web-launch-app';
 let inApp = /haokan(.*)/.test(ua);
 let appVersion = inApp ? /haokan\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
 const lanchInstance = new LaunchApp({
