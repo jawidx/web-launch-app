@@ -14,6 +14,7 @@ npm install --save web-launch-app
 ```javascript
 const lanchApp = new LaunchApp(config);
 lanchApp.open({
+    // launchType指定唤起方案（微信除外）
     // launchType:{
     //     ios:'link'|'scheme'|'store'
     //     android:'link'|'scheme'|'store'
@@ -205,7 +206,7 @@ const lanchInstance = new LaunchApp({
             + require('../static/img/finger.png') + ') no-repeat right top;background-size:' + px('204px') + ' ' + px('212px') + ';width:100%;padding-top:' + px('208px') + ';color:white;font-size:' + px('32px') + ';text-align:center;">'
             + (explorerName ? '<img src="' + require("../static/img/safari.png") + '" style="width:' + px('120px') + ';height:' + px('120px') + ';"/>' : '')
             + '<p style="font-size:' + px('36px') + ';font-weight:bold;margin-bottom:6px;">点右上角选择“在' + explorerName + '浏览器中打开”</p>'
-            + '<p> 就能马上打开伙拍了哦~</p></div>';
+            + '<p> 就能马上打开App了哦~</p></div>';
         document.body.appendChild(div);
         div.onclick = function () {
             div.remove();
