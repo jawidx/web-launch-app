@@ -24,10 +24,11 @@ lanchApp.open({
     param:{         // for scheme&link，对object类型会进行encodeURIComponent
         forumName: 'jawidx'
     },
-    //paramMap:{}
+    // paramMap:{}
     // scheme:'',  // 指定完整的scheme值
     // url:'',  // 指定完成的link值
     // wxGuideMethod: ()=>{},
+    // useYingyongbao
     // updateTipMethod: ()=>{},
     // clipboardTxt:'',
     // pkgs:{

@@ -286,6 +286,7 @@ export class LaunchApp {
      *     android:link/scheme/store
      * }
      * wxGuideMethod
+     * useYingyongbao
      * updateTipMethod
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
