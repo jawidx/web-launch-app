@@ -1,4 +1,4 @@
-import { LaunchApp, detector } from '../src/index';
+import { LaunchApp, detector, ua, isAndroid, isIos, inWexin } from '../src/index';
 import './index.less';
 console.log('detector,', detector);
 function addHandler(element, type, handler) {
@@ -415,16 +415,23 @@ const lanchHaokan = new LaunchApp(haokanConfig);
 
 addHandler(linkHaokan, 'click', function () {
     lanchHaokan.open({
+        // launchType: {
+        //     ios: inWexin ? 'store' : 'link'
+        // },
         page: 'my',
         param: {
             vid: '4215764431860909454'
         },
-        pkgName:'3333',
+        pkgName: '3333',
         // launchType: {
         //     ios: 'store',
         //     android: 'store'
         // },
-        // clipboardTxt: '#baiduhaokan://webview/?url_key=https%3a%2f%2feopa.baidu.com%2fpage%2fauthorizeIndex-AcHzJLpa%3fproductid%3d1%26gtype%3d1%26idfrom%3dinside-baiduappbanner&pd=yq&tab=guide&tag=guide&source=yq-0-yq#',
+        wxGuideMethod: null,
+        // wxGuideMethod: isIos ? null : undefined,
+        // useYingyongbao: true,
+        timeout: 200,
+        clipboardTxt: '2323#baiduhaokan://webview/?url_key=https%3a%2f%2feopa.baidu.com%2fpage%2fauthorizeIndex-AcHzJLpa%3fproductid%3d1%26gtype%3d1%26idfrom%3dinside-baiduappbanner&pd=yq&tab=guide&tag=guide&source=yq-0-yq#',
         pkgs: {
             android: 'https://sv.bdstatic.com/static/haokanapk/apk/baiduhaokan1021176d.apk',
             ios: 'https://itunes.apple.com/cn/app/id1322948417?mt=8',
@@ -432,7 +439,7 @@ addHandler(linkHaokan, 'click', function () {
         }
     }, (s, d) => {
         console.log('callbackout', s, d);
-        return 2;
+        return inWexin && isIos ? 3 : 2;
     });
 
     // lanchHaokan.open({

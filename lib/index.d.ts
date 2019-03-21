@@ -1,6 +1,11 @@
 import { copy } from './copy';
 import { ua, detector } from './detector';
 export { ua, detector, copy };
+export declare const inWexin: boolean;
+export declare const isIos: boolean;
+export declare const isAndroid: boolean;
+export declare const enableULink: boolean;
+export declare const enableApplink: boolean;
 /**
  * iframe call
  * @param url
@@ -50,7 +55,7 @@ export declare class LaunchApp {
     private callbackId;
     constructor(opt: any);
     /**
-     * select open method according to the environment and options
+     * select open method according to the environment and config
      */
     _getOpenMethod(): {
         preOpen(opt: any): any;
@@ -79,7 +84,7 @@ export declare class LaunchApp {
      * landPage
      * callback 端回调方法
      * },
-     * @param {*} callback number(1 download,0 landpage,-1 nothing)
+     * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
      */
     open(opt?: any, callback?: (status: number, detector: any) => number): void;
     /**
