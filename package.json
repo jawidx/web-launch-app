@@ -1,6 +1,6 @@
 {
     "name": "web-launch-app",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "description": "launch app from web page",
     "main": "./lib/index.js",
     "scripts": {
