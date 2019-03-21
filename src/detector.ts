@@ -136,20 +136,10 @@ const OS = [
     ["windowsce", /\bwindows ce(?: ([0-9.]+))?/]
 ];
 const BROWSER = [
-    // Android 默认浏览器。该规则需要在 safari 之前。
-    ["android", function (ua: string) {
-        if (ua.indexOf("android") === -1) { return; }
-        return /\bversion\/([0-9.]+(?: beta)?)/;
-    }],
-    ["safari", /\bversion\/([0-9.]+(?: beta)?)(?: mobile(?:\/[a-z0-9]+)?)? safari\//],
     // tencent
     ["micromessenger", /\bmicromessenger\/([\d.]+)/],
     ["qq", /\bm?qqbrowser\/([0-9.]+)/],
-    // return /^(?!.*Safari).*QQ/.test(navigator.userAgent);
-    // return /MQQBrowser/i.test(navigator.userAgent);
     ["tt", /\btencenttraveler ([0-9.]+)/],
-    // UC 浏览器，可能会被识别为 Android 浏览器，规则需要前置。
-    // UC 桌面版浏览器携带 Chrome 信息，需要放在 Chrome 之前。
     ["uc", function (ua: string) {
         if (ua.indexOf("ucbrowser/") >= 0) {
             return /\bucbrowser\/([0-9.]+)/;
@@ -165,6 +155,32 @@ const BROWSER = [
             return /\b(?:ucbrowser|uc)\b/;
         }
     }],
+    ["360", function (ua: string) {
+        if (ua.indexOf("360 aphone browser") !== -1) {
+            return /\b360 aphone browser \(([^\)]+)\)/;
+        }
+        return /\b360(?:se|ee|chrome|browser)\b/;
+    }],
+    ["baidu", /\b(?:ba?idubrowser|baiduhd)[ \/]([0-9.x]+)/],
+    ["baiduboxapp",
+        function (ua) {
+            let back = 0;
+            let a;
+            if (/ baiduboxapp\//i.test(ua)) {
+                if (a = /([\d+.]+)_(?:diordna|enohpi)_/.exec(ua)) {
+                    a = a[1].split(".");
+                    back = a.reverse().join(".");
+                } else if ((a = /baiduboxapp\/([\d+.]+)/.exec(ua))) {
+                    back = a[1];
+                }
+
+                return {
+                    version: back,
+                };
+            }
+            return false;
+        },
+    ],
     ["sogou", function (ua: string) {
         if (ua.indexOf("sogoumobilebrowser") >= 0) {
             return /sogoumobilebrowser\/([0-9.]+)/;
@@ -173,14 +189,8 @@ const BROWSER = [
         }
         return / se ([0-9.x]+)/;
     }],
-    ["360", function (ua: string) {
-        if (ua.indexOf("360 aphone browser") !== -1) {
-            return /\b360 aphone browser \(([^\)]+)\)/;
-        }
-        return /\b360(?:se|ee|chrome|browser)\b/;
-    }],
-    ["baidu", /\b(?:ba?idubrowser|baiduhd)[ \/]([0-9.x]+)/],
     ["mi", /\bmiuibrowser\/([0-9.]+)/],
+    ["oppo", /\boppobrowser\/([0-9.]+)/],
     ["tao", /\btaobrowser\/([0-9.]+)/],
     ["ali-ap", function (ua: string) {
         if (ua.indexOf("aliapp") > 0) {
@@ -197,9 +207,17 @@ const BROWSER = [
         const re_opera_new = /\bopr\/([0-9.]+)/;
         return re_opera_old.test(ua) ? re_opera_old : re_opera_new;
     }],
+    ["edge", /edge\/([0-9.]+)/],
     ["chrome", / (?:chrome|crios|crmo)\/([0-9.]+)/],
     ["firefox", /\bfirefox\/([0-9.ab]+)/],
     ["nokia", /\bnokiabrowser\/([0-9.]+)/],
+    ["maxthon", /\b(?:maxthon|mxbrowser)(?:[ \/]([0-9.]+))?/],
+    // Android 默认浏览器。该规则需要在 safari 之前。
+    ["android", function (ua: string) {
+        if (ua.indexOf("android") === -1) { return; }
+        return /\bversion\/([0-9.]+(?: beta)?)/;
+    }],
+    ["safari", /\bversion\/([0-9.]+(?: beta)?)(?: mobile(?:\/[a-z0-9]+)?)? safari\//],
     // 如果不能被识别为 Safari，则猜测是 WebView。
     ["webview", /\bcpu(?: iphone)? os (?:[0-9._]+).+\bapplewebkit\b/],
 ];
