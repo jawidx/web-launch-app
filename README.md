@@ -11,6 +11,7 @@ npm install --save web-launch-app
     - 其它平台可通过方法参数控制实现
 
 ## 使用
+- open方法参数配置>web-launch-app实例配置>web-launch-app默认配置
 ```javascript
 const lanchApp = new LaunchApp(config);
 lanchApp.open({
@@ -38,8 +39,8 @@ lanchApp.open({
     // timeout:3000,
     // landpage:''
 }, (status, detector) => {
-    // 使用scheme方案时唤起回调，status(0:failed，1:success，2:unknow)
-    // 返回值：1下载安装包，2跳转兜底页，3跳转应用商店
+    // 使用scheme方案时超时回调方法，可选，status(0:failed，1:success，2:unknow)
+    // 返回值：1不做处理，2跳转兜底页，3跳转应用商店，默认下载pkg或跳转appstore
     return 2;
 });
 // 下载
@@ -266,6 +267,19 @@ lanchApp({
     },
     url:'https://tieba.baidu.com/huodong'
 });
+// 微信中方案通过wxGuideMethod、useYingyongbao控制，如果想走store可以通过超时返回3实现（同时把timeout设置小些）
+lanchHaokan.open({
+    page: 'my',
+    param: {
+        vid: '4215764431860909454'
+    },
+    wxGuideMethod: null,
+    timeout: 200
+}, (s, d) => {
+    console.log('callbackout', s, d);
+    // 微信中唤起超时: ios时走appstore，android到落地页
+    return inWexin && isIos ? 3 : 2;
+});
 downApp();
 downApp({
     pkgs:{
@@ -276,4 +290,4 @@ downApp({
 ```
 
 ## Who use?
-Tieba、伙拍小视频、好看视频
+贴吧、伙拍小视频、好看视频
