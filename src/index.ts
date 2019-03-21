@@ -1,6 +1,11 @@
 import { copy } from './copy'
 import { ua, detector } from './detector';
 export { ua, detector, copy }
+export const inWexin = detector.browser.name === 'micromessenger';
+export const isIos = detector.os.name === 'ios';
+export const isAndroid = detector.os.name === 'android';
+export const enableULink = isIos && detector.os.version >= 9;
+export const enableApplink = isAndroid && detector.os.version >= 6;
 
 /**
  * iframe call
@@ -34,10 +39,6 @@ function deepMerge(firstObj, secondObj) {
     }
     return firstObj;
 }
-
-const inWexin = detector.browser.name === 'micromessenger';
-const enableULink = detector.os.name === 'ios' && detector.os.version >= 9;
-const enableApplink = detector.os.name === 'android' && detector.os.version >= 6;
 
 export class LaunchApp {
     static defaultConfig: any = {
@@ -105,16 +106,17 @@ export class LaunchApp {
         useAppLink: true,
         // use UniversalLink for ios9+(default:true)
         useUniversalLink: true,
-        useYingyongbao: true,
+        useYingyongbao: false,
         // 微信引导
         wxGuideMethod: () => {
             const div = document.createElement('div');
             div.style.position = 'absolute'
             div.style.top = '0';
             div.style.zIndex = '1111';
-            div.style.width = '100%';
-            div.style.height = '100%';
-            div.innerHTML = '<div style="height:100%;background-color:#000;opacity:0.5;"></div><p style="position:absolute;top:0px;background-color:white;font-size:80px;padding: 20px 40px;margin: 0 40px;">点击右上角->选择在浏览器中打开->即可打开或下载APP</p>';
+            div.style.display = 'flex';
+            div.style.flexDirection = 'column';
+            div.style.alignItems = 'center';
+            div.innerHTML = '<div style="height:100vh;width: 100vw;background-color:#000;opacity:0.5;"></div><p style="position:absolute;top:0px;background-color:white;font-size:24px;padding:50px 30px;margin:0;width:60vw;text-align:center;">点击右上角->选择"在浏览器中打开"</p>';
             document.body.appendChild(div);
             div.onclick = function () {
                 div.remove();
@@ -122,7 +124,7 @@ export class LaunchApp {
         },
         // 升级提示
         updateTipMethod: () => {
-            alert('升级才能使用此功能！');
+            alert('升级App后才能使用此功能！');
         },
         // 口令
         clipboardTxt: '',
@@ -137,9 +139,9 @@ export class LaunchApp {
         scheme: {
             preOpen(opt: any) {
                 let pageMap: any = {};
-                if (detector.os.name === 'android') {
+                if (isAndroid) {
                     pageMap = this.configs.deeplink.scheme.android;
-                } else if (detector.os.name === 'ios') {
+                } else if (isIos) {
                     pageMap = this.configs.deeplink.scheme.ios;
                 }
                 let pageConf = pageMap[opt.page] || pageMap['index'];
@@ -160,7 +162,7 @@ export class LaunchApp {
                 if (this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                if (detector.os.name === 'ios' && detector.browser.name == 'safari') {
+                if (isIos && detector.browser.name == 'safari') {
                     locationCall(url);
                 } else {
                     iframeCall(url);
@@ -201,9 +203,9 @@ export class LaunchApp {
                 if (!noTimeout && this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                if (detector.os.name === 'ios') {
+                if (isIos) {
                     locationCall(this.configs.pkgs.ios);
-                } else if (detector.os.name === 'android') {
+                } else if (isAndroid) {
                     let store = this.configs.pkgs.store, brand, url;
                     for (let key in store) {
                         brand = store[key];
@@ -248,23 +250,26 @@ export class LaunchApp {
     }
 
     /**
-     * select open method according to the environment and options
+     * select open method according to the environment and config
      */
     _getOpenMethod() {
+        let { wxGuide, yingyongbao, link, scheme, unknown } = LaunchApp.openChannel;
         if (inWexin) {
-            if (this.configs.useYingyongbao) {
-                return LaunchApp.openChannel.yingyongbao;
-            } else if (this.configs.wxGuideMethod) {
-                return LaunchApp.openChannel.wxGuide;
+            if (this.configs.wxGuideMethod) {
+                return wxGuide;
+            }
+            else if (this.configs.useYingyongbao) {
+                return yingyongbao;
             }
         }
+
         if ((this.configs.useUniversalLink && enableULink) || (this.configs.useAppLink && enableApplink)) {
-            return LaunchApp.openChannel.link;
+            return link;
         }
-        if (detector.os.name == 'ios' || detector.os.name == 'android') {
-            return LaunchApp.openChannel.scheme;
+        if (isIos || isAndroid) {
+            return scheme;
         }
-        return LaunchApp.openChannel.unknown;
+        return unknown;
     }
 
     /**
@@ -288,48 +293,50 @@ export class LaunchApp {
      * landPage
      * callback 端回调方法
      * },
-     * @param {*} callback number(1 download,0 landpage,-1 nothing)
+     * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
      */
     open(opt?: any, callback?: (status: number, detector: any) => number) {
         try {
             this.options = opt;
             this.callback = callback;
             this.timeoutDownload = opt.timeout >= 0 || (this.configs.timeout >= 0 && opt.timeout == undefined);
+            let { scheme, link, wxGuide, yingyongbao, store, unknown } = LaunchApp.openChannel;
             let tmpOpenMethod = null, needPro = true;
 
-            // 指定降级调起方案
+            // 指定调起方案
             if (inWexin) {
-                // 腾讯系产品
-                if (opt.wxGuideMethod === null) {
-                    tmpOpenMethod = LaunchApp.openChannel.unknown;
-                    if ((this.configs.useUniversalLink && enableULink) || (this.configs.useAppLink && enableApplink)) {
-                        tmpOpenMethod = LaunchApp.openChannel.link;
-                    } else if (detector.os.name == 'ios' || detector.os.name == 'android') {
-                        tmpOpenMethod = LaunchApp.openChannel.scheme;
-                    }
-                } else if (opt.wxGuideMethod) {
-                    tmpOpenMethod = LaunchApp.openChannel.wxGuide;
+                if (opt.wxGuideMethod) {
+                    tmpOpenMethod = wxGuide;
                     needPro = false;
+                } else if (opt.useYingyongbao) {
+                    tmpOpenMethod = yingyongbao;
+                } else if (opt.wxGuideMethod === null) {
+                    tmpOpenMethod = unknown;
+                    if ((this.configs.useUniversalLink && enableULink) || (this.configs.useAppLink && enableApplink)) {
+                        tmpOpenMethod = link;
+                    } else if (isIos || isAndroid) {
+                        tmpOpenMethod = scheme;
+                    }
                 }
             } else if (opt.launchType) {
-                let type;
-                switch (detector.os.name) {
-                    case 'ios':
-                        type = opt.launchType.ios;
-                        break;
-                    case 'android':
-                        type = opt.launchType.android;
-                        break;
-                }
+                let type = opt.launchType[detector.os.name];
                 switch (type) {
                     case 'link':
-                        tmpOpenMethod = LaunchApp.openChannel.link;
+                        if ((isIos && enableULink) || (isAndroid && enableApplink)) {
+                            tmpOpenMethod = link;
+                        } else {
+                            tmpOpenMethod = scheme;
+                        }
                         break;
                     case 'scheme':
-                        tmpOpenMethod = LaunchApp.openChannel.scheme;
+                        tmpOpenMethod = scheme;
                         break;
                     case 'store':
-                        tmpOpenMethod = LaunchApp.openChannel.store;
+                        tmpOpenMethod = store;
+                        needPro = false;
+                        break;
+                    default:
+                        tmpOpenMethod = unknown;
                         needPro = false;
                         break;
                 }
@@ -349,15 +356,12 @@ export class LaunchApp {
                 }
             }
 
+            opt.clipboardTxt && copy(opt.clipboardTxt);
             if (needPro) {
                 const openUrl = tmpOpenMethod.preOpen && tmpOpenMethod.preOpen.call(this, opt || {});
                 tmpOpenMethod.open.call(this, openUrl);
             } else {
                 tmpOpenMethod.open.call(this);
-            }
-
-            if (opt.clipboardTxt) {
-                copy(opt.clipboardTxt);
             }
         } catch (e) {
             console.log('launch error:', e);
@@ -374,9 +378,9 @@ export class LaunchApp {
 
         if (detector.browser.name == 'micromessenger' || detector.browser.name == 'qq') {
             locationCall(pkgs.yyb);
-        } else if (detector.os.name === 'android') {
+        } else if (isAndroid) {
             locationCall(pkgs.android);
-        } else if (detector.os.name === 'ios') {
+        } else if (isIos) {
             locationCall(pkgs.ios);
         } else {
             locationCall(opt.landPage || this.configs.landPage);
@@ -465,7 +469,7 @@ export class LaunchApp {
                 if (this.options.scheme) {
                     strUrl = this.options.scheme + (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
                 } else {
-                    let protocol = conf.protocol || (detector.os.name === 'ios' ? this.configs.deeplink.scheme.ios.protocol : this.configs.deeplink.scheme.android.protocol);
+                    let protocol = conf.protocol || (isIos ? this.configs.deeplink.scheme.ios.protocol : this.configs.deeplink.scheme.android.protocol);
                     strUrl = protocol + '://' +
                         (conf.host ? conf.host + '/' + conf.path : conf.path) +
                         (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
@@ -486,12 +490,19 @@ export class LaunchApp {
         const backResult = this.callback && this.callback(status, detector);
         // 调起失败处理
         if (status != LaunchApp.openStatus.SUCCESS) {
-            if (backResult == 1) {
-                this.download(this.options.pkgs);
-            } else if (backResult == 2) {
-                locationCall(this.options.landPage || this.configs.landPage);
-            } else if (backResult == 3) {
-                LaunchApp.openChannel.store.open.call(this, true);
+            switch (backResult) {
+                case 1:
+                    // do nothing
+                    break;
+                case 2:
+                    locationCall(this.options.landPage || this.configs.landPage);
+                    break;
+                case 3:
+                    LaunchApp.openChannel.store.open.call(this, true);
+                    break;
+                default:
+                    this.download(this.options.pkgs);
+                    break;
             }
         }
     }
