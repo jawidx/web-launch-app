@@ -38,7 +38,7 @@ lanchApp.open({
     //     store:{...}
     // },
     // timeout:3000,
-    // landpage:''
+    // landPage:''
 }, (status, detector) => {
     // 使用scheme方案时超时回调方法，可选，status(0:failed，1:success，2:unknow)
     // 返回值：1不做处理，2跳转兜底页，3跳转应用商店，默认下载pkg或跳转appstore
