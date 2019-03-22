@@ -15,30 +15,45 @@ npm install --save web-launch-app
 ```javascript
 const lanchApp = new LaunchApp(config);
 lanchApp.open({
-    // launchType指定唤起方案（微信除外）
-    // launchType:{
-    //     ios:'link'|'scheme'|'store'
-    //     android:'link'|'scheme'|'store'
-    // }
+    page: 'frs',    // for scheme&link
+    param:{         // for scheme&link，对object类型会进行encodeURIComponent
+        forumName: 'jawidx'
+    }
+    // paramMap:{} // 参数映射，解决不同平台参数名不一至情况
+});
+// 指定唤起方案（微信除外）
+lanchApp.open({
+    launchType:{
+        ios:'link'|'scheme'|'store'
+        android:'link'|'scheme'|'store'
+    }
+    scheme:'',  // 指定完整的scheme值
+    url:''  // 指定完成的link值
+});
+// 指定微信中方案
+lanchApp.open({
     page: 'frs',    // for scheme&link
     param:{         // for scheme&link，对object类型会进行encodeURIComponent
         forumName: 'jawidx'
     },
-    // paramMap:{}
-    // scheme:'',  // 指定完整的scheme值
-    // url:'',  // 指定完成的link值
-    // wxGuideMethod: ()=>{},
-    // useYingyongbao
+    wxGuideMethod: ()=>{},  // 引导提示，优先级高于useYingyongbao
+    useYingyongbao: true
+});
+lanchApp.open({
+    page: 'frs',    // for scheme&link
+    param:{         // for scheme&link，对object类型会进行encodeURIComponent
+        forumName: 'jawidx'
+    },
     // updateTipMethod: ()=>{},
-    // clipboardTxt:'',
-    // pkgs:{
-    //     android:'',
-    //     ios:''
-    //     yyb:'',
-    //     store:{...}
-    // },
-    // timeout:3000,
-    // landPage:''
+    clipboardTxt:'',
+    pkgs:{
+        android:'',
+        ios:''
+        yyb:'',
+        store:{...}
+    },
+    timeout:3000,
+    landPage:''
 }, (status, detector) => {
     // 使用scheme方案时超时回调方法，可选，status(0:failed，1:success，2:unknow)
     // 返回值：1不做处理，2跳转兜底页，3跳转应用商店，默认下载pkg或跳转appstore
