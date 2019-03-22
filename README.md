@@ -21,6 +21,7 @@ lanchApp.open({
     }
     // paramMap:{} // 参数映射，解决不同平台参数名不一至情况
 });
+
 // 指定唤起方案（微信除外）
 lanchApp.open({
     launchType:{
@@ -30,6 +31,7 @@ lanchApp.open({
     scheme:'',  // 指定完整的scheme值
     url:''  // 指定完成的link值
 });
+
 // 指定微信中方案
 lanchApp.open({
     page: 'frs',    // for scheme&link
@@ -39,6 +41,7 @@ lanchApp.open({
     wxGuideMethod: ()=>{},  // 引导提示，优先级高于useYingyongbao
     useYingyongbao: true
 });
+
 lanchApp.open({
     page: 'frs',    // for scheme&link
     param:{         // for scheme&link，对object类型会进行encodeURIComponent
@@ -59,8 +62,10 @@ lanchApp.open({
     // 返回值：1不做处理，2跳转兜底页，3跳转应用商店，默认下载pkg或跳转appstore
     return 2;
 });
+
 // 下载
 lanchApp.download();
+
 // 下载指定包(不指定平台使用全局配置)
 lanchApp.down{
     pkgs:{
