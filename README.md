@@ -4,7 +4,7 @@ npm install --save web-launch-app
 
 ## 简介 
 - 通过简单配置，在业务代码中通过open/download方法唤起App指定页或下载安装包（适用app内调用端功能）
-- 默认唤起方案
+- 唤起方案
     - iOS使用universal link或scheme或appstore方案
     - Android使用app link或scheme或应用商店方案
     - 微信中使用应用宝或引导提示方案或走ios/android的具体方案
