@@ -1,11 +1,42 @@
 import { copy } from './copy'
 import { ua, detector } from './detector';
-export { ua, detector, copy }
+export { copy, ua, detector }
 export const inWexin = detector.browser.name === 'micromessenger';
 export const isIos = detector.os.name === 'ios';
 export const isAndroid = detector.os.name === 'android';
 export const enableULink = isIos && detector.os.version >= 9;
 export const enableApplink = isAndroid && detector.os.version >= 6;
+
+/**
+ * 是否支持link
+ */
+export function supportLink() {
+    let supportLink = false;
+    if (isAndroid) {
+        switch (detector.browser.name) {
+            case 'chrome':
+            case 'samsung':
+            case 'zhousi':
+                supportLink = true;
+                break;
+            default:
+                supportLink = false;
+                break;
+        }
+    }
+    if (isIos) {
+        switch (detector.browser.name) {
+            case 'uc':
+            case 'qq':
+                supportLink = false;
+                break;
+            default:
+                supportLink = true;
+                break;
+        }
+    }
+    return supportLink;
+}
 
 /**
  * iframe call
@@ -112,11 +143,14 @@ export class LaunchApp {
             const div = document.createElement('div');
             div.style.position = 'absolute'
             div.style.top = '0';
+            div.style.left = '0';
             div.style.zIndex = '1111';
-            div.style.display = 'flex';
-            div.style.flexDirection = 'column';
-            div.style.alignItems = 'center';
-            div.innerHTML = '<div style="height:100vh;width: 100vw;background-color:#000;opacity:0.5;"></div><p style="position:absolute;top:0px;background-color:white;font-size:24px;padding:50px 30px;margin:0;width:60vw;text-align:center;">点击右上角->选择"在浏览器中打开"</p>';
+            div.style.width = '100vw';
+            div.style.height = '100vh';
+            div.style.textAlign = 'center';
+            div.style.backgroundColor = '#000';
+            div.style.opacity = '0.7';
+            div.innerHTML = '<p class="wx-guide-p" style="font-size:20px;color:#fff;line-height:200px;">点击右上角->选择"在浏览器中打开"</p>';
             document.body.appendChild(div);
             div.onclick = function () {
                 div.remove();
