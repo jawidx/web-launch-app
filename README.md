@@ -9,45 +9,45 @@ npm install --save web-launch-app
     - Android使用app link或scheme或应用商店方案
     - 微信中使用应用宝或引导提示方案或走ios/android的具体方案
     - 其它平台可通过方法参数控制实现
+- 唤起方案选择：open方法参数配置>实例配置>默认配置（代码中参见方法：_getOpenMethod、open）
 
 ## 使用
-- open方法参数配置>web-launch-app实例配置>web-launch-app默认配置
 ```javascript
 const lanchApp = new LaunchApp(config);
+// 常用唤起
 lanchApp.open({
-    page: 'frs',    // for scheme&link
-    param:{         // for scheme&link，对object类型会进行encodeURIComponent
+    page: 'frs',
+    param:{
         forumName: 'jawidx'
     }
-    // paramMap:{} // 参数映射，解决不同平台参数名不一至情况
+    // paramMap:{}
 });
 
-// 指定唤起方案（微信除外）
+// 指定方案唤起（微信中引导提示，可在实例中配置默认值）
 lanchApp.open({
     launchType:{
-        ios:'link'|'scheme'|'store'
-        android:'link'|'scheme'|'store'
-    }
-    scheme:'',  // 指定完整的scheme值
-    url:''  // 指定完成的link值
-});
-
-// 指定微信中方案
-lanchApp.open({
-    page: 'frs',    // for scheme&link
-    param:{         // for scheme&link，对object类型会进行encodeURIComponent
-        forumName: 'jawidx'
+        ios:'store',
+        android:'scheme'
     },
-    wxGuideMethod: ()=>{},  // 引导提示，优先级高于useYingyongbao
-    useYingyongbao: true
+    wxGuideMethod: ()=>{alert('右上角选择浏览器中打开')},  // 引导提示，优先级高于useYingyongbao
+    useYingyongbao: true, // 因为指定了wxGuideMethod，此行并不会生效
+    scheme:'',
+    url:''
+    Param:{}
 });
 
+// 定制唤起（微信android去应用宝，ios微信去appstore）
 lanchApp.open({
-    page: 'frs',    // for scheme&link
-    param:{         // for scheme&link，对object类型会进行encodeURIComponent
+    launchType:{
+        ios:'link',
+        android:'scheme'
+    },
+    page: 'frs',
+    param:{
         forumName: 'jawidx'
     },
     // updateTipMethod: ()=>{},
+    useYingyongbao: isAndroid&&inWechat,
     clipboardTxt:'',
     pkgs:{
         android:'',
@@ -60,7 +60,7 @@ lanchApp.open({
 }, (status, detector) => {
     // 使用scheme方案时超时回调方法，可选，status(0:failed，1:success，2:unknow)
     // 返回值：1不做处理，2跳转兜底页，3跳转应用商店，默认下载pkg或跳转appstore
-    return 2;
+    return isIos&&inWechat ? 3 : 0;
 });
 
 // 下载
@@ -80,9 +80,9 @@ lanchApp.down{
 ## 配置
 ```javascript
 {
-    inApp: false,   //是否是app内，在app内且指定了version的scheme会进行版本检测时
-    appVersion: '', //对具体scheme链接进行版本检测时使用
-    pkgName:'', //应用商店使用
+    inApp: false,   // 是否是app内，在app内且指定了version的scheme会进行版本检测时
+    appVersion: '', // 对具体scheme链接进行版本检测时使用
+    pkgName:'', // 应用商店使用
     deeplink:{
         // 配置scheme方案具体页面及参数，生成请求格式为"protocol://path?param&param"
         scheme: {
@@ -90,8 +90,9 @@ lanchApp.down{
                 // 指定android的scheme协议头
                 protocol: 'protocol',
                 index: {
+                    protocol: 'protocol', // 可选，如无会读取上一级protocol，一般不需要配置
                     path: 'path',
-                    param: {},
+                    param: {},	// 生成scheme或linkurl时的参数
                     paramMap: {},// 参数映射，解决不同平台参数名不一至情况
                     version: '4.9.6'  // 版本要求
                 }
@@ -99,6 +100,7 @@ lanchApp.down{
             ios: {
                 protocol: 'protocol',
                 index: {
+                    protocol: 'protocol',
                     path: 'path',
                     param: {},
                     paramMap: {
@@ -107,6 +109,7 @@ lanchApp.down{
                 }
             }
         },
+        // 配置univerlink方案具体url及参数
         link: {
             pagename: {
                 url: '',
@@ -116,7 +119,7 @@ lanchApp.down{
                 },
                 version: 0
             }
-        }, // 配置univerlink方案具体页面及参数，生成请求格式为"https://domain.com?param=value"
+        },
         yyb: {
             url: 'http://a.app.qq.com/o/simple.jsp',
             param: {
@@ -125,7 +128,8 @@ lanchApp.down{
             }
         },
     },
-    pkgs: { // 下载包配置
+    // 下载包配置
+    pkgs: { 
         yyb: '',
             android: 'http://www.**.com/package.apk',
             ios: '',
@@ -138,8 +142,8 @@ lanchApp.down{
     }, 
     useAppLink: true,       // 是否为android6+使用applink方案，默认true
     useUniversalLink: true, // 是否为ios9+使用universallink方案，默认true
-    useYingyongbao: true,   // 在微信中跳转应用宝，默认为true
-    wxGuideMethod: ()=>{},  // 微信中进行提示引导(useYingyongbao为false时)，指定null时走ios/android方案（适用不受微信限制）
+    useYingyongbao: false,   // 在微信中跳转应用宝，默认为false
+    wxGuideMethod: ()=>{},  // 微信中进行提示引导，优先级高于useYingyongbao配置，指定null时走ios/android方案（适用不受微信限制的app）
     updateTipMethod: ()=>{},    // scheme版本检测时升级提示
     clipboardTxt:'',    // 剪贴板内容，常见口令方案
     searchPrefix: '?',  // scheme或univerlink生成请求中参数前缀，默认为"?"
@@ -217,22 +221,7 @@ const lanchInstance = new LaunchApp({
     useYingyongbao: false,
     wxGuideMethod: function (detector) {
         const explorerName = (detector.os.name == 'ios' ? 'Safari' : '');
-        const div = document.createElement('div');
-        div.style.position = 'absolute'
-        div.style.top = '0';
-        div.style.zIndex = '1111';
-        div.style.width = '100%';
-        div.style.height = '100%';
-        div.innerHTML = '<div style="height:100%;background-color:#000;opacity:0.5;"></div>'
-            +'<div style="position:absolute;top:0;background: url('
-            + require('../static/img/finger.png') + ') no-repeat right top;background-size:' + px('204px') + ' ' + px('212px') + ';width:100%;padding-top:' + px('208px') + ';color:white;font-size:' + px('32px') + ';text-align:center;">'
-            + (explorerName ? '<img src="' + require("../static/img/safari.png") + '" style="width:' + px('120px') + ';height:' + px('120px') + ';"/>' : '')
-            + '<p style="font-size:' + px('36px') + ';font-weight:bold;margin-bottom:6px;">点右上角选择“在' + explorerName + '浏览器中打开”</p>'
-            + '<p> 就能马上打开App了哦~</p></div>';
-        document.body.appendChild(div);
-        div.onclick = function () {
-            div.remove();
-        }
+        alert('在'+explorerName?'『Safari』':''+'浏览器中打开');
     },
     searchPrefix: (detector) => {
        return '?';
@@ -269,7 +258,6 @@ export function invokeApp(options:any, callback?: (status, detector) => boolean)
 ```javascript
 // 业务代码中使用
 import {lanchApp, downApp} from 'launchapp'
-lanchApp();
 lanchApp({
     page: 'frs',
     param: {
@@ -278,30 +266,6 @@ lanchApp({
 }, (status, detector) => {
     return true;
 });
-lanchApp({
-    openMethod:'yingyongbao'
-});
-lanchApp({
-    page: 'h5',
-    param: {
-        url: 'https://tieba.baidu.com/huodong'
-    },
-    url:'https://tieba.baidu.com/huodong'
-});
-// 微信中方案通过wxGuideMethod、useYingyongbao控制，如果想走store可以通过超时返回3实现（同时把timeout设置小些）
-lanchHaokan.open({
-    page: 'my',
-    param: {
-        vid: '4215764431860909454'
-    },
-    wxGuideMethod: null,
-    timeout: 200
-}, (s, d) => {
-    console.log('callbackout', s, d);
-    // 微信中唤起超时: ios时走appstore，android到落地页
-    return inWexin && isIos ? 3 : 2;
-});
-downApp();
 downApp({
     pkgs:{
         ios:'',

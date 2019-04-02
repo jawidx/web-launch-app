@@ -181,7 +181,7 @@ export class LaunchApp {
                 let pageConf = pageMap[opt.page] || pageMap['index'];
                 pageConf = (<any>Object).assign({}, pageConf, opt);
                 // 版本检测
-                if (this.configs.inApp && pageConf.version && !this.checkVersion(pageConf)) {
+                if (this.configs.inApp && pageConf.version && !this._checkVersion(pageConf)) {
                     return '';
                 }
                 if (pageConf.paramMap) {
@@ -426,7 +426,7 @@ export class LaunchApp {
      * 检验版本
      * @param pageConf {version:''}
      */
-    checkVersion(pageConf) {
+    _checkVersion(pageConf) {
         if (pageConf.version > this.configs.appVersion) {
             let func = this.options.updateTipMethod || this.configs.updateTipMethod;
             func && func();

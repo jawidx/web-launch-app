@@ -1,11 +1,15 @@
 import { copy } from './copy';
 import { ua, detector } from './detector';
-export { ua, detector, copy };
+export { copy, ua, detector };
 export declare const inWexin: boolean;
 export declare const isIos: boolean;
 export declare const isAndroid: boolean;
 export declare const enableULink: boolean;
 export declare const enableApplink: boolean;
+/**
+ * 是否支持link
+ */
+export declare function supportLink(): boolean;
 /**
  * iframe call
  * @param url
@@ -77,6 +81,7 @@ export declare class LaunchApp {
      *     android:link/scheme/store
      * }
      * wxGuideMethod
+     * useYingyongbao
      * updateTipMethod
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
@@ -96,7 +101,7 @@ export declare class LaunchApp {
      * 检验版本
      * @param pageConf {version:''}
      */
-    checkVersion(pageConf: any): boolean;
+    _checkVersion(pageConf: any): boolean;
     /**
      * map param (for different platform)
      * @param {*} param
