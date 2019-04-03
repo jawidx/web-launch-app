@@ -13,7 +13,7 @@ export const inWeibo = detector.browser.name === 'weibo';
  */
 export function supportLink() {
     let supportLink = false;
-    if (isAndroid) {
+    if (enableApplink) {
         switch (detector.browser.name) {
             case 'chrome':
             case 'samsung':
@@ -25,7 +25,7 @@ export function supportLink() {
                 break;
         }
     }
-    if (isIos) {
+    if (enableULink) {
         switch (detector.browser.name) {
             case 'uc':
             case 'qq':
