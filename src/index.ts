@@ -1,14 +1,15 @@
 import { copy } from './copy'
 import { ua, detector } from './detector';
 export { copy, ua, detector }
-export const inWexin = detector.browser.name === 'micromessenger';
 export const isIos = detector.os.name === 'ios';
 export const isAndroid = detector.os.name === 'android';
 export const enableULink = isIos && detector.os.version >= 9;
 export const enableApplink = isAndroid && detector.os.version >= 6;
+export const inWexin = detector.browser.name === 'micromessenger';
+export const inWeibo = detector.browser.name === 'weibo';
 
 /**
- * 是否支持link
+ * 宿主环境是否支持link
  */
 export function supportLink() {
     let supportLink = false;
@@ -133,14 +134,18 @@ export class LaunchApp {
                 }
             }
         },
-        // use UniversalLink for android6+(default:true)
+        // for android6+(default:true)
         useAppLink: true,
-        // use UniversalLink for ios9+(default:true)
+        // for ios9+(default:true)
         useUniversalLink: true,
+        // 不支持link方案时自动降级为scheme方案
+        autodemotion: false,
         useYingyongbao: false,
-        // 微信引导
-        wxGuideMethod: () => {
+        useGuideMethod: false,
+        // App内受限引导
+        guideMethod: () => {
             const div = document.createElement('div');
+            div.className = 'wx-guide-div'
             div.style.position = 'absolute'
             div.style.top = '0';
             div.style.left = '0';
@@ -148,9 +153,12 @@ export class LaunchApp {
             div.style.width = '100vw';
             div.style.height = '100vh';
             div.style.textAlign = 'center';
+            div.style.lineHeight = '200px'
+            div.style.color = '#fff';
+            div.style.fontSize = '20px'
             div.style.backgroundColor = '#000';
             div.style.opacity = '0.7';
-            div.innerHTML = '<p class="wx-guide-p" style="font-size:20px;color:#fff;line-height:200px;">点击右上角->选择"在浏览器中打开"</p>';
+            div.innerText = '点击右上角->选择"在浏览器中打开"';
             document.body.appendChild(div);
             div.onclick = function () {
                 div.remove();
@@ -217,18 +225,9 @@ export class LaunchApp {
                 locationCall(url);
             }
         },
-        yingyongbao: {
-            preOpen: function (opt: any) {
-                let pageConf = deepMerge(this.configs.deeplink.yyb, { param: opt.param });
-                return this._getUrlFromConf(pageConf, 'yyb');
-            },
-            open: function (url: string) {
-                locationCall(url);
-            }
-        },
-        wxGuide: {
+        guide: {
             open: function () {
-                let func = this.options.wxGuideMethod || this.configs.wxGuideMethod;
+                let func = this.options.guideMethod || this.configs.guideMethod;
                 func && func(detector);
             }
         },
@@ -237,7 +236,10 @@ export class LaunchApp {
                 if (!noTimeout && this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                if (isIos) {
+                if (this.options.useYingyongbao) {
+                    let pageConf = deepMerge(this.configs.deeplink.yyb, { param: this.options.param });
+                    locationCall(this._getUrlFromConf(pageConf, 'yyb'));
+                } else if (isIos) {
                     locationCall(this.configs.pkgs.ios);
                 } else if (isAndroid) {
                     let store = this.configs.pkgs.store, brand, url;
@@ -274,8 +276,9 @@ export class LaunchApp {
     // param
     private options: any;
     private timeoutDownload: boolean;
-    private callback: (status: number, detector: any) => number;
+    private callback: (status: number, detector: any, scheme: string) => number;
     // other
+    private openUrl: string
     private callbackId = 0;
     constructor(opt: any) {
         let tmpConfig = deepMerge({}, LaunchApp.defaultConfig);
@@ -287,17 +290,19 @@ export class LaunchApp {
      * select open method according to the environment and config
      */
     _getOpenMethod() {
-        let { wxGuide, yingyongbao, link, scheme, unknown } = LaunchApp.openChannel;
-        if (inWexin) {
-            if (this.configs.wxGuideMethod) {
-                return wxGuide;
-            }
-            else if (this.configs.useYingyongbao) {
-                return yingyongbao;
-            }
-        }
+        let { guide, link, scheme, unknown } = LaunchApp.openChannel;
+        let { useGuideMethod, useUniversalLink, useAppLink, autodemotion } = this.configs;
 
-        if ((this.configs.useUniversalLink && enableULink) || (this.configs.useAppLink && enableApplink)) {
+        if (useGuideMethod) {
+            return guide;
+        }
+        if ((useUniversalLink && enableULink) || (useAppLink && enableApplink)) {
+            return link;
+        }
+        if (useUniversalLink || useAppLink) {
+            if (autodemotion && ((isIos && !enableULink) || (isAndroid && !enableApplink))) {
+                return scheme;
+            }
             return link;
         }
         if (isIos || isAndroid) {
@@ -319,7 +324,8 @@ export class LaunchApp {
      *     ios:link/scheme/store
      *     android:link/scheme/store
      * }
-     * wxGuideMethod
+     * autodemotion
+     * guideMethod
      * useYingyongbao
      * updateTipMethod
      * clipboardTxt
@@ -330,36 +336,24 @@ export class LaunchApp {
      * },
      * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
      */
-    open(opt?: any, callback?: (status: number, detector: any) => number) {
+    open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number) {
         try {
             this.options = opt;
             this.callback = callback;
             this.timeoutDownload = opt.timeout >= 0 || (this.configs.timeout >= 0 && opt.timeout == undefined);
-            let { scheme, link, wxGuide, yingyongbao, store, unknown } = LaunchApp.openChannel;
+            let { scheme, link, guide, store, unknown } = LaunchApp.openChannel;
             let tmpOpenMethod = null, needPro = true;
 
             // 指定调起方案
-            if (inWexin) {
-                if (opt.wxGuideMethod) {
-                    tmpOpenMethod = wxGuide;
-                    needPro = false;
-                } else if (opt.useYingyongbao) {
-                    tmpOpenMethod = yingyongbao;
-                } else if (opt.wxGuideMethod === null) {
-                    tmpOpenMethod = unknown;
-                    if ((this.configs.useUniversalLink && enableULink) || (this.configs.useAppLink && enableApplink)) {
-                        tmpOpenMethod = link;
-                    } else if (isIos || isAndroid) {
-                        tmpOpenMethod = scheme;
-                    }
-                }
+            if (opt.useGuideMethod) {
+                tmpOpenMethod = guide;
+                needPro = false;
             } else if (opt.launchType) {
                 let type = opt.launchType[detector.os.name];
                 switch (type) {
                     case 'link':
-                        if ((isIos && enableULink) || (isAndroid && enableApplink)) {
-                            tmpOpenMethod = link;
-                        } else {
+                        tmpOpenMethod = link;
+                        if (opt.autodemotion && ((isIos && !enableULink) || (isAndroid && !enableApplink))) {
                             tmpOpenMethod = scheme;
                         }
                         break;
@@ -393,8 +387,8 @@ export class LaunchApp {
 
             opt.clipboardTxt && copy(opt.clipboardTxt);
             if (needPro) {
-                const openUrl = tmpOpenMethod.preOpen && tmpOpenMethod.preOpen.call(this, opt || {});
-                tmpOpenMethod.open.call(this, openUrl);
+                this.openUrl = tmpOpenMethod.preOpen && tmpOpenMethod.preOpen.call(this, opt || {});
+                tmpOpenMethod.open.call(this, this.openUrl);
             } else {
                 tmpOpenMethod.open.call(this);
             }
@@ -522,7 +516,7 @@ export class LaunchApp {
 
     _callend(status: number) {
         clearTimeout(this.timer);
-        const backResult = this.callback && this.callback(status, detector);
+        const backResult = this.callback && this.callback(status, detector, this.openUrl);
         // 调起失败处理
         if (status != LaunchApp.openStatus.SUCCESS) {
             switch (backResult) {
