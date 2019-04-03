@@ -1,13 +1,14 @@
 import { copy } from './copy';
 import { ua, detector } from './detector';
 export { copy, ua, detector };
-export declare const inWexin: boolean;
 export declare const isIos: boolean;
 export declare const isAndroid: boolean;
 export declare const enableULink: boolean;
 export declare const enableApplink: boolean;
+export declare const inWexin: boolean;
+export declare const inWeibo: boolean;
 /**
- * 是否支持link
+ * 宿主环境是否支持link
  */
 export declare function supportLink(): boolean;
 /**
@@ -31,11 +32,7 @@ export declare class LaunchApp {
             preOpen: (opt: any) => any;
             open: (url: string) => void;
         };
-        yingyongbao: {
-            preOpen: (opt: any) => any;
-            open: (url: string) => void;
-        };
-        wxGuide: {
+        guide: {
             open: () => void;
         };
         store: {
@@ -56,6 +53,7 @@ export declare class LaunchApp {
     private options;
     private timeoutDownload;
     private callback;
+    private openUrl;
     private callbackId;
     constructor(opt: any);
     /**
@@ -80,7 +78,8 @@ export declare class LaunchApp {
      *     ios:link/scheme/store
      *     android:link/scheme/store
      * }
-     * wxGuideMethod
+     * autodemotion
+     * guideMethod
      * useYingyongbao
      * updateTipMethod
      * clipboardTxt
@@ -91,7 +90,7 @@ export declare class LaunchApp {
      * },
      * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
      */
-    open(opt?: any, callback?: (status: number, detector: any) => number): void;
+    open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number): void;
     /**
      * download package
      * opt: {android:'',ios:''，yyk:'',landPage}
