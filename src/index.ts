@@ -134,15 +134,15 @@ export class LaunchApp {
                 }
             }
         },
-        // for android6+(default:true)
-        useAppLink: true,
         // for ios9+(default:true)
         useUniversalLink: true,
+        // for android6+(default:true)
+        useAppLink: true,
         // 不支持link方案时自动降级为scheme方案
         autodemotion: false,
         useYingyongbao: false,
+        // 受限引导
         useGuideMethod: false,
-        // App内受限引导
         guideMethod: () => {
             const div = document.createElement('div');
             div.className = 'wx-guide-div'
@@ -168,8 +168,6 @@ export class LaunchApp {
         updateTipMethod: () => {
             alert('升级App后才能使用此功能！');
         },
-        // 口令
-        clipboardTxt: '',
         // 参数前缀
         searchPrefix: (detector: any) => { return '?' },
         // 超时下载, <0表示不使用超时下载
