@@ -140,6 +140,7 @@ const BROWSER = [
     ["micromessenger", /\bmicromessenger\/([\d.]+)/],
     ["qq", /\bm?qqbrowser\/([0-9.]+)/],
     ["tt", /\btencenttraveler ([0-9.]+)/],
+    ["weibo", /weibo__([0-9.]+)/],
     ["uc", function (ua: string) {
         if (ua.indexOf("ucbrowser/") >= 0) {
             return /\bucbrowser\/([0-9.]+)/;
