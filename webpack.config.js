@@ -22,8 +22,6 @@ module.exports = {
             title: 'Demo Title',
             // chunksSortMode: none
         }),
-        // new webpack.optimize.UglifyJsPlugin(),
-        // new webpack.optimize.ModuleConcatenationPlugin()
     ],
     resolve: {
         extensions: ['*', '.js', '.jsx', '.ts', '.tsx']
@@ -38,11 +36,6 @@ module.exports = {
                         loader: 'babel-loader',
                         options: {
                             presets: ['@babel/env'],
-                            // "plugins": [
-                            //     ["@babel/plugin-proposal-decorators", { "legacy": true }],
-                            //     ["@babel/plugin-proposal-class-properties", { "loose": true }],
-                            //     ['@babel/transform-runtime'],
-                            // ]
                         }
                     },
                     'ts-loader'
@@ -57,16 +50,10 @@ module.exports = {
             {
                 test: /\.(css|less)$/,
                 use: [
-                    'style-loader',
                     'css-loader',
                     'less-loader'
                 ]
             },
-            // test: /\.(png|jpg|gif)$/,
-            // loader: 'url?limit=8192&name=./static/img/[hash].[ext]',
         ]
-    },
-    // devServer: {
-    //     contentBase: './build'
-    // },
+    }
 };
