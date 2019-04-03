@@ -1,86 +1,46 @@
 # web-launch-app
-## 安装
-npm install --save web-launch-app
 
 ## 简介 
-- 通过简单配置，在业务代码中通过open/download方法唤起App指定页或下载安装包（适用app内调用端功能）
-- 唤起方案
-    - iOS使用universal link或scheme或appstore方案
-    - Android使用app link或scheme或应用商店方案
-    - 微信中使用应用宝或引导提示方案或走ios/android的具体方案
-    - 其它平台可通过方法参数控制实现
-- 唤起方案选择：open方法参数配置>实例配置>默认配置（代码中参见方法：_getOpenMethod、open）
+- 通过简单配置，实现唤起App并打开指定页或下载安装包（同时适用app内调用端能力）
+
+## 安装
+- npm install --save web-launch-app
 
 ## 使用
+
+###
 ```javascript
+import { LaunchApp } from 'web-launch-app';
+
 const lanchApp = new LaunchApp(config);
-// 常用唤起
 lanchApp.open({
     page: 'frs',
     param:{
         forumName: 'jawidx'
     }
-    // paramMap:{}
 });
-
-// 指定方案唤起（微信中引导提示，可在实例中配置默认值）
-lanchApp.open({
-    launchType:{
-        ios:'store',
-        android:'scheme'
-    },
-    wxGuideMethod: ()=>{alert('右上角选择浏览器中打开')},  // 引导提示，优先级高于useYingyongbao
-    useYingyongbao: true, // 因为指定了wxGuideMethod，此行并不会生效
-    scheme:'',
-    url:''
-    Param:{}
-});
-
-// 定制唤起（微信android去应用宝，ios微信去appstore）
-lanchApp.open({
-    launchType:{
-        ios:'link',
-        android:'scheme'
-    },
-    page: 'frs',
-    param:{
-        forumName: 'jawidx'
-    },
-    // updateTipMethod: ()=>{},
-    useYingyongbao: isAndroid&&inWechat,
-    clipboardTxt:'',
-    pkgs:{
-        android:'',
-        ios:''
-        yyb:'',
-        store:{...}
-    },
-    timeout:3000,
-    landPage:''
-}, (status, detector) => {
-    // 使用scheme方案时超时回调方法，可选，status(0:failed，1:success，2:unknow)
-    // 返回值：1不做处理，2跳转兜底页，3跳转应用商店，默认下载pkg或跳转appstore
-    return isIos&&inWechat ? 3 : 0;
-});
-
-// 下载
-lanchApp.download();
-
-// 下载指定包(不指定平台使用全局配置)
-lanchApp.down{
-    pkgs:{
-        ios:'',
-        android:''
-        yyb:'',
-        landPage:''
-    }
-};
 ```
 
-## 配置
+### export
+- LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
+- detector：宿主环境对象（包含os及browser信息）
+- copy：复制方法（浏览器安全限制，必须由用户行为触发）
+- ua：=navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
+- isAndroid、isIos、inWexin、inWeibo：字面含义，Boolea值
+- supportLink：是否支持universal link或applink（ios中uc和qq浏览器不支持ulink，android中chrome、三星、宙斯及基于chrome的等浏览器支持applink），供参考
+
+### 方案
+- guide：适应于微信、微博等受限环境中引导用户出App。
+- link：iOS9+使用universal link，Android6+使用applink，可指定link无法使用时自动降级为scheme。
+- scheme：scheme协议，同时适用于app内打开页面调用native功能。
+- store：应用商店，微信中通过同时指定useYingyongbao参数去应用宝（百度1春晚活动时引导去应用市场分流减压）。
+- scheme和store方案有超时逻辑，根据callback中的返回值进行超时处理。
+- 方案选择：open方法参数配置>实例配置>默认配置（参见源码中方法：_getOpenMethod、open）。
+
+### 配置
 ```javascript
 {
-    inApp: false,   // 是否是app内，在app内且指定了version的scheme会进行版本检测时
+    inApp: false,   // 是否是app内（在app内使用了指定version的scheme会进行版本检测）
     appVersion: '', // 对具体scheme链接进行版本检测时使用
     pkgName:'', // 应用商店使用
     deeplink:{
@@ -95,7 +55,8 @@ lanchApp.down{
                     param: {},	// 生成scheme或linkurl时的参数
                     paramMap: {},// 参数映射，解决不同平台参数名不一至情况
                     version: '4.9.6'  // 版本要求
-                }
+                },
+                ...
             },
             ios: {
                 protocol: 'protocol',
@@ -107,18 +68,20 @@ lanchApp.down{
                     },
                     version: 0
                 }
+                ...
             }
         },
         // 配置univerlink方案具体url及参数
         link: {
             pagename: {
-                url: '',
+                url: 'https://tieba.baidu.com/p/{forumName}',	// 支持占位符
                 param: {
                 },
                 paramMap: {
                 },
                 version: 0
-            }
+            },
+            ...
         },
         yyb: {
             url: 'http://a.app.qq.com/o/simple.jsp',
@@ -131,31 +94,32 @@ lanchApp.down{
     // 下载包配置
     pkgs: { 
         yyb: '',
-            android: 'http://www.**.com/package.apk',
-            ios: '',
-            store: {    // 手机商店匹配
-                xphone: {
-                    reg: /\(.*Android.*\)/,
-                    scheme: 'market://details?id=packagename'
-                }
+        android: 'http://www.**.com/package.apk',
+        ios: '',
+        store: {    // 手机商店匹配
+            xphone: {
+                reg: /\(.*Android.*\)/,
+                scheme: 'market://details?id=packagename'
             }
+        }
     }, 
-    useAppLink: true,       // 是否为android6+使用applink方案，默认true
     useUniversalLink: true, // 是否为ios9+使用universallink方案，默认true
-    useYingyongbao: false,   // 在微信中跳转应用宝，默认为false
-    wxGuideMethod: ()=>{},  // 微信中进行提示引导，优先级高于useYingyongbao配置，指定null时走ios/android方案（适用不受微信限制的app）
+    useAppLink: true,       // 是否为android6+使用applink方案，默认true
+    autodemotion: false,    // 不支持link方案时自动降级为scheme方案，默认false	
+    useYingyongbao: false,   // 在微信中store方案时是否走应用宝，默认false
+    useGuideMethod: false,   // 使用guide方案
+    guideMethod: ()=>{},  // 引导方法，默认蒙层文案提示
     updateTipMethod: ()=>{},    // scheme版本检测时升级提示
-    clipboardTxt:'',    // 剪贴板内容，常见口令方案
     searchPrefix: '?',  // scheme或univerlink生成请求中参数前缀，默认为"?"
-    timeout: 2000   // scheme方案中跳转超时判断，默认2000毫秒
+    timeout: 2000   // scheme/store方案中超时时间，默认2000毫秒
     landPage:'',   // 兜底页
 }
 ```
 
 ## Demo
 ```javascript
-// launchapp.ts
-import { LaunchApp, ua, detector, copy } from 'web-launch-app';
+// launchHaokan.ts
+import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWexin, inWeibo, copy } from 'web-launch-app';
 let inApp = /haokan(.*)/.test(ua);
 let appVersion = inApp ? /haokan\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
 const lanchInstance = new LaunchApp({
@@ -196,13 +160,8 @@ const lanchInstance = new LaunchApp({
             }
         },
         link: {
-            index: {
-                url: 'https://tieba.baidu.com'
-            },
-            frs: {
-                // 支持占位符
-                url: 'https://tieba.baidu.com/p/{forumName}'
-            }
+            index: {url: 'https://tieba.baidu.com'},
+            frs: {url: 'https://tieba.baidu.com/p/{forumName}'}
         },
         yyb: {
             url: 'http://a.app.qq.com/o/simple.jsp',
@@ -216,24 +175,18 @@ const lanchInstance = new LaunchApp({
         ios: 'https://itunes.apple.com/app/apple-store/id477927812?pt=328057&ct=MobileQQ_LXY&mt=8',
         yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513',
     },
-    useAppLink: false,
-    useUniversalLink: true,
-    useYingyongbao: false,
-    wxGuideMethod: function (detector) {
-        const explorerName = (detector.os.name == 'ios' ? 'Safari' : '');
-        alert('在'+explorerName?'『Safari』':''+'浏览器中打开');
-    },
-    searchPrefix: (detector) => {
-       return '?';
-    },
-    timeout: 3000,
+    useUniversalLink: supportLink,
+    useAppLink: supportLink,
+    autodemotion: true,
+    useYingyongbao: inWexin,
+    useGuideMethod: inWeibo,
     landPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download'
 });
 
 /**
  * 外部调起app到具体页面
 */ 
-export function lanchApp(options:any, callback?: (status, detector) => boolean) {
+export function lanchApp(options:any, callback?: (status, detector, scheme) => boolean) {
     lanchInstance.open(options, callback);
 }
 
@@ -247,7 +200,7 @@ export function downApp(options:any) {
 /**
  * 端内H5页面调用端能力
  */
-export function invokeApp(options:any, callback?: (status, detector) => boolean) {
+export function invokeApp(options:any, callback?: (status, detector, scheme) => boolean) {
     lanchInstance.open(Object.assign({},{launchType:{
             ios:'scheme'
             android:'scheme'
@@ -257,21 +210,60 @@ export function invokeApp(options:any, callback?: (status, detector) => boolean)
 
 ```javascript
 // 业务代码中使用
-import {lanchApp, downApp} from 'launchapp'
+import {lanchApp, downApp, supportLink} from './launchHaokan'
+
+// 唤起
 lanchApp({
     page: 'frs',
-    param: {
+    param:{
         forumName: 'jawidx'
     }
-}, (status, detector) => {
-    return true;
+    // paramMap:{}
 });
-downApp({
+
+// 定制唤起（微博提示，微信去应用宝）
+lanchApp({
+    useGuideMethod: inWeibo,
+    useYingyongbao: true,//inWexin && isAndroid,
+    launchType: {
+        ios: inWexin ? 'store' : 'link',
+        android: inWexin ? 'store' : 'scheme',
+    },
+    page: 'author',
+    param: {
+        url_key: '4215764431860909454',
+        target: 'https%3A%2F%2Fbaijiahao.baidu.com%2Fu%3Fapp_id%3D1611116910625404%26fr%3Dbjhvideo',
+    },
+    // scheme:'',
+    // url:'http://hku.baidu.com/h5/share/detailauthor?url_key=1611116910625404&target=https%3A%2F%2Fbaijiahao.baidu.com%2Fu%3Fapp_id%3D1611116910625404%26fr%3Dbjhvideo',
+    // guideMethod: () => {
+    //     alert('出去玩~');
+    // },
+    timeout: 200,
+    // clipboardTxt: '#key#',
+    pkgs: {
+        android: 'https://sv.bdstatic.com/static/haokanapk/apk/baiduhaokan1021176d.apk',
+        ios: 'https://itunes.apple.com/cn/app/id1322948417?mt=8',
+        yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
+    }
+}, (s, d, url) => {
+    console.log('callbackout', s, d, url);
+    s != 1 && copy(url);
+    return 0;
+});
+
+// 下载
+downApp();
+
+// 下载指定包(不指定平台使用全局配置)
+downApp{
     pkgs:{
         ios:'',
         android:''
+        yyb:'',
+        landPage:''
     }
-});
+};
 ```
 
 ## Who use?
