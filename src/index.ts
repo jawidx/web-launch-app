@@ -146,6 +146,7 @@ export class LaunchApp {
         guideMethod: () => {
             const div = document.createElement('div');
             div.className = 'wx-guide-div'
+            div.innerText = '点击右上角->选择"在浏览器中打开"';
             div.style.position = 'absolute'
             div.style.top = '0';
             div.style.left = '0';
@@ -158,7 +159,6 @@ export class LaunchApp {
             div.style.fontSize = '20px'
             div.style.backgroundColor = '#000';
             div.style.opacity = '0.7';
-            div.innerText = '点击右上角->选择"在浏览器中打开"';
             document.body.appendChild(div);
             div.onclick = function () {
                 div.remove();
@@ -231,10 +231,11 @@ export class LaunchApp {
         },
         store: {
             open: function (noTimeout) {
-                if (!noTimeout && this.timeoutDownload) {
+                // 超时处理
+                if (!inWexin && !noTimeout && this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                if (this.options.useYingyongbao) {
+                if (this.options.useYingyongbao || (this.options.useYingyongbao == undefined && this.configs.useYingyongbao)) {
                     let pageConf = deepMerge(this.configs.deeplink.yyb, { param: this.options.param });
                     locationCall(this._getUrlFromConf(pageConf, 'yyb'));
                 } else if (isIos) {
@@ -294,9 +295,6 @@ export class LaunchApp {
         if (useGuideMethod) {
             return guide;
         }
-        if ((useUniversalLink && enableULink) || (useAppLink && enableApplink)) {
-            return link;
-        }
         if (useUniversalLink || useAppLink) {
             if (autodemotion && ((isIos && !enableULink) || (isAndroid && !enableApplink))) {
                 return scheme;
@@ -343,7 +341,7 @@ export class LaunchApp {
             let tmpOpenMethod = null, needPro = true;
 
             // 指定调起方案
-            if (opt.useGuideMethod) {
+            if (opt.useGuideMethod || (this.options.useGuideMethod == undefined && this.configs.useGuideMethod)) {
                 tmpOpenMethod = guide;
                 needPro = false;
             } else if (opt.launchType) {
@@ -525,6 +523,7 @@ export class LaunchApp {
                     locationCall(this.options.landPage || this.configs.landPage);
                     break;
                 case 3:
+                    // 指定参数后续无超时逻辑
                     LaunchApp.openChannel.store.open.call(this, true);
                     break;
                 default:
