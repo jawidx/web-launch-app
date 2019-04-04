@@ -200,9 +200,9 @@ export function downApp(options:any) {
 /**
  * 端内H5页面调用端能力
  */
-export function invokeApp(options:any, callback?: (status, detector, scheme) => boolean) {
+export function invokeApp(options:any, callback?: (status, detector, scheme) => number) {
     lanchInstance.open(Object.assign({},{launchType:{
-            ios:'scheme'
+            ios:'scheme',
             android:'scheme'
         }},options), callback);
 }
