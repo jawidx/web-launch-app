@@ -147,7 +147,7 @@ export class LaunchApp {
             const div = document.createElement('div');
             div.className = 'wx-guide-div'
             div.innerText = '点击右上角->选择"在浏览器中打开"';
-            div.style.position = 'absolute'
+            div.style.position = 'fixed'
             div.style.top = '0';
             div.style.left = '0';
             div.style.zIndex = '1111';
