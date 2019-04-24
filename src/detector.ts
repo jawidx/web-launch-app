@@ -207,7 +207,7 @@ const BROWSER = [
     ["meizu", /\bmzbrowser\/([0-9.]+)/],
     ["nokia", /\bnokiabrowser\/([0-9.]+)/],
     // ["huawei", /\bhuaweibrowser\/([0-9.]+)/],
-    // ["samsung", /\bsamsungbrowser\/([0-9.]+)/],
+    ["samsung", /\bsamsungbrowser\/([0-9.]+)/],
     // ["nexus", /\bnexus ([0-9s.]+)/],
     // Opera 15 之后开始使用 Chromniun 内核，需要放在 Chrome 的规则之前。
     ["opera", function (ua: string) {
