@@ -208,7 +208,7 @@ const BROWSER = [
     ["nokia", /\bnokiabrowser\/([0-9.]+)/],
     // ["huawei", /\bhuaweibrowser\/([0-9.]+)/],
     ["samsung", /\bsamsungbrowser\/([0-9.]+)/],
-    // ["nexus", /\bnexus ([0-9s.]+)/],
+    ["maxthon", /\b(?:maxthon|mxbrowser)(?:[ \/]([0-9.]+))?/],
     // Opera 15 之后开始使用 Chromniun 内核，需要放在 Chrome 的规则之前。
     ["opera", function (ua: string) {
         const re_opera_old = /\bopera.+version\/([0-9.ab]+)/;
@@ -216,9 +216,8 @@ const BROWSER = [
         return re_opera_old.test(ua) ? re_opera_old : re_opera_new;
     }],
     ["edge", /edge\/([0-9.]+)/],
-    ["chrome", / (?:chrome|crios|crmo)\/([0-9.]+)/],
     ["firefox", /\bfirefox\/([0-9.ab]+)/],
-    ["maxthon", /\b(?:maxthon|mxbrowser)(?:[ \/]([0-9.]+))?/],
+    ["chrome", / (?:chrome|crios|crmo)\/([0-9.]+)/],
     // Android 默认浏览器。该规则需要在 safari 之前。
     ["android", function (ua: string) {
         if (ua.indexOf("android") === -1) { return; }
