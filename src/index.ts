@@ -401,7 +401,7 @@ export class LaunchApp {
     download(opt?: any) {
         let pkgs = (<any>Object).assign({}, this.configs.pkgs, opt);
 
-        if (detector.browser.name == 'micromessenger') {
+        if (inWexin) {
             locationCall(pkgs.yyb);
         } else if (isAndroid) {
             locationCall(pkgs.android);
