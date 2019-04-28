@@ -19,23 +19,25 @@ lanchApp.open({
         forumName: 'jawidx'
     }
 });
-```
 
-### export
+/*
 - LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
 - detector：宿主环境对象（包含os及browser信息）
 - copy：复制方法（浏览器安全限制，必须由用户行为触发）
 - ua：=navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
 - isAndroid、isIos、inWexin、inWeibo：字面含义，Boolea值
 - supportLink：是否支持universal link或applink（ios中uc和qq浏览器不支持ulink，android中chrome、三星、宙斯及基于chrome的等浏览器支持applink），供参考
+*/
+```
 
 ### 方案
-- guide：适应于微信、微博等受限环境中引导用户出App（配置useGuideMethod指定，优先级高于launchType值）。
 - link：iOS9+使用universal link，Android6+使用applink，可指定link无法使用时自动降级为scheme。
 - scheme：scheme协议，同时适用于app内打开页面调用native功能。
 - store：应用商店，微信中通过同时指定useYingyongbao参数去应用宝（百度1春晚活动时引导去应用市场分流减压）。
-- scheme和store方案有超时逻辑，根据callback中的返回值进行超时处理。
-- 方案选择：open方法参数配置>实例配置>默认配置（参见源码中方法：_getOpenMethod、open）。
+- 其它
+    - useGuideMethod指定微信、微博等受限环境中引导用户出App（优先级高于launchType指定的方案）。
+    - scheme和store方案默认有超时逻辑，根据callback中的返回值进行超时处理。
+    - 方案选择：open方法参数配置>实例配置>默认配置（参见源码中方法：_getOpenMethod、open）。
 
 ### 配置
 ```javascript
@@ -59,15 +61,6 @@ lanchApp.open({
                 ...
             },
             ios: {
-                protocol: 'protocol',
-                index: {
-                    protocol: 'protocol',
-                    path: 'path',
-                    param: {},
-                    paramMap: {
-                    },
-                    version: 0
-                }
                 ...
             }
         },
@@ -118,7 +111,6 @@ lanchApp.open({
 
 ## Demo
 ```javascript
-// launchHaokan.ts
 import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWexin, inWeibo, copy } from 'web-launch-app';
 let inApp = /haokan(.*)/.test(ua);
 let appVersion = inApp ? /haokan\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
@@ -183,37 +175,9 @@ const lanchInstance = new LaunchApp({
     landPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download'
 });
 
-/**
- * 外部调起app到具体页面
-*/ 
-export function lanchApp(options:any, callback?: (status, detector, scheme) => boolean) {
-    lanchInstance.open(options, callback);
-}
-
-/**
- * 下载APP
- */
-export function downApp(options:any) {
-    lanchInstance.down(options);
-}
-
-/**
- * 端内H5页面调用端能力
- */
-export function invokeApp(options:any, callback?: (status, detector, scheme) => number) {
-    lanchInstance.open(Object.assign({},{launchType:{
-            ios:'scheme',
-            android:'scheme'
-        }},options), callback);
-}
-```
-
-```javascript
-// 业务代码中使用
-import {lanchApp, downApp, supportLink} from './launchHaokan'
 
 // 唤起
-lanchApp({
+lanchInstance.open({
     page: 'frs',
     param:{
         forumName: 'jawidx'
@@ -222,7 +186,7 @@ lanchApp({
 });
 
 // 定制唤起（微博提示，微信去应用宝）
-lanchApp({
+lanchInstance.open({
     useGuideMethod: inWeibo,
     useYingyongbao: true,//inWexin && isAndroid,
     launchType: {
@@ -239,7 +203,7 @@ lanchApp({
     // guideMethod: () => {
     //     alert('出去玩~');
     // },
-    timeout: 200,
+    timeout: 2000,
     // clipboardTxt: '#key#',
     pkgs: {
         android: 'https://sv.bdstatic.com/static/haokanapk/apk/baiduhaokan1021176d.apk',
@@ -252,11 +216,26 @@ lanchApp({
     return 0;
 });
 
+/**
+ * 端内H5页面调用端能力
+ */
+lanchInstance.open(
+    launchType:{
+        ios:'scheme',
+        android:'scheme'
+    },
+    scheme:'baiduhaokan://copy',
+    param:{
+        context:'copycontent'
+    },
+    timeout: -1
+);
+
 // 下载
-downApp();
+lanchInstance.down();
 
 // 下载指定包(不指定平台使用全局配置)
-downApp{
+lanchInstance.down{
     pkgs:{
         ios:'',
         android:''
