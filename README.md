@@ -104,7 +104,7 @@ lanchApp.open({
     guideMethod: ()=>{},  // 引导方法，默认蒙层文案提示
     updateTipMethod: ()=>{},    // scheme版本检测时升级提示
     searchPrefix: '?',  // scheme或univerlink生成请求中参数前缀，默认为"?"
-    timeout: 2000   // scheme/store方案中超时时间，默认2000毫秒
+    timeout: 2000   // scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑
     landPage:'',   // 兜底页
 }
 ```
