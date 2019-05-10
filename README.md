@@ -191,7 +191,7 @@ lanchInstance.open({
     useYingyongbao: true,//inWexin && isAndroid,
     launchType: {
         ios: inWexin ? 'store' : 'link',
-        android: inWexin ? 'store' : 'scheme',
+        android: inWexin ? 'store' : 'scheme'
     },
     page: 'author',
     param: {
