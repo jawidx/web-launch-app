@@ -33,10 +33,10 @@ lanchApp.open({
 ### 方案
 - link：iOS9+使用universal link，Android6+使用applink，可指定link无法使用时自动降级为scheme。
 - scheme：scheme协议，同时适用于app内打开页面调用native功能。
-- store：应用商店，微信中通过同时指定useYingyongbao参数去应用宝（百度1春晚活动时引导去应用市场分流减压）。
+- store：应用商店，微信中通过同时指定useYingyongbao参数去应用宝（百度春晚活动时引导去应用市场下载分流减压）。
 - 其它
     - useGuideMethod指定微信、微博等受限环境中引导用户出App（优先级高于launchType指定的方案）。
-    - scheme和store方案默认有超时逻辑，根据callback中的返回值进行超时处理。
+    - scheme和store方案默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。
     - 方案选择：open方法参数配置>实例配置>默认配置（参见源码中方法：_getOpenMethod、open）。
 
 ### 配置
@@ -122,7 +122,7 @@ const lanchInstance = new LaunchApp({
         scheme: {
             android: {
                 protocol: 'tbfrs',
-                // 页面名称(默认页面请设置为:index)
+                // 页面名称(默认页面请设置为:index)
                 index: {
                     protocol: 'tbfrs',
                     path: 'tieba.baidu.com',
@@ -211,8 +211,10 @@ lanchInstance.open({
         yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
     }
 }, (s, d, url) => {
+    // s表示唤起结果，0失败，1成功，2未知, d为detector，url为最终的scheme或link值
     console.log('callbackout', s, d, url);
     s != 1 && copy(url);
+    // 返回值指定后续处理（默认下载apk包，1不处理，2中间页，3应用市场）
     return 0;
 });
 
