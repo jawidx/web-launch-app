@@ -580,7 +580,6 @@ export class LaunchApp {
             if (!document.hidden && !haveChange) {
                 self._callend(LaunchApp.openStatus.FAILED);
             } else {
-                alert('unknown');
                 self._callend(LaunchApp.openStatus.UNKNOW);
             }
             haveChange = true;
