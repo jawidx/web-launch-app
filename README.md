@@ -114,6 +114,7 @@ lanchApp.open({
 import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWexin, inWeibo, copy } from 'web-launch-app';
 let inApp = /haokan(.*)/.test(ua);
 let appVersion = inApp ? /haokan\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
+// 初始化实例，指定默认配置
 const lanchInstance = new LaunchApp({
     inApp: inApp,
     appVersion: appVersion,
@@ -176,7 +177,7 @@ const lanchInstance = new LaunchApp({
 });
 
 
-// 唤起
+// 唤起（使用配置中的scheme、linkurl）
 lanchInstance.open({
     page: 'frs',
     param:{
@@ -185,10 +186,20 @@ lanchInstance.open({
     // paramMap:{}
 });
 
-// 定制唤起（微博提示，微信去应用宝）
+// 唤起（指定scheme和linkurl）
+lanchInstance.open({
+    param:{
+        forumName: 'jawidx'
+    },
+    scheme: 'tbfrs://setting',
+    url: 'https://www.demo.com/a/setting'
+});
+
+
+// 唤起（微博出引导提示，ios微信去appstore，android微信去应用宝，同时指定超时处理及下载包）
 lanchInstance.open({
     useGuideMethod: inWeibo,
-    useYingyongbao: true,//inWexin && isAndroid,
+    useYingyongbao: true,   //inWexin && isAndroid,
     launchType: {
         ios: inWexin ? 'store' : 'link',
         android: inWexin ? 'store' : 'scheme'
