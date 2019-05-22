@@ -10,7 +10,7 @@
 
 ###
 ```javascript
-import { LaunchApp } from 'web-launch-app';
+import { LaunchApp, detector, copy, ua, isAndroid, isIos, inWexin, inWeibo, supportLink } from 'web-launch-app';
 
 const lanchApp = new LaunchApp(config);
 lanchApp.open({
@@ -211,7 +211,7 @@ lanchInstance.open({
         yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
     }
 }, (s, d, url) => {
-    // s表示唤起结果，0失败，1成功，2未知, d为detector，url为最终的scheme或link值
+    // s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值
     console.log('callbackout', s, d, url);
     s != 1 && copy(url);
     // 返回值指定后续处理（默认下载apk包，1不处理，2中间页，3应用市场）
