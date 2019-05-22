@@ -31,8 +31,8 @@ lanchApp.open({
 ```
 
 ### 方案
-- link：iOS9+使用universal link，Android6+使用applink，可指定link无法使用时自动降级为scheme。
-- scheme：scheme协议，同时适用于app内打开页面调用native功能。
+- link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。
+- scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。
 - store：应用商店，微信中通过同时指定useYingyongbao参数去应用宝（百度春晚活动时引导去应用市场下载分流减压）。
 - 其它
     - useGuideMethod指定微信、微博等受限环境中引导用户出App（优先级高于launchType指定的方案）。
@@ -41,6 +41,7 @@ lanchApp.open({
 
 ### 配置
 ```javascript
+// 针对各种环境及方案参数有点多，需要使用者了解scheme及link本身的区别
 {
     inApp: false,   // 是否是app内（在app内使用了指定version的scheme会进行版本检测）
     appVersion: '', // 对具体scheme链接进行版本检测时使用
@@ -114,7 +115,7 @@ lanchApp.open({
 import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWexin, inWeibo, copy } from 'web-launch-app';
 let inApp = /haokan(.*)/.test(ua);
 let appVersion = inApp ? /haokan\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
-// 初始化实例，指定默认配置
+// 初始化实例，指定全局默认配置（具体业务可使用默认配置可以少写代码）
 const lanchInstance = new LaunchApp({
     inApp: inApp,
     appVersion: appVersion,
