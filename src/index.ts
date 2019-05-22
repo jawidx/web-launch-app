@@ -554,16 +554,16 @@ export class LaunchApp {
 
         const pageChange = function (e) {
             haveChange = true;
-            if (document.hidden || e.hidden) {
+            if (document[property] || e.hidden || document.visibilityState == 'hidden') {
                 self._callend(LaunchApp.openStatus.SUCCESS);
             } else {
                 self._callend(LaunchApp.openStatus.UNKNOW);
             }
-            document.removeEventListener('pagehide', pageChange);
+            // document.removeEventListener('pagehide', pageChange);
             document.removeEventListener(eventName, pageChange);
             document.removeEventListener('baiduboxappvisibilitychange', pageChange);
         };
-        window.addEventListener('pagehide', pageChange, false);
+        // window.addEventListener('pagehide', pageChange, false);
         document.addEventListener(eventName, pageChange, false);
         document.addEventListener('baiduboxappvisibilitychange', pageChange, false);
 
@@ -572,8 +572,7 @@ export class LaunchApp {
             if (haveChange) {
                 return;
             }
-            // document.removeEventListener('visibilitychange', pageChange);
-            document.removeEventListener('pagehide', pageChange);
+            // document.removeEventListener('pagehide', pageChange);
             document.removeEventListener(eventName, pageChange);
             document.removeEventListener('baiduboxappvisibilitychange', pageChange);
 
