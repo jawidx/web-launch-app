@@ -202,11 +202,7 @@ export class LaunchApp {
                 if (this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                if (isIos && detector.browser.name == 'safari') {
-                    locationCall(url);
-                } else {
-                    iframeCall(url);
-                }
+                iframeCall(url);
             }
         },
         link: {
