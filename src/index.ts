@@ -492,11 +492,10 @@ export class LaunchApp {
                 break;
             case 'scheme':
                 if (this.options.scheme) {
-                    strUrl = this.options.scheme + (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
+                    strUrl = this.options.scheme + (paramStr ? ((this.options.scheme.indexOf('?') > 0 ? '&' : this.configs.searchPrefix(detector)) + paramStr) : '');
                 } else {
                     let protocol = conf.protocol || (isIos ? this.configs.deeplink.scheme.ios.protocol : this.configs.deeplink.scheme.android.protocol);
-                    strUrl = protocol + '://' +
-                        (conf.host ? conf.host + '/' + conf.path : conf.path) +
+                    strUrl = protocol + '://' + conf.path +
                         (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
                 }
                 break;
