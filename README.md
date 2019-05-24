@@ -1,45 +1,93 @@
 # web-launch-app
 
-## 简介 
-- 通过简单配置，实现唤起App并打开指定页或下载安装包（同时适用app内调用端能力）
+## Intro 
+- 通过简单配置，实现唤起App并打开指定页或下载安装包（同样适用app内调用端能力）
 
-## 安装
-- npm install --save web-launch-app
+## Installation
+- npm install web-launch-app --save
 
-## 使用
+## Usage
 
-###
 ```javascript
 import { LaunchApp, detector, copy, ua, isAndroid, isIos, inWexin, inWeibo, supportLink } from 'web-launch-app';
-
-const lanchApp = new LaunchApp(config);
-lanchApp.open({
-    page: 'frs',
-    param:{
-        forumName: 'jawidx'
-    }
-});
-
 /*
 - LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
-- detector：宿主环境对象（包含os及browser信息）
+- detector：宿主环境对象（含os及browser信息）
 - copy：复制方法（浏览器安全限制，必须由用户行为触发）
 - ua：=navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
 - isAndroid、isIos、inWexin、inWeibo：字面含义，Boolea值
-- supportLink：是否支持universal link或applink（ios中uc和qq浏览器不支持ulink，android中chrome、三星、宙斯及基于chrome的等浏览器支持applink），供参考
+- supportLink：是否支持universal link或applink（uc&qq浏览器不支持ulink，chrome、三星、宙斯及基于chrome的浏览器支持applink），供参考
 */
+
+const lanchApp = new LaunchApp();
+lanchApp.open({
+    scheme: 'app://path?k=v',
+    url: 'https://link.domain.com/path?k=v',
+    param:{
+        k2: 'v2'
+    }
+});
+
+lanchApp.open({
+    useYingyongbao: inWexin && isAndroid,
+    launchType: {
+        ios: inWexin ? 'store' : 'link',
+        android: inWexin ? 'store' : 'scheme',
+    },
+    autodemotion: false,
+    scheme: 'app://path?k=v',
+    url: 'https://link.domain.com/path?k=v',
+    param:{
+        k2: 'v2'
+    },
+    timeout: 2000
+}, (s, d, url) => {
+        console.log('callbackout', s, d, url);
+        s != 1 && copy(url);
+        return 2;
+    });
+
+lanchApp.down();
+
+const lanchApp2 = new LaunchApp(config);
+lanchApp2.open({
+    page: 'pagenameInConfig',
+    param:{
+        k: 'v'
+    }
+});
 ```
 
-### 方案
-- link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。
-- scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。
-- store：系统应用商店，配置useYingyongbao指定去应用宝（百度春晚活动时引导去应用市场下载分流减压）。
-- 其它
-    - useGuideMethod指定微信、微博等受限环境中引导用户出App（优先级高于launchType指定的方案）。
-    - scheme和store方案默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。
-    - 方案选择：open方法参数配置>实例配置>默认配置（参见源码中方法：_getOpenMethod、open）。
+## API
+#### open(options, callback)
+|Param | |Notes|
+|------|--------|-----|
+|options  |useGuideMethod| 是否使用引导提示，适用于微信、微博等受限环境，优先级高于launchType指定的方案 |
+|  |useYingyongbao| 在微信中store方案时是否走应用宝，默认false |
+|  |guideMethod| 引导方法，默认蒙层文案提示 |
+|  |launchType| 1.link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。2.scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。3.store：系统应用商店，配置useYingyongbao指定去应用宝（百度春晚活动时引导去应用市场下载分流减压）。 |
+|  |autodemotion| 不支持link方案时自动降级为scheme方案，默认false |
+|  |page| 在config中配置的页面名称 |
+|  |param| 参数 |
+|  |scheme| 指定scheme |
+|  |url| 指定link url |
+|  |timeout| scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑 |
+|  |clipboardTxt| 复制内容，针对未安装等唤起中断情况使用 |
+|  |pkgs| {android:'',ios:'',yyb:''} |
+|callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值默认下载apk包，1不处理，2落地页，3应用市场|
 
-### 配置
+
+#### down(options)
+|Param | |Notes|
+|------|--------|-----|
+|options  || {android:'',ios:''，yyk:'',landPage:''} |
+|options  |android| android apk包下载地址 |
+|options  |ios| appstore地址 |
+|options  |yyb| 应用宝地址 |
+|options  |landPage| 落地页地址 |
+
+
+## Config
 ```javascript
 // 针对各种环境及方案参数有点多，需要使用者了解scheme及link本身的区别
 {
@@ -52,10 +100,10 @@ lanchApp.open({
             android: {
                 // 指定android的scheme协议头
                 protocol: 'protocol',
-                index: {
+                index: {    // 页面名称(默认页面请设置为:index)
                     protocol: 'protocol', // 可选，如无会读取上一级protocol，一般不需要配置
                     path: 'path',
-                    param: {},	// 生成scheme或linkurl时的参数
+                    param: {},	// 生成scheme或linkurl时的固定参数
                     paramMap: {},// 参数映射，解决不同平台参数名不一至情况
                     version: '4.9.6'  // 版本要求
                 },
@@ -99,7 +147,7 @@ lanchApp.open({
     }, 
     useUniversalLink: true, // 是否为ios9+使用universallink方案，默认true
     useAppLink: true,       // 是否为android6+使用applink方案，默认true
-    autodemotion: false,    // 不支持link方案时自动降级为scheme方案，默认false	
+    autodemotion: false,    // 不支持link方案时自动降级为scheme方案，默认false
     useYingyongbao: false,   // 在微信中store方案时是否走应用宝，默认false
     useGuideMethod: false,   // 使用guide方案
     guideMethod: ()=>{},  // 引导方法，默认蒙层文案提示
@@ -115,7 +163,7 @@ lanchApp.open({
 import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWexin, inWeibo, copy } from 'web-launch-app';
 let inApp = /haokan(.*)/.test(ua);
 let appVersion = inApp ? /haokan\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
-// 初始化实例，指定全局默认配置（具体业务可使用默认配置可以少写代码）
+// 初始化实例，指定全局默认配置（具体业务代码中使用默认配置）
 const lanchInstance = new LaunchApp({
     inApp: inApp,
     appVersion: appVersion,
@@ -124,17 +172,14 @@ const lanchInstance = new LaunchApp({
         scheme: {
             android: {
                 protocol: 'tbfrs',
-                // 页面名称(默认页面请设置为:index)
                 index: {
                     protocol: 'tbfrs',
                     path: 'tieba.baidu.com',
-                    // 固定参数
                     param: {from:'h5'},
                 },
                 frs: {
                     protocol: 'tbfrs',
                     path: 'tieba.baidu.com',
-                    // 参数映射(解决不同端使用不同参数名的问题)
                     paramMap: {
                         forumName: 'kw'
                     }
@@ -223,10 +268,8 @@ lanchInstance.open({
         yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
     }
 }, (s, d, url) => {
-    // s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值
     console.log('callbackout', s, d, url);
     s != 1 && copy(url);
-    // 返回值指定后续处理（默认下载apk包，1不处理，2中间页，3应用市场）
     return 0;
 });
 
