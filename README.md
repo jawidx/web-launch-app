@@ -1,7 +1,7 @@
 # web-launch-app
 
 ## Intro 
-- 通过简单配置，实现唤起App并打开指定页或下载安装包（同样适用app内调用端能力）
+- 唤起App并打开指定页、下载安装包（同样适用App内H5页调用端能力）
 
 ## Installation
 - npm install web-launch-app --save
@@ -47,32 +47,31 @@ lanchApp.open({
         return 2;
     });
 
-lanchApp.down();
-
-const lanchApp2 = new LaunchApp(config);
+const lanchApp2 = new LaunchApp(config); // 参见Config部分
 lanchApp2.open({
     page: 'pagenameInConfig',
     param:{
         k: 'v'
     }
 });
+lanchApp2.down();
 ```
 
 ## API
 #### open(options, callback)
 |Param | |Notes|
 |------|--------|-----|
-|options  |useGuideMethod| 是否使用引导提示，适用于微信、微博等受限环境，优先级高于launchType指定的方案 |
-|  |useYingyongbao| 在微信中store方案时是否走应用宝，默认false |
+|options|useGuideMethod| 是否使用引导提示，适用于微信、微博等受限环境，优先级高于launchType指定的方案 |
 |  |guideMethod| 引导方法，默认蒙层文案提示 |
+|  |useYingyongbao| 在微信中store方案时是否走应用宝，默认false |
 |  |launchType| 1.link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。2.scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。3.store：系统应用商店，配置useYingyongbao指定去应用宝（百度春晚活动时引导去应用市场下载分流减压）。 |
 |  |autodemotion| 不支持link方案时自动降级为scheme方案，默认false |
 |  |page| 在config中配置的页面名称 |
 |  |param| 参数 |
 |  |scheme| 指定scheme |
 |  |url| 指定link url |
-|  |timeout| scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑 |
 |  |clipboardTxt| 复制内容，针对未安装等唤起中断情况使用 |
+|  |timeout| scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑 |
 |  |pkgs| {android:'',ios:'',yyb:''} |
 |callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值默认下载apk包，1不处理，2落地页，3应用市场|
 
@@ -80,11 +79,11 @@ lanchApp2.open({
 #### down(options)
 |Param | |Notes|
 |------|--------|-----|
-|options  || {android:'',ios:''，yyk:'',landPage:''} |
-|options  |android| android apk包下载地址 |
-|options  |ios| appstore地址 |
-|options  |yyb| 应用宝地址 |
-|options  |landPage| 落地页地址 |
+|options  |||
+||yyb| 应用宝地址，在微信中使用 |
+||android| android apk包下载地址 |
+||ios| appstore地址 |
+||landPage| 落地页地址，非iOS/Android平台使用 |
 
 
 ## Config
