@@ -63,15 +63,19 @@ lanchApp2.down();
 |------|--------|-----|
 |options|useGuideMethod| 是否使用引导提示，适用于微信、微博等受限环境，优先级高于launchType指定的方案 |
 |  |guideMethod| 引导方法，默认蒙层文案提示 |
+|  |updateTipMethod| scheme版本检测时升级提示，默认alert提示 |
 |  |useYingyongbao| 在微信中store方案时是否走应用宝，默认false |
 |  |launchType| 1.link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。2.scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。3.store：系统应用商店，配置useYingyongbao指定去应用宝（百度春晚活动时引导去应用市场下载分流减压）。 |
 |  |autodemotion| 不支持link方案时自动降级为scheme方案，默认false |
 |  |page| 在config中配置的页面名称 |
 |  |param| 参数 |
+|  |paramMap| 参数映射 |
 |  |scheme| 指定scheme |
 |  |url| 指定link url |
 |  |clipboardTxt| 复制内容，针对未安装等唤起中断情况使用 |
 |  |timeout| scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑 |
+|  |landPage| 落地页面 |
+|  |callback| 端回调方法 |
 |  |pkgs| {android:'',ios:'',yyb:''} |
 |callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值默认下载apk包，1不处理，2落地页，3应用市场|
 
