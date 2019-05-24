@@ -1,7 +1,7 @@
 # web-launch-app
 
 ## Intro 
-- 唤起App并打开指定页、下载安装包（同样适用App内H5页调用端能力）
+- 唤起App并打开指定页、下载安装包（同样适用App内H5页通过Scheme调用端能力）
 
 ## Installation
 - npm install web-launch-app --save
@@ -20,7 +20,7 @@ import { LaunchApp, detector, copy, ua, isAndroid, isIos, inWexin, inWeibo, supp
 */
 
 const lanchApp = new LaunchApp();
-lanchApp.open({
+lanchApp.open({ // 参数参见Api部分
     scheme: 'app://path?k=v',
     url: 'https://link.domain.com/path?k=v',
     param:{
@@ -47,7 +47,7 @@ lanchApp.open({
         return 2;
     });
 
-const lanchApp2 = new LaunchApp(config); // 参见Config部分
+const lanchApp2 = new LaunchApp(config); // 配置参见Config部分
 lanchApp2.open({
     page: 'pagenameInConfig',
     param:{
