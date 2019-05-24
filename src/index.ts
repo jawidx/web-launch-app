@@ -185,7 +185,7 @@ export class LaunchApp {
                     pageMap = this.configs.deeplink.scheme.ios;
                 }
                 let pageConf = pageMap[opt.page] || pageMap['index'];
-                pageConf = (<any>Object).assign({}, pageConf, opt);
+                pageConf = deepMerge(pageConf, opt);
                 // 版本检测
                 if (this.configs.inApp && pageConf.version && !this._checkVersion(pageConf)) {
                     return '';
@@ -213,7 +213,7 @@ export class LaunchApp {
             preOpen: function (opt: any) {
                 const pageMap = this.configs.deeplink.link;
                 let pageConf = pageMap[opt.page] || pageMap['index'];
-                pageConf = (<any>Object).assign({}, pageConf, opt);
+                pageConf = deepMerge(pageConf, opt);
                 if (pageConf.paramMap) {
                     pageConf.param = this._paramMapProcess(pageConf.param, pageConf.paramMap);
                 }
@@ -399,7 +399,7 @@ export class LaunchApp {
      * opt: {android:'',ios:''，yyk:'',landPage}
      */
     download(opt?: any) {
-        let pkgs = (<any>Object).assign({}, this.configs.pkgs, opt);
+        let pkgs = deepMerge(this.configs.pkgs, opt);
 
         if (inWexin) {
             locationCall(pkgs.yyb);
