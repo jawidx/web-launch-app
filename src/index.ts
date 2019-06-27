@@ -5,7 +5,7 @@ export const isIos = detector.os.name === 'ios';
 export const isAndroid = detector.os.name === 'android';
 export const enableULink = isIos && detector.os.version >= 9;
 export const enableApplink = isAndroid && detector.os.version >= 6;
-export const inWexin = detector.browser.name === 'micromessenger';
+export const inWeixin = detector.browser.name === 'micromessenger';
 export const inWeibo = detector.browser.name === 'weibo';
 
 /**
@@ -232,12 +232,14 @@ export class LaunchApp {
         store: {
             open: function (noTimeout) {
                 // 超时处理
-                if (!inWexin && !noTimeout && this.timeoutDownload) {
+                if (!inWeixin && !noTimeout && this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                if (this.options.useYingyongbao || (this.options.useYingyongbao == undefined && this.configs.useYingyongbao)) {
+                // let pkgs = deepMerge(this.configs.pkgs,this.options.pkgs);
+                if (inWeixin && (this.options.useYingyongbao || (this.options.useYingyongbao == undefined && this.configs.useYingyongbao))) {
                     let pageConf = deepMerge(this.configs.deeplink.yyb, { param: this.options.param });
                     locationCall(this._getUrlFromConf(pageConf, 'yyb'));
+                    // locationCall(pkgs.yyb);
                 } else if (isIos) {
                     locationCall(this.configs.pkgs.ios);
                 } else if (isAndroid) {
@@ -401,7 +403,7 @@ export class LaunchApp {
     download(opt?: any) {
         let pkgs = deepMerge(this.configs.pkgs, opt);
 
-        if (inWexin) {
+        if (inWeixin) {
             locationCall(pkgs.yyb);
         } else if (isAndroid) {
             locationCall(pkgs.android);
