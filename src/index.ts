@@ -204,6 +204,8 @@ export class LaunchApp {
                 }
                 if (detector.browser.name == 'safari' && detector.os.version >= 9 && isIos) {
                     locationCall(url);
+                } else if (isAndroid && detector.browser.name == 'chrome' && detector.browser.version > 55) {
+                    locationCall(url);
                 } else {
                     iframeCall(url);
                 }
