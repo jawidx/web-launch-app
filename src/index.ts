@@ -110,19 +110,12 @@ export class LaunchApp {
                     },
                     version: 0
                 }
-            },
-            yyb: {
-                url: 'http://a.app.qq.com/o/simple.jsp',
-                param: {
-                    pkgname: '',
-                    ckey: ''
-                }
             }
         },
         pkgs: {
-            yyb: '',
+            yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.haokan&ckey=',
+            ios: 'https://itunes.apple.com/cn/app/id1092031003?mt=8',
             android: '',
-            ios: '',
             store: {
                 samsung: {
                     reg: /\(.*Android.*(SAMSUNG|SM-|GT-).*\)/,
@@ -130,7 +123,7 @@ export class LaunchApp {
                 },
                 android: {
                     reg: /\(.*Android.*\)/,
-                    scheme: 'market://details?id={id}&a=3'
+                    scheme: 'market://details?id={id}'
                 }
             }
         },
@@ -237,13 +230,12 @@ export class LaunchApp {
                 if (!inWeixin && !noTimeout && this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                // let pkgs = deepMerge(this.configs.pkgs,this.options.pkgs);
+                let pkgs = deepMerge(this.configs.pkgs, this.options.pkgs);
                 if (inWeixin && (this.options.useYingyongbao || (this.options.useYingyongbao == undefined && this.configs.useYingyongbao))) {
-                    let pageConf = deepMerge(this.configs.deeplink.yyb, { param: this.options.param });
+                    let pageConf = deepMerge({ url: pkgs.yyb }, { param: this.options.param });
                     locationCall(this._getUrlFromConf(pageConf, 'yyb'));
-                    // locationCall(pkgs.yyb);
                 } else if (isIos) {
-                    locationCall(this.configs.pkgs.ios);
+                    locationCall(pkgs.ios);
                 } else if (isAndroid) {
                     let store = this.configs.pkgs.store, brand, url;
                     for (let key in store) {

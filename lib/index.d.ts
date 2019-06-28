@@ -5,7 +5,7 @@ export declare const isIos: boolean;
 export declare const isAndroid: boolean;
 export declare const enableULink: boolean;
 export declare const enableApplink: boolean;
-export declare const inWexin: boolean;
+export declare const inWeixin: boolean;
 export declare const inWeibo: boolean;
 /**
  * 宿主环境是否支持link

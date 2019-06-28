@@ -40,7 +40,12 @@ lanchApp.open({
     param:{
         k2: 'v2'
     },
-    timeout: 2000
+    timeout: 2000,
+    pkgs:{
+        android: 'https://sv.bdstatic.com/static/haokanapk/apk/baiduhaokan1021176d.apk',
+        ios: 'https://itunes.apple.com/cn/app/id1322948417?mt=8',
+        yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
+    }
 }, (s, d, url) => {
         console.log('callbackout', s, d, url);
         s != 1 && copy(url);
@@ -76,7 +81,7 @@ lanchApp2.down();
 |  |timeout| scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑 |
 |  |landPage| 落地页面 |
 |  |callback| scheme回调方法 |
-|  |pkgs| {android:'',ios:'',yyb:''} |
+|  |pkgs| {android:'',ios:'',yyb:''}，指定子项会覆盖基础配置 |
 |callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值默认下载apk包，1不处理，2落地页，3应用市场|
 
 
@@ -127,14 +132,7 @@ lanchApp2.down();
                 version: 0
             },
             ...
-        },
-        yyb: {
-            url: 'http://a.app.qq.com/o/simple.jsp',
-            param: {
-                pkgname: '',
-                ckey: ''
-            }
-        },
+        }
     },
     // 下载包配置
     pkgs: { 
@@ -205,12 +203,6 @@ const lanchInstance = new LaunchApp({
             index: {url: 'https://tieba.baidu.com'},
             frs: {url: 'https://tieba.baidu.com/p/{forumName}'}
         },
-        yyb: {
-            url: 'http://a.app.qq.com/o/simple.jsp',
-            param: {
-                pkgname: 'com.baidu.tieba'
-            }
-        },
     },
     pkgs: {
         android: 'https://downpack.baidu.com/default.apk',
@@ -268,7 +260,7 @@ lanchInstance.open({
     pkgs: {
         android: 'https://sv.bdstatic.com/static/haokanapk/apk/baiduhaokan1021176d.apk',
         ios: 'https://itunes.apple.com/cn/app/id1322948417?mt=8',
-        yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
+        // yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
     }
 }, (s, d, url) => {
     console.log('callbackout', s, d, url);
