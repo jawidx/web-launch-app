@@ -1,4 +1,4 @@
-import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWexin, inWeibo, copy } from '../src/index';
+import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWeixin, inWeibo, copy } from '../src/index';
 import './index.less';
 console.log('detector,', detector);
 
@@ -55,7 +55,7 @@ const haokanConfig = {
     useUniversalLink: true,
     useAppLink: supportLink,
     autodemotion: true,
-    useYingyongbao: inWexin && isAndroid,
+    useYingyongbao: inWeixin && isAndroid,
     useGuideMethod: inWeibo,
     // guideMethod: () => {
     //     alert('出去玩');
@@ -68,10 +68,10 @@ const lanchHaokan = new LaunchApp(haokanConfig);
 addHandler(linkOpen, 'click', function () {
     lanchHaokan.open({
         // useGuideMethod: true,
-        useYingyongbao: true,//inWexin && isAndroid,
+        useYingyongbao: true,//inWeixin && isAndroid,
         launchType: {
-            // ios: inWexin ? 'store' : 'link',
-            // android: inWexin ? 'store' : 'scheme',
+            // ios: inWeixin ? 'store' : 'link',
+            // android: inWeixin ? 'store' : 'scheme',
             ios: 'store',
             android: 'store',
         },

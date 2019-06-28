@@ -9,13 +9,13 @@
 ## Usage
 
 ```javascript
-import { LaunchApp, detector, copy, ua, isAndroid, isIos, inWexin, inWeibo, supportLink } from 'web-launch-app';
+import { LaunchApp, detector, copy, ua, isAndroid, isIos, inWeixin, inWeibo, supportLink } from 'web-launch-app';
 /*
 - LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
 - detector：宿主环境对象（含os及browser信息）
 - copy：复制方法（浏览器安全限制，必须由用户行为触发）
 - ua：=navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
-- isAndroid、isIos、inWexin、inWeibo：字面含义，Boolea值
+- isAndroid、isIos、inWeixin、inWeibo：字面含义，Boolea值
 - supportLink：是否支持universal link或applink（uc&qq浏览器不支持ulink，chrome、三星、宙斯及基于chrome的浏览器支持applink），供参考
 */
 
@@ -29,10 +29,10 @@ lanchApp.open({ // 参数参见Api部分
 });
 
 lanchApp.open({
-    useYingyongbao: inWexin && isAndroid,
+    useYingyongbao: inWeixin && isAndroid,
     launchType: {
-        ios: inWexin ? 'store' : 'link',
-        android: inWexin ? 'store' : 'scheme',
+        ios: inWeixin ? 'store' : 'link',
+        android: inWeixin ? 'store' : 'scheme',
     },
     autodemotion: false,
     scheme: 'app://path?k=v',
@@ -161,7 +161,7 @@ lanchApp2.down();
 
 ## Demo
 ```javascript
-import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWexin, inWeibo, copy } from 'web-launch-app';
+import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWeixin, inWeibo, copy } from 'web-launch-app';
 let inApp = /haokan(.*)/.test(ua);
 let appVersion = inApp ? /haokan\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
 // 初始化实例，指定全局默认配置（具体业务代码中使用默认配置）
@@ -212,7 +212,7 @@ const lanchInstance = new LaunchApp({
     useUniversalLink: supportLink,
     useAppLink: supportLink,
     autodemotion: true,
-    useYingyongbao: inWexin,
+    useYingyongbao: inWeixin,
     useGuideMethod: inWeibo,
     landPage: 'http://tieba.baidu.com/mo/q/activityDiversion/download'
 });
@@ -240,10 +240,10 @@ lanchInstance.open({
 // 唤起（微博出引导提示，ios微信去appstore，android微信去应用宝，同时指定超时处理及下载包）
 lanchInstance.open({
     useGuideMethod: inWeibo,
-    useYingyongbao: true,   //inWexin && isAndroid,
+    useYingyongbao: true,   //inWeixin && isAndroid,
     launchType: {
-        ios: inWexin ? 'store' : 'link',
-        android: inWexin ? 'store' : 'scheme'
+        ios: inWeixin ? 'store' : 'link',
+        android: inWeixin ? 'store' : 'scheme'
     },
     page: 'author',
     param: {
