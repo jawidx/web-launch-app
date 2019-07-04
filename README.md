@@ -175,13 +175,12 @@ const lanchIns = new LaunchApp({
             android: {
                 protocol: 'app',
                 index: {
-                    protocol: 'app',
                     path: '/',
-                    param: {from:'h5'},
                 },
                 frs: {
                     protocol: 'app',
                     path: 'forum/detail',
+                    param: {from:'h5'},
                     paramMap: {
                         forumName: 'kw'
                     }
@@ -193,10 +192,7 @@ const lanchIns = new LaunchApp({
                     path: '/',
                 },
                 frs: {
-                    path: 'forum/detail',
-                    paramMap: {
-                        forumName: ''
-                    }
+                    path: 'forum/detail'
                 }
             }
         },
@@ -257,6 +253,7 @@ export function download(opt) {
     lanchIns.download(opt);
 }
 
+// ----------------------分割线------------------------
 // demopage.ts（业务代码部分）
 import {launch, invoke, download} from 'launch-app'
 // 唤起（使用配置中的scheme、linkurl）
