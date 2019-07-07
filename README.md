@@ -10,14 +10,6 @@
 
 ```javascript
 import { LaunchApp, detector, copy, ua, isAndroid, isIos, inWeixin, inWeibo, supportLink } from 'web-launch-app';
-/*
-- LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
-- detector：宿主环境对象（含os及browser信息）
-- copy：复制方法（浏览器安全限制，必须由用户行为触发）
-- ua：=navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
-- isAndroid、isIos、inWeixin、inWeibo：字面含义，Boolea值
-- supportLink：是否支持universal link或applink（uc&qq浏览器不支持ulink，chrome、三星、宙斯及基于chrome的浏览器支持applink），供参考
-*/
 
 const lanchApp = new LaunchApp();
 lanchApp.open({ // 参数含义参见Api部分
@@ -60,6 +52,15 @@ lanchApp2.open({
     }
 });
 lanchApp2.down();
+
+/*
+- LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
+- detector：宿主环境对象（含os及browser信息）
+- copy：复制方法（浏览器安全限制，必须由用户行为触发）
+- ua：=navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
+- isAndroid、isIos、inWeixin、inWeibo：字面含义，Boolea值
+- supportLink：是否支持universal link或applink（uc&qq浏览器不支持ulink，chrome、三星、宙斯及基于chrome的浏览器支持applink），供参考
+*/
 ```
 
 ## API
