@@ -1,9 +1,9 @@
 # web-launch-app
 
 ## Intro 
-- 唤起App到指定页，下载安装包、到应用商店（同样适用App内H5页通过Scheme调用端能力）
+- 唤起App到指定页、通过Scheme调用端能力、下载安装包、到应用商店
 
-## Installation
+## Install
 - npm install web-launch-app --save
 
 ## Usage
@@ -76,7 +76,7 @@ lanchApp2.down();
 |  |scheme| 指定scheme |
 |  |callback| scheme的回调方法 |
 |  |url| 指定link url（iOS的universal link值或Android的applink值） |
-|  |page| 在config中配置的页面名称（用来替代scheme和link参数，方便管理）|
+|  |page| 在config中配置的页面名称（用来替代scheme和url参数，方便管理）|
 |  |param| scheme或link的参数 |
 |  |paramMap| 参数映射（适用于iOS与Android同scheme功能但参数名不同的情况，真实世界就是有这么多坑orz）|
 |  |clipboardTxt| 复制到剪贴板内容（针对未安装或环境受限等唤起中断情况使用，在打开app或下载app后可以通过剪贴板内容进行交互衔接或统计），浏览器安全限制需要用户动作触发才能生效|
@@ -99,7 +99,7 @@ lanchApp2.down();
 ## Config
 ```javascript
 // 针对各种环境及方案参数有点多，需要使用者了解scheme及link本身的区别
-// 很多参数项可以在使用api时指定，建议在实例时全局配置，减少使用api时传参
+// 虽然config中很多参数可以在使用api时指定，还是建议在实例时全局配置，减少使用api时传参
 {
     inApp: false,   // 是否是app内（在app内使用了指定version的scheme会进行版本检测）
     appVersion: '', // 对具体scheme链接进行版本检测时使用
@@ -165,8 +165,9 @@ lanchApp2.down();
 ```javascript
 // launch-app.ts（业务使用的基础文件，如多代码模块使用建议提npm包）
 import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWeixin, inWeibo, copy } from 'web-launch-app';
-let inApp = /appname(.*)/.test(ua);
-let appVersion = inApp ? /appname\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
+const inApp = /appname(.*)/.test(ua);
+const appVersion = inApp ? /appname\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
+const wxSupportLink = isIos && inWeixin && detector.browser.fullVersion > '7.0.4';
 const lanchIns = new LaunchApp({
     inApp: inApp,
     appVersion: appVersion,
@@ -211,7 +212,7 @@ const lanchIns = new LaunchApp({
     useAppLink: supportLink,
     autodemotion: true,
     useYingyongbao: inWeixin,
-    useGuideMethod: inWeibo,
+    useGuideMethod: inWeixin && !wxSupportLink,
     landPage: 'http://www.app.com/download'
 });
 
