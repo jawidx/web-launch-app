@@ -1,6 +1,6 @@
 # web-launch-app
 
-## Intro 
+## Intro
 - 唤起App到指定页、通过Scheme调用端能力、下载安装包、到应用商店
 
 ## Install
@@ -71,7 +71,7 @@ lanchApp2.down();
 |  |guideMethod| 引导提示方法，默认蒙层文案提示 |
 |  |updateTipMethod| 版本升级提示方法，scheme指定版本要求时使用，默认alert提示 |
 |  |useYingyongbao| launchType为store方案时在微信中是否走应用宝（应用宝归为应用商店），默认false |
-|  |launchType| 1.link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。2.scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。3.store：应用商店（去应用宝需要指定useYingyongbao为true） |
+|  |launchType| 1.link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。2.scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。3.store：系统应用商店（去应用宝需要指定useYingyongbao为true） |
 |  |autodemotion| 不支持link方案时自动降级为scheme方案，需要注意相关参数配置（使用page时要有同page下的link和scheme配置，或同时指定url及scheme参数），默认false |
 |  |scheme| 指定scheme |
 |  |callback| scheme的回调方法 |
@@ -163,10 +163,13 @@ lanchApp2.down();
 
 ## Demo
 ```javascript
-// launch-app.ts（业务使用的基础文件，如多代码模块使用建议提npm包）
+// ----------------------------------------------------
+// launch-app.ts（业务使用的基础文件，多模块使用建议提npm包）
+// ----------------------------------------------------
 import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWeixin, inWeibo, copy } from 'web-launch-app';
 const inApp = /appname(.*)/.test(ua);
 const appVersion = inApp ? /appname\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
+// 微信iOS7.0.5支持ulink（20190716）
 const wxSupportLink = isIos && inWeixin && detector.browser.fullVersion > '7.0.4';
 const lanchIns = new LaunchApp({
     inApp: inApp,
@@ -255,24 +258,45 @@ export function download(opt) {
     lanchIns.download(opt);
 }
 
-// ----------------------分割线------------------------
+// ----------------------------------------------------
 // demopage.ts（业务代码部分）
+// ----------------------------------------------------
 import {launch, invoke, download} from 'launch-app'
-// 唤起（使用配置中的scheme、linkurl）
+// 唤起（使用page参数，根据配置自动生成scheme和url）
 launch({
     page: 'frs',
     param:{
         forumName: 'jawidx'
     }
-    // paramMap:{}
 });
 
-// 唤起（指定scheme和linkurl）
+// 唤起（指定scheme和url）
 launch({
     param:{
         forumName: 'jawidx'
     },
     scheme: 'tbfrs://setting',
+    url: 'https://link.app.com/user/setting'
+});
+
+// 唤起（指定使用scheme唤起）
+launch({
+    launchType: {
+        ios: 'scheme',
+        android: 'scheme'
+    },
+    scheme: 'tbfrs://setting',
+    param:{
+        forumName: 'jawidx'
+    },
+});
+
+// 唤起（指定使用link唤起）
+launch({
+    launchType: {
+        ios: 'link',
+        android: 'link'
+    },
     url: 'https://link.app.com/user/setting'
 });
 
@@ -290,7 +314,7 @@ launch({
         target: 'https%3A%2F%2Fwww.app.com%2Fdemo',
     },
     // scheme:'',
-    // url:'https%3A%2F%2Fwww.app.com%2Fdemo',
+    // url:'https://link.app.com/path',
     // guideMethod: () => {
     //     alert('出去玩~');
     // },
