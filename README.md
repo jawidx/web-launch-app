@@ -53,7 +53,16 @@ lanchApp2.open({
 });
 lanchApp2.down();
 
-/*
+/* 必知：
+- H5页面并不知道用户是否已安装App
+- Scheme，一般格式为protocol://path?param=value&**，通过判断是否离开当前页面来推断是否唤起app
+- Link，和正常url格式一样，尝试唤起App，未唤起时会像一个正常页面一样访问（一般会通过server转发到url中参数指定页面）
+    - iOS上的Link叫UniversalLink，iOS9开始支持，各浏览器支持比较好
+    - Android上的Link叫Applink，Chrome、三星、宙斯等浏览器支持（各版本支持情况也可能不一样）
+- 微信等App及浏览器会尽可能封禁scheme或link，避免用户流出（2019.7.16发布的iOS7.0.5支持ulink）
+*/
+
+/* export：
 - LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
 - detector：宿主环境对象（含os及browser信息）
 - copy：复制方法（浏览器安全限制，必须由用户行为触发）
