@@ -312,8 +312,9 @@ launch({
     }
 });
 
-// 唤起（ios使用link，android使用scheme或引导）
+// 唤起（ios使用link，android使用scheme，微信中受限时使用引导）
 launch({
+    // useGuideMethod: inWeixin && !wxSupportLink, // 使用默认配置，微信中受限时使用引导
     launchType: {
         ios: 'link',
         android: 'scheme'
