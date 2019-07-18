@@ -224,7 +224,7 @@ const lanchIns = new LaunchApp({
     useAppLink: supportLink,
     autodemotion: true,
     useYingyongbao: inWeixin,
-    useGuideMethod: inWeixin && !wxSupportLink,
+    useGuideMethod: inWeixin && !wxSupportLink, // 受限情况下使用引导方案
     landPage: 'http://www.app.com/download'
 });
 
@@ -271,7 +271,7 @@ export function download(opt) {
 // demopage.ts（业务代码部分）
 // ----------------------------------------------------
 import {launch, invoke, download} from 'launch-app'
-// 唤起（使用page参数，根据配置自动生成scheme和url）
+// 唤起（使用默认唤起方案，指定page参数会根据配置自动生成scheme和url）
 launch({
     page: 'frs',
     param:{
@@ -279,34 +279,54 @@ launch({
     }
 });
 
-// 唤起（指定scheme和url）
+// 唤起（使用默认唤起方案，直接指定scheme和url）
 launch({
+    scheme: 'app://path?k=v',
+    url: 'https://link.domain.com/path?k=v',
     param:{
         forumName: 'jawidx'
-    },
-    scheme: 'tbfrs://setting',
-    url: 'https://link.app.com/user/setting'
+    }
 });
 
-// 唤起（指定使用scheme唤起）
+// 唤起（使用scheme唤起）
 launch({
     launchType: {
         ios: 'scheme',
         android: 'scheme'
     },
-    scheme: 'tbfrs://setting',
+    page: 'frs',
     param:{
         forumName: 'jawidx'
-    },
+    }
 });
 
-// 唤起（指定使用link唤起）
+// 唤起（使用link唤起，适用于不阻断用户继续去h5页体验场景）
 launch({
     launchType: {
         ios: 'link',
         android: 'link'
     },
-    url: 'https://link.app.com/user/setting'
+    url: 'https://link.domain.com/path?k=v',
+    param:{
+        k2: 'v2'
+    }
+});
+
+// 唤起（ios使用link，android使用scheme或引导）
+launch({
+    launchType: {
+        ios: 'link',
+        android: 'scheme'
+    },
+    page: 'frs',
+    param: {
+        k: 'v',
+        target: 'https%3A%2F%2Fwww.app.com%2Fdownload', // 未唤起app时，server处理跳转到此页面
+    },
+    timeout: 2000,
+    pkgs: {
+        android: 'https://cdn.app.com/package/app20190502.apk'
+    }
 });
 
 // 唤起（微博出引导提示，ios微信去appstore，android微信去应用宝，同时指定超时处理及下载包）
@@ -317,10 +337,11 @@ launch({
         ios: inWeixin ? 'store' : 'link',
         android: inWeixin ? 'store' : 'scheme'
     },
-    page: 'author',
+    page: 'frs',
     param: {
-        url_key: '12345',
-        target: 'https%3A%2F%2Fwww.app.com%2Fdemo',
+        k: 'v',
+        ckey: '123',
+        target: 'https%3A%2F%2Fwww.app.com%2Fdownload',
     },
     // scheme:'',
     // url:'https://link.app.com/path',
@@ -332,11 +353,11 @@ launch({
     pkgs: {
         android: 'https://cdn.app.com/package/app20190502.apk',
         // ios: 'https://itunes.apple.com/cn/app/appid123?mt=8',    // 不传使用默认值
-        yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=123'
+        // yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=123' // 不传使用默认值
     }
 }, (s, d, url) => {
     console.log('callbackout', s, d, url);
-    s != 1 && copy(url);
+    // s != 1 && copy(url);
     return 0;
 });
 
