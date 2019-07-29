@@ -12,7 +12,8 @@
 import { LaunchApp, detector, copy, ua, isAndroid, isIos, inWeixin, inWeibo, supportLink } from 'web-launch-app';
 
 const lanchApp = new LaunchApp();
-lanchApp.open({ // 参数含义参见Api部分
+// 简单唤起（参数含义参见Api部分）
+lanchApp.open({
     scheme: 'app://path?k=v',
     url: 'https://link.domain.com/path?k=v',
     param:{
@@ -20,6 +21,7 @@ lanchApp.open({ // 参数含义参见Api部分
     }
 });
 
+// 复杂唤起
 lanchApp.open({
     useYingyongbao: inWeixin && isAndroid,
     launchType: {
@@ -44,7 +46,11 @@ lanchApp.open({
         return 2;
     });
 
-const lanchApp2 = new LaunchApp(config); // 配置参见Config部分
+// 下载
+lanchApp.down();
+
+// 全局默认配置（参见Config部分）
+const lanchApp2 = new LaunchApp(config);
 lanchApp2.open({
     page: 'pagenameInConfig',
     param:{
@@ -132,7 +138,7 @@ lanchApp2.down();
                 ...
             }
         },
-        // 配置univerlink方案具体url及参数
+        // 配置univerlink或applink方案中具体页面url及参数
         link: {
             pagename: {
                 url: 'https://link.app.com/p/{forumName}',	// 支持占位符
@@ -234,7 +240,17 @@ const lanchIns = new LaunchApp({
  * @param callback 
  */
 export function launch(options?: any, callback?: (status, detector, scheme) => number) {
-    // 针对scheme情况处理剪贴板参数（纯link方案不需要）
+
+    // pkgs处理
+    options.pkgs = options.pkgs || {};
+    if(options.param && options.param.pkg){
+        options.pkgs.android = options.pkgs.android || `https://cdn.app.com/download/app-${pkg}.apk`;
+    }
+    if(options.param && options.param.ckey){
+        options.pkgs.android = options.pkgs.android || `http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=${ckey}`;
+    }
+    
+    // 针对scheme情况处理剪贴板口令（纯link方案不需要）
     if (options.clipboardTxt === undefined) {
         let paramStr = options.param ? stringtifyParams(options.param) : '';
         if (options.scheme) {
@@ -322,7 +338,7 @@ launch({
     page: 'frs',
     param: {
         k: 'v',
-        target: 'https%3A%2F%2Fwww.app.com%2Fdownload', // 未唤起app时，server处理跳转到此页面
+        target: 'https://www.app.com/download', // 未唤起app时，server处理跳转到此页面
     },
     timeout: 2000,
     pkgs: {
@@ -342,7 +358,8 @@ launch({
     param: {
         k: 'v',
         ckey: '123',
-        target: 'https%3A%2F%2Fwww.app.com%2Fdownload',
+        pkg: '20190502',
+        target: 'https://www.app.com/download',
     },
     // scheme:'',
     // url:'https://link.app.com/path',
@@ -351,11 +368,11 @@ launch({
     // },
     timeout: 2000,
     // clipboardTxt: '#key#', // launch-app中自动生成
-    pkgs: {
-        android: 'https://cdn.app.com/package/app20190502.apk',
+    // pkgs: {
+        // android: 'https://cdn.app.com/package/app-20190502.apk',  // 通过pkg参数处理
         // ios: 'https://itunes.apple.com/cn/app/appid123?mt=8',    // 不传使用默认值
-        // yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=123' // 不传使用默认值
-    }
+        // yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=123' // 通过ckey参数处理，不传使用默认值
+    // }
 }, (s, d, url) => {
     console.log('callbackout', s, d, url);
     // s != 1 && copy(url);
