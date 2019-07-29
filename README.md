@@ -57,7 +57,6 @@ lanchApp2.open({
         k: 'v'
     }
 });
-lanchApp2.down();
 
 /* 必知：
 - H5页面并不知道用户是否已安装App
@@ -86,7 +85,7 @@ lanchApp2.down();
 |  |guideMethod| 引导提示方法，默认蒙层文案提示 |
 |  |updateTipMethod| 版本升级提示方法，scheme指定版本要求时使用，默认alert提示 |
 |  |useYingyongbao| launchType为store方案时（应用宝归为应用商店），控制微信中是否走应用宝，默认false |
-|  |launchType| 【1】.link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。【2】.scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。【3】.store：系统应用商店（去应用宝需要指定useYingyongbao为true） |
+|  |launchType| 【1】link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。【2】scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。【3】store：系统应用商店（去应用宝需要指定useYingyongbao为true） |
 |  |autodemotion| 是否支持link方案不可用时自动降级为scheme方案，（注意参数配置：使用page时要有同page下的link和scheme配置，或同时指定url及scheme参数），默认false |
 |  |scheme| 指定scheme |
 |  |callback| scheme的回调方法 |
@@ -178,9 +177,9 @@ lanchApp2.down();
 
 ## Demo
 ```javascript
-// ----------------------------------------------------
-// launch-app.ts（业务使用的基础文件，多模块使用建议提npm包）
-// ----------------------------------------------------
+// -------------------------------------------------------------------
+// launch-app.ts（基础文件，通过默认配置减少业务代码开发量，多模块使用建议提npm包）
+// -------------------------------------------------------------------
 import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWeixin, inWeibo, copy } from 'web-launch-app';
 const inApp = /appname(.*)/.test(ua);
 const appVersion = inApp ? /appname\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
@@ -231,6 +230,7 @@ const lanchIns = new LaunchApp({
     autodemotion: true,
     useYingyongbao: inWeixin,
     useGuideMethod: inWeixin && !wxSupportLink, // 受限情况下使用引导方案
+    timeout: 2500,
     landPage: 'http://www.app.com/download'
 });
 
@@ -240,7 +240,6 @@ const lanchIns = new LaunchApp({
  * @param callback 
  */
 export function launch(options?: any, callback?: (status, detector, scheme) => number) {
-
     // pkgs处理
     options.pkgs = options.pkgs || {};
     if(options.param && options.param.pkg){
@@ -283,9 +282,9 @@ export function download(opt) {
     lanchIns.download(opt);
 }
 
-// ----------------------------------------------------
+// -------------------------------------------------------------------
 // demopage.ts（业务代码部分）
-// ----------------------------------------------------
+// -------------------------------------------------------------------
 import {launch, invoke, download} from 'launch-app'
 // 唤起（使用默认唤起方案，指定page参数会根据配置自动生成scheme和url）
 launch({
@@ -339,10 +338,6 @@ launch({
     param: {
         k: 'v',
         target: 'https://www.app.com/download', // 未唤起app时，server处理跳转到此页面
-    },
-    timeout: 2000,
-    pkgs: {
-        android: 'https://cdn.app.com/package/app20190502.apk'
     }
 });
 
@@ -364,14 +359,14 @@ launch({
     // scheme:'',
     // url:'https://link.app.com/path',
     // guideMethod: () => {
-    //     alert('出去玩~');
+    //     alert('请点击右上角，选择浏览器打开~');
     // },
     timeout: 2000,
     // clipboardTxt: '#key#', // launch-app中自动生成
     // pkgs: {
+        // yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=123', // 通过ckey参数处理，不传使用默认值
         // android: 'https://cdn.app.com/package/app-20190502.apk',  // 通过pkg参数处理
-        // ios: 'https://itunes.apple.com/cn/app/appid123?mt=8',    // 不传使用默认值
-        // yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=123' // 通过ckey参数处理，不传使用默认值
+        // ios: 'https://itunes.apple.com/cn/app/appid123?mt=8'    // 不传使用默认值
     // }
 }, (s, d, url) => {
     console.log('callbackout', s, d, url);
@@ -388,19 +383,25 @@ invoke({
         context:'copycontent'
     }
 });
+invoke({
+    page:'copy',
+    param:{
+        context:'copycontent'
+    }
+});
 
 // 下载
 download();
 
 // 下载指定包(不指定平台使用全局配置)
-download{
+download({
     pkgs:{
         ios:'',
         android:''
         yyb:'',
         landPage:''
     }
-};
+});
 ```
 
 ## Who use?
