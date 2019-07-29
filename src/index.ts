@@ -135,7 +135,7 @@ export class LaunchApp {
         autodemotion: false,
         useYingyongbao: false,
         // 受限引导
-        useGuideMethod: false,
+        useGuideMethod: isAndroid && (inWeixin || inWeibo),
         guideMethod: () => {
             const div = document.createElement('div');
             div.className = 'wx-guide-div'
@@ -232,8 +232,7 @@ export class LaunchApp {
                 }
                 let pkgs = deepMerge(this.configs.pkgs, this.options.pkgs);
                 if (inWeixin && (this.options.useYingyongbao || (this.options.useYingyongbao == undefined && this.configs.useYingyongbao))) {
-                    let pageConf = deepMerge({ url: pkgs.yyb }, { param: this.options.param });
-                    locationCall(this._getUrlFromConf(pageConf, 'yyb'));
+                    locationCall(pkgs.yyb);
                 } else if (isIos) {
                     locationCall(pkgs.ios);
                 } else if (isAndroid) {
@@ -459,7 +458,7 @@ export class LaunchApp {
             if (typeof obj[k] == 'object') {
                 str += k + '=' + encodeURIComponent(JSON.stringify(obj[k])) + '&';
             } else {
-                str += k + '=' + obj[k] + '&';
+                str += k + '=' + encodeURIComponent(obj[k]) + '&';
             }
         };
         return str ? str.substr(0, str.length - 1) : str;
@@ -494,9 +493,6 @@ export class LaunchApp {
                     strUrl = protocol + '://' + conf.path +
                         (paramStr ? this.configs.searchPrefix(detector) + paramStr : '');
                 }
-                break;
-            case 'yyb':
-                strUrl = conf.url + (paramStr ? ((conf.url.indexOf('?') > 0 ? '&' : '?') + paramStr) : '');
                 break;
             case 'store':
                 strUrl = conf.scheme.replace('{id}', conf.pkgName || this.configs.pkgName);
