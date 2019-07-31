@@ -263,6 +263,37 @@ export function launch(options?: any, callback?: (status, detector, scheme) => n
 }
 
 /**
+ * 唤起app到指定页面(尝试唤起场景，使用link方案)
+ * @param options 
+ * @param callback 
+ */
+export function tryLaunch(options?: any, callback?: (status, detector, scheme) => number) {
+    options.launchType = {
+        ios: 'link',
+        android: 'link'
+    };
+    options.autodemotion = false;
+    launch(options);
+}
+
+/**
+ * 唤起app到指定页面(常见场景方案，ios走link,android走scheme,android微信中走应用宝)
+ * @param options 
+ * @param callback 
+ */
+export function hotLaunch(options?: any, callback?: (status, detector, scheme) => number) {
+    options.useGuideMethod = isAndroid && inWeibo;
+    options.launchType = {
+        ios: 'link',
+        android: inWeixin ? 'store' : 'scheme'
+    };
+    options.useYingyongbao = isAndroid && inWeixin;
+    options.autodemotion = true;
+
+    launch(options, callback);
+}
+
+/**
  * 端内H5页面调用端能力
  */
 export function invoke(options: any) {
@@ -285,7 +316,7 @@ export function download(opt) {
 // -------------------------------------------------------------------
 // demopage.ts（业务代码部分）
 // -------------------------------------------------------------------
-import {launch, invoke, download} from 'launch-app'
+import {launch, tryLaunch, hotLaunch, invoke, download} from 'launch-app'
 // 唤起（使用默认唤起方案，指定page参数会根据配置自动生成scheme和url）
 launch({
     page: 'frs',
@@ -303,18 +334,6 @@ launch({
     }
 });
 
-// 唤起（使用scheme唤起）
-launch({
-    launchType: {
-        ios: 'scheme',
-        android: 'scheme'
-    },
-    page: 'frs',
-    param:{
-        forumName: 'jawidx'
-    }
-});
-
 // 唤起（使用link唤起，适用于不阻断用户继续去h5页体验场景）
 launch({
     launchType: {
@@ -326,6 +345,12 @@ launch({
         k2: 'v2'
     }
 });
+tryLaunch({
+    url: 'https://link.domain.com/path?k=v',
+    param:{
+        k2: 'v2'
+    }
+})
 
 // 唤起（ios使用link，android使用scheme，微信中受限时使用引导）
 launch({
@@ -340,6 +365,13 @@ launch({
         target: 'https://www.app.com/download', // 未唤起app时，server处理跳转到此页面
     }
 });
+hotLaunch({
+    page: 'frs',
+    param: {
+        k: 'v',
+        target: 'https://www.app.com/download', // 未唤起app时，server处理跳转到此页面
+    }
+})
 
 // 唤起（微博出引导提示，ios微信去appstore，android微信去应用宝，同时指定超时处理及下载包）
 launch({
