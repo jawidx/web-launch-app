@@ -58,15 +58,6 @@ lanchApp2.open({
     }
 });
 
-/* 必知：
-- H5页面并不知道用户是否已安装App
-- Scheme，一般格式为protocol://path?param=value&**，通过判断是否离开当前页面来推断是否唤起app
-- Link，和正常url格式一样，尝试唤起App，未唤起时会像一个正常页面一样访问（一般会通过server转发到url中参数指定页面）
-    - iOS上的Link叫UniversalLink，iOS9开始支持，各浏览器支持比较好
-    - Android上的Link叫Applink，Chrome、三星、宙斯等浏览器支持（各版本支持情况也可能不一样）
-- 微信等App及浏览器会尽可能封禁scheme或link，避免用户流出（2019.7.16发布的iOS7.0.5支持ulink）
-*/
-
 /* export：
 - LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
 - detector：宿主环境对象（含os及browser信息）
@@ -162,8 +153,8 @@ lanchApp2.open({
             }
         }
     }, 
-    useUniversalLink: true, // 是否为ios9+使用universallink方案，默认true
-    useAppLink: true,       // 是否为android6+使用applink方案，默认true
+    useUniversalLink: supportLink(), // 默认根据环境判断
+    useAppLink: supportLink(),       // 默认根据环境判断
     autodemotion: false,    // 不支持link方案时自动降级为scheme方案，默认false
     useYingyongbao: false,   // 在微信中store方案时是否走应用宝，默认false
     useGuideMethod: false,   // 使用guide方案
@@ -225,11 +216,11 @@ const lanchIns = new LaunchApp({
         ios: 'https://itunes.apple.com/app/apple-store/appid123?pt=328057&ct=MobileQQ_LXY&mt=8',
         yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=123',
     },
-    useUniversalLink: supportLink,
-    useAppLink: supportLink,
+    useUniversalLink: supportLink(),
+    useAppLink: supportLink(),
     autodemotion: true,
-    useYingyongbao: inWeixin,
-    useGuideMethod: inWeixin && !wxSupportLink, // 受限情况下使用引导方案
+    useYingyongbao: inWeixin && isAndroid, // 2019.7.16发布iOS微信7.0.5支持ulink
+    useGuideMethod: inWeibo && isAndroid, // 受限情况下使用引导方案
     timeout: 2500,
     landPage: 'http://www.app.com/download'
 });
