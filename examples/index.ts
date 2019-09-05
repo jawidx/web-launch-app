@@ -16,11 +16,11 @@ function addHandler(element, type, handler) {
 const linkOpen = document.getElementsByClassName('j_open')[0];
 const linkDown = document.getElementsByClassName('j_down')[0];
 
-// Haokan
+// config
 let schemeConfig = {
     protocol: 'baiduhaokan',
     index: { path: 'home/index' },
-    // my
+    video: { path: 'video/details/' },
     author: { path: 'author/details/' },
 };
 const haokanConfig = {
@@ -35,9 +35,7 @@ const haokanConfig = {
         link: {
             index: { url: 'http://hku.baidu.com/h5/share/homeindex' },
             video: { url: 'http://hku.baidu.com/h5/share/detail' },
-            miniVideo: { url: 'http://hku.baidu.com/h5/share/minidetail' },
-            author: { url: 'http://hku.baidu.com/h5/share/detailauthor' },
-            webview: { url: 'http://hku.baidu.com/h5/share/webview' }
+            author: { url: 'http://hku.baidu.com/h5/share/detailauthor' }
         }
     },
     pkgs: {
@@ -53,12 +51,12 @@ const haokanConfig = {
         }
     },
     useUniversalLink: true,
-    useAppLink: supportLink,
+    useAppLink: supportLink(),
     autodemotion: true,
     useYingyongbao: inWeixin && isAndroid,
-    useGuideMethod: inWeibo,
+    useGuideMethod: inWeibo && isAndroid,
     // guideMethod: () => {
-    //     alert('出去玩');
+    //     alert('右上角->在浏览器中打开');
     // },
     timeout: 2000,
     landPage: 'http://haokan.baidu.com/download'
@@ -72,8 +70,8 @@ addHandler(linkOpen, 'click', function () {
         launchType: {
             // ios: inWeixin ? 'store' : 'link',
             // android: inWeixin ? 'store' : 'scheme',
-            ios: 'store',
-            android: 'store',
+            ios: 'link',
+            android: 'scheme',
         },
         // page: 'author',
         param: {
@@ -89,16 +87,17 @@ addHandler(linkOpen, 'click', function () {
         // },
         timeout: 2000,
         // clipboardTxt: '#baiduhaokan://webview/?url_key=https%3a%2f%2feopa.baidu.com%2fpage%2fauthorizeIndex-AcHzJLpa%3fproductid%3d1%26gtype%3d1%26idfrom%3dinside-baiduappbanner&pd=yq&tab=guide&tag=guide&source=yq-0-yq#',
-        pkgs: {
-            android: 'https://sv.bdstatic.com/static/haokanapk/apk/baiduhaokan1021176d.apk',
-            ios: 'https://itunes.apple.com/cn/app/id1322948417?mt=8',
-            // yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
-        }
-    }, (s, d, url) => {
-        console.log('callbackout', s, d, url);
-        s != 1 && copy(url);
-        return 2;
+        // pkgs: {
+        //     android: 'https://sv.bdstatic.com/static/haokanapk/apk/baiduhaokan1021176d.apk',
+        //     ios: 'https://itunes.apple.com/cn/app/id1322948417?mt=8',
+        //     // yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.tieba&ckey=CK1374101624513'
+        // }
     });
+    // , (s, d, url) => {
+    //     console.log('callbackout', s, d, url);
+    //     s != 1 && copy(url);
+    //     return 2;
+    // }
 
 });
 
