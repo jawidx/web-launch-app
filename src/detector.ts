@@ -162,6 +162,7 @@ const BROWSER = [
         }
         return /\b360(?:se|ee|chrome|browser)\b/;
     }],
+    ["bdminivideo", /bdminivideo\/([0-9.]+)/],
     ["baidu", /\b(?:ba?idubrowser|baiduhd)[ \/]([0-9.x]+)/],
     ["baiduboxapp",
         function (ua) {
