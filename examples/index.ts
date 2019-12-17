@@ -68,18 +68,16 @@ addHandler(linkOpen, 'click', function () {
         // useGuideMethod: true,
         useYingyongbao: true,//inWeixin && isAndroid,
         launchType: {
-            // ios: inWeixin ? 'store' : 'link',
-            // android: inWeixin ? 'store' : 'scheme',
             ios: 'link',
-            android: 'scheme',
+            android: inWeixin ? 'store' : 'scheme'
         },
-        // page: 'author',
+        page: 'author',
         param: {
             url_key: '4215764431860909454',
             target: 'https%3A%2F%2Fbaijiahao.baidu.com%2Fu%3Fapp_id%3D1611116910625404%26fr%3Dbjhvideo',
         },
-        scheme: 'baiduhaokan://my/history?a=b',
-        url: 'https://hku.baidu.com/h5/share/s/my/settings',
+        // scheme: 'baiduhaokan://my/history?a=b',
+        // url: 'https://hku.baidu.com/h5/share/s/my/settings',
         // scheme:'baiduhaokan://my/setting',
         // url:'http://hku.baidu.com/h5/share/detailauthor?url_key=1611116910625404&target=https%3A%2F%2Fbaijiahao.baidu.com%2Fu%3Fapp_id%3D1611116910625404%26fr%3Dbjhvideo',
         // guideMethod: () => {
