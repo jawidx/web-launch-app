@@ -47,7 +47,7 @@ lanchApp.open({
     });
 
 // 下载
-lanchApp.down();
+lanchApp.download();
 
 // 全局默认配置（参见Config部分）
 const lanchApp2 = new LaunchApp(config);
@@ -57,31 +57,30 @@ lanchApp2.open({
         k: 'v'
     }
 });
+```
 
-/* export：
-- LaunchApp：唤起类，核心逻辑所在，通过不同方案实现唤起App及下载
+## API
+#### export
+- LaunchApp：唤起类，核心逻辑所在，提供了open()及download()方法通过不同方案实现唤起App及下载
 - detector：宿主环境对象（含os及browser信息）
 - copy：复制方法（浏览器安全限制，必须由用户行为触发）
 - ua：=navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
 - isAndroid、isIos、inWeixin、inWeibo：字面含义，Boolea值
 - supportLink：是否支持universal link或applink（uc&qq浏览器不支持ulink，chrome、三星、宙斯及基于chrome的浏览器支持applink），供参考
-*/
-```
 
-## API
 #### open(options, callback)
 |Param | |Notes|
 |------|--------|-----|
 |options|useGuideMethod| 是否使用引导提示，优先级高于launchType指定的方案（适用于微信、微博等受限环境），默认false |
 |  |guideMethod| 引导提示方法，默认蒙层文案提示 |
-|  |updateTipMethod| 版本升级提示方法，scheme指定版本要求时使用，默认alert提示 |
+|  |updateTipMethod| 版本升级提示方法，scheme配置指定版本时使用，默认alert提示 |
 |  |useYingyongbao| launchType为store方案时（应用宝归为应用商店），控制微信中是否走应用宝，默认false |
 |  |launchType| 【1】link：iOS9+使用universal link，Android6+使用applink，可配置指定link无法使用时自动降级为scheme。【2】scheme：scheme协议，通过唤起超时逻辑进行未唤起处理，同时适用于app内打开页面调用native功能。【3】store：系统应用商店（去应用宝需要指定useYingyongbao为true） |
 |  |autodemotion| 是否支持link方案不可用时自动降级为scheme方案，（注意参数配置：使用page时要有同page下的link和scheme配置，或同时指定url及scheme参数），默认false |
 |  |scheme| 指定scheme |
 |  |callback| scheme的回调方法 |
 |  |url| 指定link url（iOS的universal link值或Android的applink值） |
-|  |page| 在config中配置的页面名称（用来替代scheme和url参数，方便管理）|
+|  |page| 在config中配置的页面名称或端能力名称（替代scheme和url参数方便维护）|
 |  |param| scheme或link的参数 |
 |  |paramMap| 参数映射（适用于iOS与Android同scheme功能但参数名不同的情况，真实世界就是有这么多坑orz）|
 |  |clipboardTxt| 复制到剪贴板内容（针对未安装或环境受限等唤起中断情况使用，在打开app或下载app后可以通过剪贴板内容进行交互衔接或统计），浏览器安全限制需要用户动作触发才能生效|
@@ -91,7 +90,7 @@ lanchApp2.open({
 |callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值默认下载apk包或去appstore，1不处理，2落地页，3应用市场（百度春晚活动时引导去应用市场下载分流减压）|
 
 
-#### down(options)
+#### download(options)
 |Param | |Notes|
 |------|--------|-----|
 |options  ||未指定项使用实例配置中的默认值|
@@ -115,13 +114,14 @@ lanchApp2.open({
             android: {
                 // 指定android的scheme协议头
                 protocol: 'appname',
-                index: {    // 页面名称(默认页面请设置为:index)
+                index: {    // 页面名或端能力名(默认请设置为:index)
                     protocol: 'appname', // 可选，如无会读取上一级protocol，一般不需要配置
                     path: 'path',
                     param: {},	// 生成scheme或linkurl时的固定参数
                     paramMap: {},// 参数映射，解决不同平台参数名不一至情况
                     version: '4.9.6'  // 版本要求
                 },
+                share:{...},
                 ...
             },
             ios: {
@@ -143,14 +143,19 @@ lanchApp2.open({
     },
     // 下载包配置
     pkgs: { 
-        yyb: '',
+        yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.haokan&ckey=',
         android: 'https://cdn.app.com/package/app-default.apk',
-        ios: '',
-        store: {    // 手机商店匹配
-            xphone: {
+        ios: 'https://itunes.apple.com/cn/app/id1092031003?mt=8',
+        store: {    // android手机商店匹配，一般不需要配置
+            android: {
                 reg: /\(.*Android.*\)/,
                 scheme: 'market://details?id=packagename'
-            }
+            },
+            samsung: {
+                reg: /\(.*Android.*(SAMSUNG|SM-|GT-).*\)/,
+                scheme: 'samsungapps://ProductDetail/{id}'
+            },
+            ...
         }
     }, 
     useUniversalLink: supportLink(), // 默认根据环境判断
@@ -254,11 +259,11 @@ export function launch(options?: any, callback?: (status, detector, scheme) => n
 }
 
 /**
- * 唤起app到指定页面(尝试唤起场景，使用link方案)
+ * 唤起app到指定页面(尝试唤起场景，使用link方案，适用于不阻断用户继续去h5页体验场景)
  * @param options 
  * @param callback 
  */
-export function tryLaunch(options?: any, callback?: (status, detector, scheme) => number) {
+export function tryLaunch(options?: any={}, callback?: (status, detector, scheme) => number) {
     options.launchType = {
         ios: 'link',
         android: 'link'
@@ -268,7 +273,18 @@ export function tryLaunch(options?: any, callback?: (status, detector, scheme) =
 }
 
 /**
- * 唤起app到指定页面(常见场景方案，ios走link,android走scheme,android微信中走应用宝)
+ * 唤起app到指定页面(强制唤起场景，使用scheme方案)
+ */
+export function forceLaunch(options?: any={}, callback?: (status, detector, scheme) => number) {
+    options.launchType = {
+        ios: 'scheme',
+        android: 'scheme'
+    };
+    launch(options);
+}
+
+/**
+ * 唤起app到指定页面(常见场景方案，ios走link,android优先走link不支持走scheme,android微信中走应用宝)
  * @param options 
  * @param callback 
  */
@@ -276,7 +292,7 @@ export function hotLaunch(options?: any, callback?: (status, detector, scheme) =
     options.useGuideMethod = isAndroid && inWeibo;
     options.launchType = {
         ios: 'link',
-        android: inWeixin ? 'store' : 'scheme'
+        android: inWeixin ? 'store' : (supportLink ? 'link' : 'scheme')
     };
     options.useYingyongbao = isAndroid && inWeixin;
     options.autodemotion = true;
@@ -325,45 +341,6 @@ launch({
     }
 });
 
-// 唤起（使用link唤起，适用于不阻断用户继续去h5页体验场景）
-launch({
-    launchType: {
-        ios: 'link',
-        android: 'link'
-    },
-    url: 'https://link.domain.com/path?k=v',
-    param:{
-        k2: 'v2'
-    }
-});
-tryLaunch({
-    url: 'https://link.domain.com/path?k=v',
-    param:{
-        k2: 'v2'
-    }
-})
-
-// 唤起（ios使用link，android使用scheme，微信中受限时使用引导）
-launch({
-    // useGuideMethod: inWeixin && !wxSupportLink, // 使用默认配置，微信中受限时使用引导
-    launchType: {
-        ios: 'link',
-        android: 'scheme'
-    },
-    page: 'frs',
-    param: {
-        k: 'v',
-        target: 'https://www.app.com/download', // 未唤起app时，server处理跳转到此页面
-    }
-});
-hotLaunch({
-    page: 'frs',
-    param: {
-        k: 'v',
-        target: 'https://www.app.com/download', // 未唤起app时，server处理跳转到此页面
-    }
-})
-
 // 唤起（微博出引导提示，ios微信去appstore，android微信去应用宝，同时指定超时处理及下载包）
 launch({
     useGuideMethod: inWeibo,
@@ -397,9 +374,26 @@ launch({
     return 0;
 });
 
-/**
- * 端内H5页面调用端能力
- */
+// 尽量使用封装的tryLaunch、forceLaunch、hotLaunch、invoke方法，减少直接使用launch方法，便于扩展
+tryLaunch({
+    url: 'https://link.domain.com/path?k=v',
+    param:{
+        k2: 'v2'
+    }
+})
+forceLaunch({
+    page:'',
+    param:{
+        k:'v'
+    }
+})
+hotLaunch({
+    page: 'frs',
+    param: {
+        k: 'v',
+        target: 'https://www.app.com/download', // 未唤起app时，server处理跳转到此页面
+    }
+})
 invoke({
     scheme:'app://copy',
     param:{
@@ -428,4 +422,4 @@ download({
 ```
 
 ## Who use?
-百度贴吧、伙拍小视频、好看视频
+百度贴吧、伙拍小视频、好看视频...
