@@ -225,7 +225,7 @@ const BROWSER = [
         return /\bversion\/([0-9.]+(?: beta)?)/;
     }],
     ["safari", /\bversion\/([0-9.]+(?: beta)?)(?: mobile(?:\/[a-z0-9]+)?)? safari\//],
-    // 如果不能被识别为 Safari，则猜测是 WebView。
+    // 如果不能识别为浏览器则为webview。
     ["webview", /\bcpu(?: iphone)? os (?:[0-9._]+).+\bapplewebkit\b/],
 ];
 
