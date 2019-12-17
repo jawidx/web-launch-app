@@ -59,7 +59,7 @@ const haokanConfig = {
     //     alert('右上角->在浏览器中打开');
     // },
     timeout: 2000,
-    landPage: 'http://haokan.baidu.com/download'
+    landPage: 'https://haokan.baidu.com/download'
 };
 const lanchHaokan = new LaunchApp(haokanConfig);
 
