@@ -127,10 +127,8 @@ export class LaunchApp {
                 }
             }
         },
-        // for ios9+(default:true)
-        useUniversalLink: true,
-        // for android6+(default:true)
-        useAppLink: true,
+        useUniversalLink: supportLink(),
+        useAppLink: supportLink(),
         // 不支持link方案时自动降级为scheme方案
         autodemotion: false,
         useYingyongbao: false,
