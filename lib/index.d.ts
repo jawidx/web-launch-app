@@ -55,7 +55,7 @@ export declare class LaunchApp {
     private callback;
     private openUrl;
     private callbackId;
-    constructor(opt: any);
+    constructor(opt?: any);
     /**
      * select open method according to the environment and config
      */

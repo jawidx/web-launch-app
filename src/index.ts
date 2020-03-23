@@ -272,7 +272,7 @@ export class LaunchApp {
     // other
     private openUrl: string
     private callbackId = 0;
-    constructor(opt: any) {
+    constructor(opt?: any) {
         let tmpConfig = deepMerge({}, LaunchApp.defaultConfig);
         this.configs = deepMerge(tmpConfig, opt);
         this.openMethod = this._getOpenMethod();
