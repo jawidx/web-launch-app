@@ -423,3 +423,4 @@ download({
 
 ## Who use?
 百度贴吧、伙拍小视频、好看视频...
+- [好看视频的免费增长技术体系建设](https://juejin.im/post/5e778f8b518825494f7e1eac)
