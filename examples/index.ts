@@ -21,11 +21,11 @@ let schemeConfig = {
     protocol: 'baiduhaokan',
     index: { path: 'home/index' },
     video: { path: 'video/details/' },
-    author: { path: 'author/details/' },
+    author: { path: 'author/details/', version: '4.7' },
 };
 const haokanConfig = {
-    inApp: false,
-    appVersion: '4.9.5.10',
+    inApp: false,   // TODO
+    appVersion: '4.19.5.10',
     pkgName: 'com.baidu.haokan',
     deeplink: {
         scheme: {
@@ -68,7 +68,7 @@ addHandler(linkOpen, 'click', function () {
         // useGuideMethod: true,
         useYingyongbao: true,//inWeixin && isAndroid,
         launchType: {
-            ios: 'link',
+            ios: 'scheme',
             android: inWeixin ? 'store' : 'scheme'
         },
         page: 'author',

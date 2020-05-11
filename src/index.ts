@@ -410,12 +410,31 @@ export class LaunchApp {
      * @param pageConf {version:''}
      */
     _checkVersion(pageConf) {
-        if (pageConf.version > this.configs.appVersion) {
+        const nums1 = pageConf.version.trim().split('.');
+        const nums2 = this.configs.appVersion.trim().split('.');
+        const len = Math.max(nums1.length, nums2.length);
+        let result = false;
+        for (let i = 0; i < len; i++) {
+            const n1 = parseInt(nums1[i] || 0);
+            const n2 = parseInt(nums2[i] || 0);
+            if (n1 > n2) {
+                result = false;
+                break;
+            }
+            else if (n1 < n2) {
+                result = true;
+                break;
+            }
+            else {
+                continue;
+            }
+        }
+
+        if (!result) {
             let func = this.options.updateTipMethod || this.configs.updateTipMethod;
             func && func();
-            return false;
         }
-        return true;
+        return result;
     }
 
     /**
