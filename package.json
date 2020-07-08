@@ -1,9 +1,10 @@
 {
     "name": "web-launch-app",
-    "version": "2.2.2",
+    "version": "2.2.3",
     "description": "launch app from web page",
     "main": "./lib/index.js",
     "scripts": {
+        "tsc": "tsc",
         "start": "http-server output",
         "build": "webpack -w"
     },
@@ -20,11 +21,10 @@
     },
     "homepage": "https://github.com/jawidx/web-launch-app#readme",
     "license": "MIT",
-    "dependencies": {
-    },
+    "dependencies": {},
     "devDependencies": {
-        "@babel/core": "^7.2.2",
-        "@babel/preset-env": "^7.2.3",
+        "@babel/core": "^7.10.4",
+        "@babel/preset-env": "^7.10.4",
         "babel-loader": "^8.0.4",
         "clean-webpack-plugin": "^0.1.17",
         "css-loader": "^0.28.7",
@@ -34,7 +34,7 @@
         "less": "^2.7.3",
         "less-loader": "^4.0.5",
         "ts-loader": "^4.4.2",
-        "webpack": "^4.16.5",
-        "webpack-cli": "^3.2.0"
+        "webpack": "^4.43.0",
+        "webpack-cli": "^3.3.12"
     }
 }

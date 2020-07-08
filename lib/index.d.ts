@@ -6,7 +6,9 @@ export declare const isAndroid: boolean;
 export declare const enableULink: boolean;
 export declare const enableApplink: boolean;
 export declare const inWeixin: boolean;
+export declare const inQQ: boolean;
 export declare const inWeibo: boolean;
+export declare const inBaidu: boolean;
 /**
  * 宿主环境是否支持link
  */
@@ -68,7 +70,6 @@ export declare class LaunchApp {
     /**
      * launch app
      * @param {*} opt
-     * {
      * page:'index',
      * param:{},
      * paramMap:{}
@@ -87,7 +88,6 @@ export declare class LaunchApp {
      * timeout 是否走超时逻辑,<0表示不走
      * landPage
      * callback 端回调方法
-     * },
      * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
      */
     open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number): void;

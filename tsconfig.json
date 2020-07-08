@@ -7,12 +7,7 @@
         "experimentalDecorators": true,
         "preserveConstEnums": true,
         "outDir": "lib",
-        "declaration": true,
-        // "lib": [
-        //     "es2015.promise",
-        //     "es5",
-        //     "dom"
-        // ]
+        "declaration": true
     },
     "exclude": [
         "node_modules",
