@@ -17,10 +17,9 @@ import {
 const lanchApp = new LaunchApp(config);
 // 简单唤起
 lanchApp.open({
-    scheme: 'app://path?k=v',
-    url: 'https://link.domain.com/path?k=v',
+    page: 'pagename/action',
     param:{
-        k2: 'v2'
+        k: 'v'
     }
 });
 
