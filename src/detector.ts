@@ -136,9 +136,11 @@ const OS = [
     ["windowsce", /\bwindows ce(?: ([0-9.]+))?/]
 ];
 const BROWSER = [
-    // tencent
+    // app
     ["micromessenger", /\bmicromessenger\/([\d.]+)/],
-    ["qq", /\bm?qqbrowser\/([0-9.]+)/],
+    ["qq", /\bqq/i],
+    ["qzone", /qzone\/.*_qz_([\d.]+)/i],
+    ["qqbrowser", /\bm?qqbrowser\/([0-9.]+)/],
     ["tt", /\btencenttraveler ([0-9.]+)/],
     ["weibo", /weibo__([0-9.]+)/],
     ["uc", function (ua: string) {
@@ -162,9 +164,7 @@ const BROWSER = [
         }
         return /\b360(?:se|ee|chrome|browser)\b/;
     }],
-    ["bdminivideo", /bdminivideo\/([0-9.]+)/],
-    ["baidu", /\b(?:ba?idubrowser|baiduhd)[ \/]([0-9.x]+)/],
-    ["baiduboxapp",
+    ["baidu",
         function (ua) {
             let back = 0;
             let a;
@@ -175,7 +175,6 @@ const BROWSER = [
                 } else if ((a = /baiduboxapp\/([\d+.]+)/.exec(ua))) {
                     back = a[1];
                 }
-
                 return {
                     version: back,
                 };
@@ -183,6 +182,8 @@ const BROWSER = [
             return false;
         },
     ],
+    ["baidubrowser", /\b(?:ba?idubrowser|baiduhd)[ \/]([0-9.x]+)/],
+    ["bdminivideo", /bdminivideo\/([0-9.]+)/],
     ["sogou", function (ua: string) {
         if (ua.indexOf("sogoumobilebrowser") >= 0) {
             return /sogoumobilebrowser\/([0-9.]+)/;
@@ -209,6 +210,7 @@ const BROWSER = [
     ["nokia", /\bnokiabrowser\/([0-9.]+)/],
     // ["huawei", /\bhuaweibrowser\/([0-9.]+)/],
     ["samsung", /\bsamsungbrowser\/([0-9.]+)/],
+    // browser
     ["maxthon", /\b(?:maxthon|mxbrowser)(?:[ \/]([0-9.]+))?/],
     // Opera 15 之后开始使用 Chromniun 内核，需要放在 Chrome 的规则之前。
     ["opera", function (ua: string) {

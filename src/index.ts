@@ -6,7 +6,9 @@ export const isAndroid = detector.os.name === 'android';
 export const enableULink = isIos && detector.os.version >= 9;
 export const enableApplink = isAndroid && detector.os.version >= 6;
 export const inWeixin = detector.browser.name === 'micromessenger';
+export const inQQ = detector.browser.name === 'qq';
 export const inWeibo = detector.browser.name === 'weibo';
+export const inBaidu = detector.browser.name === 'baidu';
 
 /**
  * 宿主环境是否支持link
@@ -303,7 +305,6 @@ export class LaunchApp {
     /**
      * launch app
      * @param {*} opt 
-     * {
      * page:'index',
      * param:{},
      * paramMap:{}
@@ -322,7 +323,6 @@ export class LaunchApp {
      * timeout 是否走超时逻辑,<0表示不走
      * landPage
      * callback 端回调方法
-     * },
      * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
      */
     open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number) {
@@ -420,12 +420,10 @@ export class LaunchApp {
             if (n1 > n2) {
                 result = false;
                 break;
-            }
-            else if (n1 < n2) {
+            } else if (n1 < n2) {
                 result = true;
                 break;
-            }
-            else {
+            } else {
                 continue;
             }
         }
