@@ -9,10 +9,13 @@
 ## Usage
 
 ```javascript
-import { LaunchApp, detector, copy, ua, isAndroid, isIos, inWeixin, inWeibo, supportLink } from 'web-launch-app';
+import { 
+    LaunchApp, detector, ua, copy, supportLink,
+    isAndroid, isIos, inWeixin, inQQ, inWeibo, inBaidu
+} from 'web-launch-app';
 
-const lanchApp = new LaunchApp();
-// 简单唤起（参数含义参见Api部分）
+const lanchApp = new LaunchApp(config);
+// 简单唤起
 lanchApp.open({
     scheme: 'app://path?k=v',
     url: 'https://link.domain.com/path?k=v',
@@ -48,25 +51,16 @@ lanchApp.open({
 
 // 下载
 lanchApp.download();
-
-// 全局默认配置（参见Config部分）
-const lanchApp2 = new LaunchApp(config);
-lanchApp2.open({
-    page: 'pagenameInConfig',
-    param:{
-        k: 'v'
-    }
-});
 ```
 
 ## API
 #### export
 - LaunchApp：唤起类，核心逻辑所在，提供了open()及download()方法通过不同方案实现唤起App及下载
-- detector：宿主环境对象（含os及browser信息）
 - copy：复制方法（浏览器安全限制，必须由用户行为触发）
-- ua：=navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
-- isAndroid、isIos、inWeixin、inWeibo：字面含义，Boolea值
-- supportLink：是否支持universal link或applink（uc&qq浏览器不支持ulink，chrome、三星、宙斯及基于chrome的浏览器支持applink），供参考
+- detector：宿主环境对象（含os及browser信息）
+- ua：= navigator.userAgent + " " + navigator.appVersion + " " + navigator.vendor
+- isAndroid、isIos、inWeixin、inQQ、inWeibo、inBaidu：字面含义，Boolea值
+- supportLink：当前环境是否支持universal link或applink
 
 #### open(options, callback)
 |Param | |Notes|
@@ -176,7 +170,10 @@ lanchApp2.open({
 // -------------------------------------------------------------------
 // launch-app.ts（基础文件，通过默认配置减少业务代码开发量，多模块使用建议提npm包）
 // -------------------------------------------------------------------
-import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWeixin, inWeibo, copy } from 'web-launch-app';
+import { 
+    LaunchApp, copy, detector, ua, 
+    isAndroid, isIos, supportLink, inWeixin, inWeibo 
+} from 'web-launch-app';
 const inApp = /appname(.*)/.test(ua);
 const appVersion = inApp ? /appname\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
 // 微信iOS7.0.5支持ulink（20190716）
@@ -245,7 +242,7 @@ export function launch(options?: any, callback?: (status, detector, scheme) => n
         options.pkgs.android = options.pkgs.android || `http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=${ckey}`;
     }
     
-    // 针对scheme情况处理剪贴板口令（纯link方案不需要）
+    // 针对scheme方案处理剪贴板口令
     if (options.clipboardTxt === undefined) {
         let paramStr = options.param ? stringtifyParams(options.param) : '';
         if (options.scheme) {
@@ -255,6 +252,7 @@ export function launch(options?: any, callback?: (status, detector, scheme) => n
             options.clipboardTxt = '#' + schemeConfig['protocol'] + '://' + schemeConfig[options.page].path + (paramStr ? '?' + paramStr : '') + '#';
         }
     }
+    // TODO 处理唤起&新增统计归因、qq浏览器写入剪贴板延迟等通用性功能...
     lanchIns.open(options, callback);
 }
 
@@ -382,7 +380,7 @@ tryLaunch({
     }
 })
 forceLaunch({
-    page:'',
+    page:'frs',
     param:{
         k:'v'
     }
@@ -391,19 +389,19 @@ hotLaunch({
     page: 'frs',
     param: {
         k: 'v',
-        target: 'https://www.app.com/download', // 未唤起app时，server处理跳转到此页面
+        target: 'https://www.app.com/download',
     }
 })
 invoke({
-    scheme:'app://copy',
+    scheme:'app://share',
     param:{
-        context:'copycontent'
+        k:'v'
     }
 });
 invoke({
-    page:'copy',
+    page:'share',
     param:{
-        context:'copycontent'
+        k:'v'
     }
 });
 
@@ -422,5 +420,5 @@ download({
 ```
 
 ## Who use?
-百度贴吧、伙拍小视频、好看视频...
+好看视频、百度贴吧、伙拍小视频...
 - [好看视频的免费增长技术体系建设](https://juejin.im/post/5e778f8b518825494f7e1eac)
