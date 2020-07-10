@@ -7,12 +7,14 @@ module.exports = {
     // devtool: 'inline-source-map',
     target: 'web',
     entry: {
-        demo: ['./examples/index.ts']
+        demo: ['./examples/index.ts'],
+        wla: ['./src/index.ts']
     },
     output: {
-        filename: '[name].[chunkhash].js',
+        filename: '[name].[chunkhash:6].js',
         path: path.resolve(__dirname, 'output'),
-        // publicPath: '/view'
+        library: 'WLA',
+        libraryTarget: 'window',
     },
     plugins: [
         new CleanWebpackPlugin(['output']),
