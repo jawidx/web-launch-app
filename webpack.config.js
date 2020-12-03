@@ -3,8 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
-    mode: 'development',
-    // devtool: 'inline-source-map',
+    mode: 'production',
     target: 'web',
     entry: {
         demo: ['./examples/index.ts'],
@@ -40,7 +39,12 @@ module.exports = {
                             presets: ['@babel/env'],
                         }
                     },
-                    'ts-loader'
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            configFile: 'tsconfig.json',
+                        },
+                    }
                 ]
             },
             {

@@ -1,1 +1,1 @@
-export declare function copy(text: any, options?: any): boolean;
+export declare function copy(text: string, options?: any): boolean;
