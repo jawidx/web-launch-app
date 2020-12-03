@@ -5,7 +5,7 @@
 
 ## Install
 - npm install web-launch-app --save
-- https://unpkg.com/web-launch-app@2.2.4/lib/wla.min.js (window.WLA)
+- https://unpkg.com/web-launch-app@2.2.6/lib/wla.min.js (window.WLA)
 
 ## Usage
 
