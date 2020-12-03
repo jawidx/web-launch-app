@@ -60,7 +60,7 @@ export function iframeCall(url: string) {
  * @param url
  */
 export function locationCall(url: string) {
-    location.href = url;
+    (top.location || location).href = url;
 }
 
 /**
@@ -135,7 +135,7 @@ export class LaunchApp {
         autodemotion: false,
         useYingyongbao: false,
         // 受限引导
-        useGuideMethod: isAndroid && (inWeixin || inWeibo),
+        useGuideMethod: isAndroid && inWeibo,
         guideMethod: () => {
             const div = document.createElement('div');
             div.className = 'wx-guide-div'

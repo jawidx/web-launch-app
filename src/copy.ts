@@ -35,7 +35,7 @@ function select(element) {
     return selectedText;
 }
 
-export function copy(text, options?: any) {
+export function copy(text: string, options?: any) {
     var debug, fakeElem, success = false;
     options = options || {};
     debug = options.debug || false;

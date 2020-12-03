@@ -1,7 +1,7 @@
 # web-launch-app
 
 ## Intro
-- 唤起App到指定页、通过Scheme调用端能力、下载安装包、到应用商店
+- 唤起App到指定页、通过Scheme调用端能力、下载安装包、到应用商店，同时提供了相关的detector、copy功能
 
 ## Install
 - npm install web-launch-app --save
