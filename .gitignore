@@ -13,5 +13,8 @@ yarn-error.log
 .vscode/*
 !.vscode/settings.json
 
+# Jetbrains
+.idea
+
 # project
 output
