@@ -1,14 +1,6 @@
 import { copy } from './copy';
 import { ua, detector } from './detector';
 export { copy, ua, detector };
-export declare const isIos: boolean;
-export declare const isAndroid: boolean;
-export declare const enableULink: boolean;
-export declare const enableApplink: boolean;
-export declare const inWeixin: boolean;
-export declare const inQQ: boolean;
-export declare const inWeibo: boolean;
-export declare const inBaidu: boolean;
 /**
  * 宿主环境是否支持link
  */
@@ -49,8 +41,13 @@ export declare class LaunchApp {
         SUCCESS: number;
         UNKNOW: number;
     };
-    private configs;
-    private openMethod;
+    static callbackResult: {
+        OPEN_LANDING_PAGE: number;
+        OPEN_APP_STORE: number;
+        DOWNLOAD_PACKAGE: number;
+    };
+    private readonly configs;
+    private readonly openMethod;
     private timer;
     private options;
     private timeoutDownload;

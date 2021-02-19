@@ -1,14 +1,16 @@
 import { copy } from './copy'
 import { ua, detector } from './detector';
+import {
+    enableApplink,
+    enableUniversalLink,
+    inWeibo, inWeixin,
+    isAndroid,
+    isAndroidWithLocationCallSupport,
+    isIos,
+    isIOSWithLocationCallSupport
+} from './utils'
+
 export { copy, ua, detector }
-export const isIos = detector.os.name === 'ios';
-export const isAndroid = detector.os.name === 'android';
-export const enableULink = isIos && detector.os.version >= 9;
-export const enableApplink = isAndroid && detector.os.version >= 6;
-export const inWeixin = detector.browser.name === 'micromessenger';
-export const inQQ = detector.browser.name === 'qq';
-export const inWeibo = detector.browser.name === 'weibo';
-export const inBaidu = detector.browser.name === 'baidu';
 
 /**
  * 宿主环境是否支持link
@@ -27,7 +29,7 @@ export function supportLink() {
                 break;
         }
     }
-    if (enableULink) {
+    if (enableUniversalLink) {
         switch (detector.browser.name) {
             case 'uc':
             case 'qq':
@@ -195,9 +197,7 @@ export class LaunchApp {
                 if (this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                if (detector.browser.name == 'safari' && detector.os.version >= 9 && isIos) {
-                    locationCall(url);
-                } else if (isAndroid && detector.browser.name == 'chrome' && detector.browser.version > 55) {
+                if (isIOSWithLocationCallSupport || isAndroidWithLocationCallSupport) {
                     locationCall(url);
                 } else {
                     iframeCall(url);
@@ -258,14 +258,22 @@ export class LaunchApp {
             }
         }
     };
+
     static openStatus = {
         FAILED: 0,
         SUCCESS: 1,
         UNKNOW: 2
     };
+
+    static callbackResult = {
+        OPEN_LANDING_PAGE: 1,
+        OPEN_APP_STORE: 2,
+        DOWNLOAD_PACKAGE: 3,
+    }
+
     // config
-    private configs: any;
-    private openMethod: any;
+    private readonly configs: any;
+    private readonly openMethod: any;
     private timer: any;
     // param
     private options: any;
@@ -291,7 +299,7 @@ export class LaunchApp {
             return guide;
         }
         if (useUniversalLink || useAppLink) {
-            if (autodemotion && ((isIos && !enableULink) || (isAndroid && !enableApplink))) {
+            if (autodemotion && ((isIos && !enableUniversalLink) || (isAndroid && !enableApplink))) {
                 return scheme;
             }
             return link;
@@ -304,7 +312,7 @@ export class LaunchApp {
 
     /**
      * launch app
-     * @param {*} opt 
+     * @param {*} opt
      * page:'index',
      * param:{},
      * paramMap:{}
@@ -342,7 +350,7 @@ export class LaunchApp {
                 switch (type) {
                     case 'link':
                         tmpOpenMethod = link;
-                        if (opt.autodemotion && ((isIos && !enableULink) || (isAndroid && !enableApplink))) {
+                        if (opt.autodemotion && ((isIos && !enableUniversalLink) || (isAndroid && !enableApplink))) {
                             tmpOpenMethod = scheme;
                         }
                         break;
@@ -437,8 +445,8 @@ export class LaunchApp {
 
     /**
      * map param (for different platform)
-     * @param {*} param 
-     * @param {*} paramMap 
+     * @param {*} param
+     * @param {*} paramMap
      */
     _paramMapProcess(param: any, paramMap: any) {
         if (!paramMap) {
@@ -459,7 +467,7 @@ export class LaunchApp {
 
     /**
      * generating URL parameters
-     * @param {*} obj 
+     * @param {*} obj
      */
     _stringtifyParams(obj: any) {
         if (!obj) {
@@ -481,7 +489,7 @@ export class LaunchApp {
 
     /**
      * generating URL
-     * @param {*} conf 
+     * @param {*} conf
      * @param type 'scheme link yyb'
      */
     _getUrlFromConf(conf: any, type: string) {
@@ -519,21 +527,18 @@ export class LaunchApp {
     _callend(status: number) {
         clearTimeout(this.timer);
         const backResult = this.callback && this.callback(status, detector, this.openUrl);
-        // 调起失败处理
         if (status != LaunchApp.openStatus.SUCCESS) {
             switch (backResult) {
-                case 1:
-                    // do nothing
-                    break;
-                case 2:
+                case LaunchApp.callbackResult.OPEN_LANDING_PAGE:
                     locationCall(this.options.landPage || this.configs.landPage);
                     break;
-                case 3:
-                    // 指定参数后续无超时逻辑
+                case LaunchApp.callbackResult.OPEN_APP_STORE:
                     LaunchApp.openChannel.store.open.call(this, true);
                     break;
-                default:
+                case LaunchApp.callbackResult.DOWNLOAD_PACKAGE:
                     this.download(this.options.pkgs);
+                    break;
+                default:
                     break;
             }
         }
