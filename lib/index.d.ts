@@ -1,20 +1,6 @@
 import { copy } from './copy';
 import { ua, detector } from './detector';
 export { copy, ua, detector };
-/**
- * 宿主环境是否支持link
- */
-export declare function supportLink(): boolean;
-/**
- * iframe call
- * @param url
- */
-export declare function iframeCall(url: string): void;
-/**
- * location call
- * @param url
- */
-export declare function locationCall(url: string): void;
 export declare class LaunchApp {
     static defaultConfig: any;
     static openChannel: {
@@ -39,7 +25,7 @@ export declare class LaunchApp {
     static openStatus: {
         FAILED: number;
         SUCCESS: number;
-        UNKNOW: number;
+        UNKNOWN: number;
     };
     static callbackResult: {
         OPEN_LANDING_PAGE: number;
@@ -83,14 +69,14 @@ export declare class LaunchApp {
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
-     * landPage
+     * landingPage 兜底页
      * callback 端回调方法
-     * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
+     * @param {*} callback: callbackResult
      */
     open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number): void;
     /**
      * download package
-     * opt: {android:'',ios:''，yyk:'',landPage}
+     * opt: {android:'',ios:''，yyk:'',landingPage}
      */
     download(opt?: any): void;
     /**

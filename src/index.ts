@@ -7,74 +7,14 @@ import {
     isAndroid,
     isAndroidWithLocationCallSupport,
     isIos,
-    isIOSWithLocationCallSupport
+    isIOSWithLocationCallSupport,
+    deepMerge,
+    locationCall,
+    supportLink,
+    iframeCall,
 } from './utils'
 
 export { copy, ua, detector }
-
-/**
- * 宿主环境是否支持link
- */
-export function supportLink() {
-    let supportLink = false;
-    if (enableApplink) {
-        switch (detector.browser.name) {
-            case 'chrome':
-            case 'samsung':
-            case 'zhousi':
-                supportLink = true;
-                break;
-            default:
-                supportLink = false;
-                break;
-        }
-    }
-    if (enableUniversalLink) {
-        switch (detector.browser.name) {
-            case 'uc':
-            case 'qq':
-                supportLink = false;
-                break;
-            default:
-                supportLink = true;
-                break;
-        }
-    }
-    return supportLink;
-}
-
-/**
- * iframe call
- * @param url
- */
-export function iframeCall(url: string) {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('src', url);
-    iframe.setAttribute('style', 'display:none');
-    document.body.appendChild(iframe);
-    setTimeout(function () {
-        document.body.removeChild(iframe);
-    }, 200);
-}
-
-/**
- * location call
- * @param url
- */
-export function locationCall(url: string) {
-    (top.location || location).href = url;
-}
-
-/**
- * merge object
- */
-function deepMerge(firstObj, secondObj) {
-    for (var key in secondObj) {
-        firstObj[key] = firstObj[key] && firstObj[key].toString() === "[object Object]" ?
-            deepMerge(firstObj[key], secondObj[key]) : firstObj[key] = secondObj[key];
-    }
-    return firstObj;
-}
 
 export class LaunchApp {
     static defaultConfig: any = {
@@ -168,7 +108,7 @@ export class LaunchApp {
         // 超时下载, <0表示不使用超时下载
         timeout: 2000,
         // 兜底页面
-        landPage: 'https://github.com/jawidx/web-launch-app'
+        landingPage: 'https://github.com/jawidx/web-launch-app'
     };
     static openChannel = {
         scheme: {
@@ -246,7 +186,7 @@ export class LaunchApp {
                         }
                     }
                     if (noTimeout && !url) {
-                        locationCall(this.options.landPage || this.configs.landPage);
+                        locationCall(this.options.landingPage || this.configs.landingPage);
                     }
                 }
                 // 未匹配到商店会走超时逻辑走兜底
@@ -254,7 +194,7 @@ export class LaunchApp {
         },
         unknown: {
             open: function () {
-                locationCall(this.options.landPage || this.configs.landPage);
+                locationCall(this.options.landingPage || this.configs.landingPage);
             }
         }
     };
@@ -262,7 +202,7 @@ export class LaunchApp {
     static openStatus = {
         FAILED: 0,
         SUCCESS: 1,
-        UNKNOW: 2
+        UNKNOWN: 2
     };
 
     static callbackResult = {
@@ -329,9 +269,9 @@ export class LaunchApp {
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
-     * landPage
+     * landingPage 兜底页
      * callback 端回调方法
-     * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
+     * @param {*} callback: callbackResult
      */
     open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number) {
         try {
@@ -391,13 +331,13 @@ export class LaunchApp {
             }
         } catch (e) {
             console.log('launch error:', e);
-            locationCall(this.options.landPage || this.configs.landPage);
+            locationCall(this.options.landingPage || this.configs.landingPage);
         }
     }
 
     /**
      * download package
-     * opt: {android:'',ios:''，yyk:'',landPage}
+     * opt: {android:'',ios:''，yyk:'',landingPage}
      */
     download(opt?: any) {
         let pkgs = deepMerge(this.configs.pkgs, opt);
@@ -409,7 +349,7 @@ export class LaunchApp {
         } else if (isIos) {
             locationCall(pkgs.ios);
         } else {
-            locationCall(opt.landPage || this.configs.landPage);
+            locationCall(opt.landingPage || this.configs.landingPage);
         }
     }
 
@@ -530,7 +470,7 @@ export class LaunchApp {
         if (status != LaunchApp.openStatus.SUCCESS) {
             switch (backResult) {
                 case LaunchApp.callbackResult.OPEN_LANDING_PAGE:
-                    locationCall(this.options.landPage || this.configs.landPage);
+                    locationCall(this.options.landingPage || this.configs.landingPage);
                     break;
                 case LaunchApp.callbackResult.OPEN_APP_STORE:
                     LaunchApp.openChannel.store.open.call(this, true);
@@ -568,7 +508,7 @@ export class LaunchApp {
             if (document[property] || e.hidden || document.visibilityState == 'hidden') {
                 self._callend(LaunchApp.openStatus.SUCCESS);
             } else {
-                self._callend(LaunchApp.openStatus.UNKNOW);
+                self._callend(LaunchApp.openStatus.UNKNOWN);
             }
             // document.removeEventListener('pagehide', pageChange);
             document.removeEventListener(eventName, pageChange);
@@ -591,7 +531,7 @@ export class LaunchApp {
             if (!document.hidden && !haveChange) {
                 self._callend(LaunchApp.openStatus.FAILED);
             } else {
-                self._callend(LaunchApp.openStatus.UNKNOW);
+                self._callend(LaunchApp.openStatus.UNKNOWN);
             }
             haveChange = true;
         }, this.options.timeout || this.configs.timeout);

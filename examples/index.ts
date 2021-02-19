@@ -1,5 +1,5 @@
-import { LaunchApp, detector, supportLink } from '../src/index'
-import { isAndroid, inWeixin, inWeibo } from '../src/utils';
+import { LaunchApp, detector } from '../src/index'
+import { isAndroid, inWeixin, inWeibo, supportLink } from '../src/utils';
 import './index.less';
 console.log('detector,', detector);
 
@@ -60,7 +60,7 @@ const haokanConfig = {
     //     alert('右上角->在浏览器中打开');
     // },
     timeout: 2000,
-    landPage: 'https://haokan.baidu.com/download'
+    landingPage: 'https://haokan.baidu.com/download'
 };
 const lanchHaokan = new LaunchApp(haokanConfig);
 
