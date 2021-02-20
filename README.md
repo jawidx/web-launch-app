@@ -81,7 +81,7 @@ lanchApp.download();
 |  |timeout| scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑 |
 |  |landingPage| 落地页面（异常或未知情况均会进入此页面） |
 |  |pkgs| {android:'',ios:'',yyb:'',store:{...}}，指定子项会覆盖基础配置 |
-|callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值时默认不做任何后续处理，否则根据需求返回特定的返回值，详见`LaunchApp.callbackResult.OPEN_LANDING_PAGE`。
+|callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值时默认不做任何后续处理，否则根据需求返回特定的返回值，详见`LaunchApp.callbackResult`。
 
 
 #### download(options)
