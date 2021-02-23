@@ -100,6 +100,6 @@ addHandler(linkOpen, 'click', function () {
 
 });
 
-addHandler(linkDown, 'click', function (e) {
-    lanchHaokan.download(e);
+addHandler(linkDown, 'click', function () {
+    lanchHaokan.download(haokanConfig);
 })
