@@ -2,19 +2,35 @@ import { copy } from './copy'
 import { ua, detector } from './detector';
 import {
     enableApplink,
-    enableUniversalLink,
-    inWeibo, inWeixin,
+    enableULink,
+    inWeibo,
+    inWeixin,
     isAndroid,
-    isAndroidWithLocationCallSupport,
     isIos,
-    isIOSWithLocationCallSupport,
     deepMerge,
     locationCall,
     supportLink,
     iframeCall,
+    inQQ,
+    inBaidu,
+    isAndroidWithLocationCallSupport,
+    isIOSWithLocationCallSupport,
 } from './utils'
 
 export { copy, ua, detector }
+export {
+    enableApplink,
+    enableULink,
+    inWeibo,
+    inWeixin,
+    isAndroid,
+    isIos,
+    inQQ,
+    inBaidu,
+    supportLink,
+    locationCall,
+    iframeCall,
+}
 
 export class LaunchApp {
     static defaultConfig: any = {
@@ -239,7 +255,7 @@ export class LaunchApp {
             return guide;
         }
         if (useUniversalLink || useAppLink) {
-            if (autodemotion && ((isIos && !enableUniversalLink) || (isAndroid && !enableApplink))) {
+            if (autodemotion && ((isIos && !enableULink) || (isAndroid && !enableApplink))) {
                 return scheme;
             }
             return link;
@@ -290,7 +306,7 @@ export class LaunchApp {
                 switch (type) {
                     case 'link':
                         tmpOpenMethod = link;
-                        if (opt.autodemotion && ((isIos && !enableUniversalLink) || (isAndroid && !enableApplink))) {
+                        if (opt.autodemotion && ((isIos && !enableULink) || (isAndroid && !enableApplink))) {
                             tmpOpenMethod = scheme;
                         }
                         break;
