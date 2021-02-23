@@ -206,9 +206,9 @@ export class LaunchApp {
     };
 
     static callbackResult = {
-        OPEN_LANDING_PAGE: 1,
-        OPEN_APP_STORE: 2,
-        DOWNLOAD_PACKAGE: 3,
+        DO_NOTING: 1,
+        OPEN_LAND_PAGE: 2,
+        OPEN_APP_STORE: 3,
     }
 
     // config
@@ -469,16 +469,16 @@ export class LaunchApp {
         const backResult = this.callback && this.callback(status, detector, this.openUrl);
         if (status != LaunchApp.openStatus.SUCCESS) {
             switch (backResult) {
-                case LaunchApp.callbackResult.OPEN_LANDING_PAGE:
+                case LaunchApp.callbackResult.DO_NOTING:
+                    break;
+                case LaunchApp.callbackResult.OPEN_LAND_PAGE:
                     locationCall(this.options.landingPage || this.configs.landingPage);
                     break;
                 case LaunchApp.callbackResult.OPEN_APP_STORE:
                     LaunchApp.openChannel.store.open.call(this, true);
                     break;
-                case LaunchApp.callbackResult.DOWNLOAD_PACKAGE:
-                    this.download(this.options.pkgs);
-                    break;
                 default:
+                    this.download(this.options.pkgs);
                     break;
             }
         }
