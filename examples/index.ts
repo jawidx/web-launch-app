@@ -1,4 +1,5 @@
-import { LaunchApp, detector, ua, isAndroid, isIos, supportLink, inWeixin, inWeibo, copy } from '../src/index';
+import { LaunchApp, detector } from '../src/index'
+import { isAndroid, inWeixin, inWeibo, supportLink } from '../src/utils';
 import './index.less';
 console.log('detector,', detector);
 
@@ -100,5 +101,5 @@ addHandler(linkOpen, 'click', function () {
 });
 
 addHandler(linkDown, 'click', function () {
-    lanchHaokan.download();
+    lanchHaokan.download(haokanConfig);
 })

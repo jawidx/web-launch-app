@@ -1,77 +1,35 @@
 import { copy } from './copy'
 import { ua, detector } from './detector';
+import {
+    enableApplink,
+    enableULink,
+    inWeibo,
+    inWeixin,
+    isAndroid,
+    isIos,
+    deepMerge,
+    locationCall,
+    supportLink,
+    iframeCall,
+    inQQ,
+    inBaidu,
+    isAndroidWithLocationCallSupport,
+    isIOSWithLocationCallSupport,
+} from './utils'
+
 export { copy, ua, detector }
-export const isIos = detector.os.name === 'ios';
-export const isAndroid = detector.os.name === 'android';
-export const enableULink = isIos && detector.os.version >= 9;
-export const enableApplink = isAndroid && detector.os.version >= 6;
-export const inWeixin = detector.browser.name === 'micromessenger';
-export const inQQ = detector.browser.name === 'qq';
-export const inWeibo = detector.browser.name === 'weibo';
-export const inBaidu = detector.browser.name === 'baidu';
-
-/**
- * 宿主环境是否支持link
- */
-export function supportLink() {
-    let supportLink = false;
-    if (enableApplink) {
-        switch (detector.browser.name) {
-            case 'chrome':
-            case 'samsung':
-            case 'zhousi':
-                supportLink = true;
-                break;
-            default:
-                supportLink = false;
-                break;
-        }
-    }
-    if (enableULink) {
-        switch (detector.browser.name) {
-            case 'uc':
-            case 'qq':
-                supportLink = false;
-                break;
-            default:
-                supportLink = true;
-                break;
-        }
-    }
-    return supportLink;
-}
-
-/**
- * iframe call
- * @param url
- */
-export function iframeCall(url: string) {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('src', url);
-    iframe.setAttribute('style', 'display:none');
-    document.body.appendChild(iframe);
-    setTimeout(function () {
-        document.body.removeChild(iframe);
-    }, 200);
-}
-
-/**
- * location call
- * @param url
- */
-export function locationCall(url: string) {
-    (top.location || location).href = url;
-}
-
-/**
- * merge object
- */
-function deepMerge(firstObj, secondObj) {
-    for (var key in secondObj) {
-        firstObj[key] = firstObj[key] && firstObj[key].toString() === "[object Object]" ?
-            deepMerge(firstObj[key], secondObj[key]) : firstObj[key] = secondObj[key];
-    }
-    return firstObj;
+export {
+    enableApplink,
+    enableULink,
+    inWeibo,
+    inWeixin,
+    isAndroid,
+    isIos,
+    inQQ,
+    inBaidu,
+    supportLink,
+    locationCall,
+    iframeCall,
 }
 
 export class LaunchApp {
@@ -195,9 +153,7 @@ export class LaunchApp {
                 if (this.timeoutDownload) {
                     this._setTimeEvent();
                 }
-                if (detector.browser.name == 'safari' && detector.os.version >= 9 && isIos) {
-                    locationCall(url);
-                } else if (isAndroid && detector.browser.name == 'chrome' && detector.browser.version > 55) {
+                if (isIOSWithLocationCallSupport || isAndroidWithLocationCallSupport) {
                     locationCall(url);
                 } else {
                     iframeCall(url);
@@ -258,14 +214,22 @@ export class LaunchApp {
             }
         }
     };
+
     static openStatus = {
         FAILED: 0,
         SUCCESS: 1,
-        UNKNOW: 2
+        UNKNOWN: 2
     };
+
+    static callbackResult = {
+        DO_NOTING: 1,
+        OPEN_LAND_PAGE: 2,
+        OPEN_APP_STORE: 3,
+    }
+
     // config
-    private configs: any;
-    private openMethod: any;
+    private readonly configs: any;
+    private readonly openMethod: any;
     private timer: any;
     // param
     private options: any;
@@ -304,7 +268,7 @@ export class LaunchApp {
 
     /**
      * launch app
-     * @param {*} opt 
+     * @param {*} opt
      * page:'index',
      * param:{},
      * paramMap:{}
@@ -321,9 +285,9 @@ export class LaunchApp {
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
-     * landPage
+     * landPage 兜底页
      * callback 端回调方法
-     * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
+     * @param {*} callback: callbackResult
      */
     open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number) {
         try {
@@ -437,8 +401,8 @@ export class LaunchApp {
 
     /**
      * map param (for different platform)
-     * @param {*} param 
-     * @param {*} paramMap 
+     * @param {*} param
+     * @param {*} paramMap
      */
     _paramMapProcess(param: any, paramMap: any) {
         if (!paramMap) {
@@ -459,7 +423,7 @@ export class LaunchApp {
 
     /**
      * generating URL parameters
-     * @param {*} obj 
+     * @param {*} obj
      */
     _stringtifyParams(obj: any) {
         if (!obj) {
@@ -481,7 +445,7 @@ export class LaunchApp {
 
     /**
      * generating URL
-     * @param {*} conf 
+     * @param {*} conf
      * @param type 'scheme link yyb'
      */
     _getUrlFromConf(conf: any, type: string) {
@@ -519,17 +483,14 @@ export class LaunchApp {
     _callend(status: number) {
         clearTimeout(this.timer);
         const backResult = this.callback && this.callback(status, detector, this.openUrl);
-        // 调起失败处理
         if (status != LaunchApp.openStatus.SUCCESS) {
             switch (backResult) {
-                case 1:
-                    // do nothing
+                case LaunchApp.callbackResult.DO_NOTING:
                     break;
-                case 2:
+                case LaunchApp.callbackResult.OPEN_LAND_PAGE:
                     locationCall(this.options.landPage || this.configs.landPage);
                     break;
-                case 3:
-                    // 指定参数后续无超时逻辑
+                case LaunchApp.callbackResult.OPEN_APP_STORE:
                     LaunchApp.openChannel.store.open.call(this, true);
                     break;
                 default:
@@ -563,7 +524,7 @@ export class LaunchApp {
             if (document[property] || e.hidden || document.visibilityState == 'hidden') {
                 self._callend(LaunchApp.openStatus.SUCCESS);
             } else {
-                self._callend(LaunchApp.openStatus.UNKNOW);
+                self._callend(LaunchApp.openStatus.UNKNOWN);
             }
             // document.removeEventListener('pagehide', pageChange);
             document.removeEventListener(eventName, pageChange);
@@ -586,7 +547,7 @@ export class LaunchApp {
             if (!document.hidden && !haveChange) {
                 self._callend(LaunchApp.openStatus.FAILED);
             } else {
-                self._callend(LaunchApp.openStatus.UNKNOW);
+                self._callend(LaunchApp.openStatus.UNKNOWN);
             }
             haveChange = true;
         }, this.options.timeout || this.configs.timeout);

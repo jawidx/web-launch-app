@@ -1,28 +1,8 @@
 import { copy } from './copy';
 import { ua, detector } from './detector';
+import { enableApplink, enableULink, inWeibo, inWeixin, isAndroid, isIos, locationCall, supportLink, iframeCall, inQQ, inBaidu } from './utils';
 export { copy, ua, detector };
-export declare const isIos: boolean;
-export declare const isAndroid: boolean;
-export declare const enableULink: boolean;
-export declare const enableApplink: boolean;
-export declare const inWeixin: boolean;
-export declare const inQQ: boolean;
-export declare const inWeibo: boolean;
-export declare const inBaidu: boolean;
-/**
- * 宿主环境是否支持link
- */
-export declare function supportLink(): boolean;
-/**
- * iframe call
- * @param url
- */
-export declare function iframeCall(url: string): void;
-/**
- * location call
- * @param url
- */
-export declare function locationCall(url: string): void;
+export { enableApplink, enableULink, inWeibo, inWeixin, isAndroid, isIos, inQQ, inBaidu, supportLink, locationCall, iframeCall, };
 export declare class LaunchApp {
     static defaultConfig: any;
     static openChannel: {
@@ -47,10 +27,15 @@ export declare class LaunchApp {
     static openStatus: {
         FAILED: number;
         SUCCESS: number;
-        UNKNOW: number;
+        UNKNOWN: number;
     };
-    private configs;
-    private openMethod;
+    static callbackResult: {
+        DO_NOTING: number;
+        OPEN_LAND_PAGE: number;
+        OPEN_APP_STORE: number;
+    };
+    private readonly configs;
+    private readonly openMethod;
     private timer;
     private options;
     private timeoutDownload;
@@ -86,9 +71,9 @@ export declare class LaunchApp {
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
-     * landPage
+     * landPage 兜底页
      * callback 端回调方法
-     * @param {*} callback number(1 nothing,2 landpage,3 store,default download)
+     * @param {*} callback: callbackResult
      */
     open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number): void;
     /**

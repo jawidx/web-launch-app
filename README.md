@@ -81,7 +81,7 @@ lanchApp.download();
 |  |timeout| scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑 |
 |  |landPage| 落地页面（异常或未知情况均会进入此页面） |
 |  |pkgs| {android:'',ios:'',yyb:'',store:{...}}，指定子项会覆盖基础配置 |
-|callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值默认下载apk包或去appstore，1不处理，2落地页，3应用市场（百度春晚活动时引导去应用市场下载分流减压）|
+|callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值默认下载apk包或去appstore，1不处理，2落地页，3应用市场（百度春晚活动时引导去应用市场下载分流减压），详见`LaunchApp.callbackResult`。
 
 
 #### download(options)
@@ -160,8 +160,8 @@ lanchApp.download();
     guideMethod: ()=>{},  // 引导方法，默认蒙层文案提示
     updateTipMethod: ()=>{},    // scheme版本检测时升级提示
     searchPrefix: '?',  // scheme或univerlink生成请求中参数前缀，默认为"?"
-    timeout: 2000   // scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑
-    landPage:'',   // 兜底页
+    timeout: 2000,   // scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑
+    landPage: '',   // 兜底页
 }
 ```
 
@@ -366,8 +366,8 @@ launch({
         // android: 'https://cdn.app.com/package/app-20190502.apk',  // 通过pkg参数处理
         // ios: 'https://itunes.apple.com/cn/app/appid123?mt=8'    // 不传使用默认值
     // }
-}, (s, d, url) => {
-    console.log('callbackout', s, d, url);
+}, (status, detector, url) => {
+    console.log('callback', status, detector, url);
     // s != 1 && copy(url);
     return 0;
 });
@@ -411,9 +411,9 @@ download();
 // 下载指定包(不指定平台使用全局配置)
 download({
     pkgs:{
-        ios:'',
-        android:''
-        yyb:'',
+        ios: '',
+        android: '',
+        yyb: '',
         landPage:''
     }
 });
