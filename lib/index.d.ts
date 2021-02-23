@@ -69,14 +69,14 @@ export declare class LaunchApp {
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
-     * landingPage 兜底页
+     * landPage 兜底页
      * callback 端回调方法
      * @param {*} callback: callbackResult
      */
     open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number): void;
     /**
      * download package
-     * opt: {android:'',ios:''，yyk:'',landingPage}
+     * opt: {android:'',ios:''，yyk:'',landPage}
      */
     download(opt?: any): void;
     /**

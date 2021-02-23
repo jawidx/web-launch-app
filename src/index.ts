@@ -124,7 +124,7 @@ export class LaunchApp {
         // 超时下载, <0表示不使用超时下载
         timeout: 2000,
         // 兜底页面
-        landingPage: 'https://github.com/jawidx/web-launch-app'
+        landPage: 'https://github.com/jawidx/web-launch-app'
     };
     static openChannel = {
         scheme: {
@@ -202,7 +202,7 @@ export class LaunchApp {
                         }
                     }
                     if (noTimeout && !url) {
-                        locationCall(this.options.landingPage || this.configs.landingPage);
+                        locationCall(this.options.landPage || this.configs.landPage);
                     }
                 }
                 // 未匹配到商店会走超时逻辑走兜底
@@ -210,7 +210,7 @@ export class LaunchApp {
         },
         unknown: {
             open: function () {
-                locationCall(this.options.landingPage || this.configs.landingPage);
+                locationCall(this.options.landPage || this.configs.landPage);
             }
         }
     };
@@ -285,7 +285,7 @@ export class LaunchApp {
      * clipboardTxt
      * pkgs:{android:'',ios:'',yyb:'',store:{...}}
      * timeout 是否走超时逻辑,<0表示不走
-     * landingPage 兜底页
+     * landPage 兜底页
      * callback 端回调方法
      * @param {*} callback: callbackResult
      */
@@ -347,13 +347,13 @@ export class LaunchApp {
             }
         } catch (e) {
             console.log('launch error:', e);
-            locationCall(this.options.landingPage || this.configs.landingPage);
+            locationCall(this.options.landPage || this.configs.landPage);
         }
     }
 
     /**
      * download package
-     * opt: {android:'',ios:''，yyk:'',landingPage}
+     * opt: {android:'',ios:''，yyk:'',landPage}
      */
     download(opt?: any) {
         let pkgs = deepMerge(this.configs.pkgs, opt);
@@ -365,7 +365,7 @@ export class LaunchApp {
         } else if (isIos) {
             locationCall(pkgs.ios);
         } else {
-            locationCall(opt.landingPage || this.configs.landingPage);
+            locationCall(opt.landPage || this.configs.landPage);
         }
     }
 
@@ -488,7 +488,7 @@ export class LaunchApp {
                 case LaunchApp.callbackResult.DO_NOTING:
                     break;
                 case LaunchApp.callbackResult.OPEN_LAND_PAGE:
-                    locationCall(this.options.landingPage || this.configs.landingPage);
+                    locationCall(this.options.landPage || this.configs.landPage);
                     break;
                 case LaunchApp.callbackResult.OPEN_APP_STORE:
                     LaunchApp.openChannel.store.open.call(this, true);
