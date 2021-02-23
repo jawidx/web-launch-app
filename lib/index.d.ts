@@ -1,6 +1,8 @@
 import { copy } from './copy';
 import { ua, detector } from './detector';
+import { enableApplink, enableULink, inWeibo, inWeixin, isAndroid, isIos, locationCall, supportLink, iframeCall, inQQ, inBaidu } from './utils';
 export { copy, ua, detector };
+export { enableApplink, enableULink, inWeibo, inWeixin, isAndroid, isIos, inQQ, inBaidu, supportLink, locationCall, iframeCall, };
 export declare class LaunchApp {
     static defaultConfig: any;
     static openChannel: {
@@ -28,9 +30,9 @@ export declare class LaunchApp {
         UNKNOWN: number;
     };
     static callbackResult: {
-        OPEN_LANDING_PAGE: number;
+        DO_NOTING: number;
+        OPEN_LAND_PAGE: number;
         OPEN_APP_STORE: number;
-        DOWNLOAD_PACKAGE: number;
     };
     private readonly configs;
     private readonly openMethod;

@@ -79,7 +79,7 @@ lanchApp.download();
 |  |paramMap| 参数映射（适用于iOS与Android同scheme功能但参数名不同的情况，真实世界就是有这么多坑orz）|
 |  |clipboardTxt| 复制到剪贴板内容（针对未安装或环境受限等唤起中断情况使用，在打开app或下载app后可以通过剪贴板内容进行交互衔接或统计），浏览器安全限制需要用户动作触发才能生效|
 |  |timeout| scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑 |
-|  |landingPage| 落地页面（异常或未知情况均会进入此页面） |
+|  |landPage| 落地页面（异常或未知情况均会进入此页面） |
 |  |pkgs| {android:'',ios:'',yyb:'',store:{...}}，指定子项会覆盖基础配置 |
 |callback|| (s, d, url) => { return 0;} ，launchType为scheme或store方案时默认有超时逻辑，可通过设置tmieout为负值取消或根据callback中的返回值进行超时处理。s表示唤起结果（0失败，1成功，2未知）, d为detector，url为最终的scheme或link值。无返回值默认下载apk包或去appstore，1不处理，2落地页，3应用市场（百度春晚活动时引导去应用市场下载分流减压），详见`LaunchApp.callbackResult`。
 
@@ -91,7 +91,7 @@ lanchApp.download();
 ||yyb| 应用宝地址，在微信中使用 |
 ||android| android apk包下载地址 |
 ||ios| appstore地址 |
-||landingPage| 落地页地址，非iOS/Android平台使用 |
+||landPage| 落地页地址，非iOS/Android平台使用 |
 
 
 ## Config
@@ -160,8 +160,8 @@ lanchApp.download();
     guideMethod: ()=>{},  // 引导方法，默认蒙层文案提示
     updateTipMethod: ()=>{},    // scheme版本检测时升级提示
     searchPrefix: '?',  // scheme或univerlink生成请求中参数前缀，默认为"?"
-    timeout: 2000   // scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑
-    landingPage:'',   // 兜底页
+    timeout: 2000,   // scheme/store方案中超时时间，默认2000毫秒，<0表示不走超时逻辑
+    landPage: '',   // 兜底页
 }
 ```
 
@@ -224,7 +224,7 @@ const lanchIns = new LaunchApp({
     useYingyongbao: inWeixin && isAndroid, // 2019.7.16发布iOS微信7.0.5支持ulink
     useGuideMethod: inWeibo && isAndroid, // 受限情况下使用引导方案
     timeout: 2500,
-    landingPage: 'http://www.app.com/download'
+    landPage: 'http://www.app.com/download'
 });
 
 /**
@@ -414,7 +414,7 @@ download({
         ios: '',
         android: '',
         yyb: '',
-        landingPage:''
+        landPage:''
     }
 });
 ```

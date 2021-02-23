@@ -21,6 +21,7 @@
     },
     "homepage": "https://github.com/jawidx/web-launch-app#readme",
     "license": "MIT",
+    "dependencies": {},
     "devDependencies": {
         "@babel/core": "^7.10.4",
         "@babel/preset-env": "^7.10.4",
