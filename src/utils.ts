@@ -2,30 +2,21 @@ import { detector } from './detector'
 
 export const isIos = detector.os.name === 'ios';
 export const isAndroid = detector.os.name === 'android';
-export const enableULink = isIos && detector.os.version >= 9;
-export const enableApplink = isAndroid && detector.os.version >= 6;
 export const inWeixin = detector.browser.name === 'micromessenger';
 export const inQQ = detector.browser.name === 'qq';
 export const inWeibo = detector.browser.name === 'weibo';
 export const inBaidu = detector.browser.name === 'baidu';
 
-export const isIOSWithLocationCallSupport = isIos && detector.browser.name == 'safari' && detector.os.version >= 9
+export const enableULink = isIos && detector.os.version >= 9;
+export const enableApplink = isAndroid && detector.os.version >= 6;
 
-const isChromeWithLocationCallSupport = detector.browser.name == 'chrome' && detector.browser.version > 55
-const isSamsungWithLocationCallSupport = detector.browser.name == 'samsung'
-export const isAndroidWithLocationCallSupport = isAndroid && (isChromeWithLocationCallSupport || isSamsungWithLocationCallSupport)
-
-
-/**
- * location call
- * @param url
- */
-export const locationCall = (url: string) => {
-	(top.location || location).href = url;
-}
+export const isIOSWithLocationCallSupport = isIos && detector.browser.name == 'safari' && detector.os.version >= 9;
+const isChromeWithLocationCallSupport = detector.browser.name == 'chrome' && detector.browser.version > 55;
+const isSamsungWithLocationCallSupport = detector.browser.name == 'samsung';
+export const isAndroidWithLocationCallSupport = isAndroid && (isChromeWithLocationCallSupport || isSamsungWithLocationCallSupport);
 
 /**
- * 宿主环境是否支持link
+ * detect support link
  */
 export const supportLink = () => {
 	let supportLink = false;
@@ -56,6 +47,14 @@ export const supportLink = () => {
 }
 
 /**
+ * location call
+ * @param url
+ */
+export const locationCall = (url: string) => {
+	(top.location || location).href = url;
+}
+
+/**
  * iframe call
  * @param url
  */
@@ -68,7 +67,6 @@ export const iframeCall = (url: string) => {
 		document.body.removeChild(iframe);
 	}, 200);
 }
-
 
 /**
  * merge object

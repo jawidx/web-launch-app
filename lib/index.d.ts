@@ -1,8 +1,8 @@
 import { copy } from './copy';
 import { ua, detector } from './detector';
-import { enableApplink, enableULink, inWeibo, inWeixin, isAndroid, isIos, locationCall, supportLink, iframeCall, inQQ, inBaidu } from './utils';
+import { isAndroid, isIos, inWeibo, inWeixin, inQQ, inBaidu, enableApplink, enableULink, supportLink, locationCall, iframeCall } from './utils';
 export { copy, ua, detector };
-export { enableApplink, enableULink, inWeibo, inWeixin, isAndroid, isIos, inQQ, inBaidu, supportLink, locationCall, iframeCall, };
+export { isAndroid, isIos, inWeibo, inWeixin, inQQ, inBaidu, enableApplink, enableULink, supportLink, locationCall, iframeCall, };
 export declare class LaunchApp {
     static defaultConfig: any;
     static openChannel: {
@@ -78,7 +78,7 @@ export declare class LaunchApp {
     open(opt?: any, callback?: (status: number, detector: any, scheme?: string) => number): void;
     /**
      * download package
-     * opt: {android:'',ios:''，yyk:'',landPage}
+     * opt: {android:'',ios:'',yyk:'',landPage}
      */
     download(opt?: any): void;
     /**
@@ -103,6 +103,10 @@ export declare class LaunchApp {
      * @param type 'scheme link yyb'
      */
     _getUrlFromConf(conf: any, type: string): string;
+    /**
+     * callback
+     * @param status
+     */
     _callend(status: number): void;
     /**
      * determine whether or not open successfully

@@ -1,35 +1,20 @@
 import { copy } from './copy'
 import { ua, detector } from './detector';
 import {
-    enableApplink,
-    enableULink,
-    inWeibo,
-    inWeixin,
-    isAndroid,
-    isIos,
+    isAndroid, isIos,
+    inWeibo, inWeixin, inQQ, inBaidu,
+    enableApplink, enableULink, supportLink,
+    locationCall, iframeCall,
+    isAndroidWithLocationCallSupport, isIOSWithLocationCallSupport,
     deepMerge,
-    locationCall,
-    supportLink,
-    iframeCall,
-    inQQ,
-    inBaidu,
-    isAndroidWithLocationCallSupport,
-    isIOSWithLocationCallSupport,
 } from './utils'
 
 export { copy, ua, detector }
 export {
-    enableApplink,
-    enableULink,
-    inWeibo,
-    inWeixin,
-    isAndroid,
-    isIos,
-    inQQ,
-    inBaidu,
-    supportLink,
-    locationCall,
-    iframeCall,
+    isAndroid, isIos,
+    inWeibo, inWeixin, inQQ, inBaidu,
+    enableApplink, enableULink, supportLink,
+    locationCall, iframeCall,
 }
 
 export class LaunchApp {
@@ -353,7 +338,7 @@ export class LaunchApp {
 
     /**
      * download package
-     * opt: {android:'',ios:''，yyk:'',landPage}
+     * opt: {android:'',ios:'',yyk:'',landPage}
      */
     download(opt?: any) {
         let pkgs = deepMerge(this.configs.pkgs, opt);
@@ -480,6 +465,10 @@ export class LaunchApp {
         return strUrl;
     }
 
+    /**
+     * callback
+     * @param status 
+     */
     _callend(status: number) {
         clearTimeout(this.timer);
         const backResult = this.callback && this.callback(status, detector, this.openUrl);
