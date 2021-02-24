@@ -1,16 +1,16 @@
 # web-launch-app
 
 ## Intro
-- 唤起App到指定页、通过Scheme调用端能力、下载安装包、到应用商店，同时提供了相关的detector、copy功能
+- 唤起App到指定页、通过Scheme调用端能力、下载安装包、到应用商店，同时提供了相关的detector、copy、util等功能
 
 ## Install
 - npm install web-launch-app --save
-- https://unpkg.com/web-launch-app@2.2.6/lib/wla.min.js (window.WLA)
+- https://unpkg.com/web-launch-app@version/lib/wla.min.js (window.WLA)
 
 ## Usage
 
 ```javascript
-import { 
+import {
     LaunchApp, detector, ua, copy, supportLink,
     isAndroid, isIos, inWeixin, inQQ, inWeibo, inBaidu
 } from 'web-launch-app';
@@ -51,6 +51,12 @@ lanchApp.open({
 
 // 下载
 lanchApp.download();
+lanchApp.download({
+    android: 'https://cdn.app.com/package/app20190501.apk',
+    ios: 'https://itunes.apple.com/cn/app/appid123?mt=8',
+    yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.app.www&ckey=CK123',
+    landPage: 'https://haokan.baidu.com/download'
+});
 ```
 
 ## API
@@ -171,13 +177,11 @@ lanchApp.download();
 // launch-app.ts（基础文件，通过默认配置减少业务代码开发量，多模块使用建议提npm包）
 // -------------------------------------------------------------------
 import { 
-    LaunchApp, copy, detector, ua, 
-    isAndroid, isIos, supportLink, inWeixin, inWeibo 
+    LaunchApp, copy, detector, ua, supportLink,
+    isAndroid, isIos, inWeixin, inWeibo
 } from 'web-launch-app';
 const inApp = /appname(.*)/.test(ua);
 const appVersion = inApp ? /appname\/(\d+(\.\d+)*)/.exec(ua)[1] : '';
-// 微信iOS7.0.5支持ulink（20190716）
-const wxSupportLink = isIos && inWeixin && detector.browser.fullVersion > '7.0.4';
 const lanchIns = new LaunchApp({
     inApp: inApp,
     appVersion: appVersion,
@@ -315,30 +319,14 @@ export function invoke(options: any) {
  * @param opt 
  */
 export function download(opt) {
+    // TODO 参数处理...
     lanchIns.download(opt);
 }
 
 // -------------------------------------------------------------------
 // demopage.ts（业务代码部分）
 // -------------------------------------------------------------------
-import {launch, tryLaunch, hotLaunch, invoke, download} from 'launch-app'
-// 唤起（使用默认唤起方案，指定page参数会根据配置自动生成scheme和url）
-launch({
-    page: 'frs',
-    param:{
-        forumName: 'jawidx'
-    }
-});
-
-// 唤起（使用默认唤起方案，直接指定scheme和url）
-launch({
-    scheme: 'app://path?k=v',
-    url: 'https://link.domain.com/path?k=v',
-    param:{
-        forumName: 'jawidx'
-    }
-});
-
+import {launch, tryLaunch, forceLaunch, hotLaunch, invoke, download} from 'launch-app'
 // 唤起（微博出引导提示，ios微信去appstore，android微信去应用宝，同时指定超时处理及下载包）
 launch({
     useGuideMethod: inWeibo,
@@ -379,27 +367,9 @@ tryLaunch({
         k2: 'v2'
     }
 })
-forceLaunch({
-    page:'frs',
-    param:{
-        k:'v'
-    }
-})
-hotLaunch({
-    page: 'frs',
-    param: {
-        k: 'v',
-        target: 'https://www.app.com/download',
-    }
-})
-invoke({
-    scheme:'app://share',
-    param:{
-        k:'v'
-    }
-});
 invoke({
     page:'share',
+    // scheme:'app://share',
     param:{
         k:'v'
     }
@@ -407,8 +377,6 @@ invoke({
 
 // 下载
 download();
-
-// 下载指定包(不指定平台使用全局配置)
 download({
     pkgs:{
         ios: '',

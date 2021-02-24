@@ -101,5 +101,11 @@ addHandler(linkOpen, 'click', function () {
 });
 
 addHandler(linkDown, 'click', function () {
-    lanchHaokan.download(haokanConfig);
+    // lanchHaokan.download();
+    lanchHaokan.download({
+        android: 'https://downpack.baidu.com/baidutieba_AndroidPhone_v8.8.8.6(8.8.8.6)_1020584c.apk',
+        ios: 'https://itunes.apple.com/cn/app/id1322948417?mt=8',
+        yyb: 'http://a.app.qq.com/o/simple.jsp?pkgname=com.baidu.haokan&ckey=CK1374101624513&a=3',
+        landPage: 'https://haokan.baidu.com/download'
+    });
 })
